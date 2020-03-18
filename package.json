@@ -1,0 +1,38 @@
+{
+  "name": "prometheus-graphql-handler",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist",
+  "scripts": {
+    "test": "mocha -r ts-node/register tests/**/*.test.ts",
+    "test:setup": "mocha -r ts-node/register tests/setup.test.ts",
+    "start": "ts-node ./src",
+    "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
+    "start:watch": "nodemon",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.3",
+    "chalk": "^2.4.2",
+    "deepmerge": "^4.2.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.3",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.7",
+    "@types/node-fetch": "^2.5.4",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "mocha": "^6.2.0",
+    "chai": "^4.2.0",
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.4",
+    "prettier": "^1.19.1"
+  }
+}
