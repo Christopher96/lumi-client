@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { callback } from './routes';
+import main from './routes';
+import profile_index from './routes/profile';
 
 // This reads in all the varibles from the
 // .env file where we can set infromation.
@@ -25,7 +26,8 @@ const bootstrap = async (): Promise<void> => {
   // We declare all the routes here. The first arguemnt is
   // the path, the second argument is the function which is to
   // be called
-  app.get('/', callback);
+  app.get('/', main);
+  app.get('/profile', profile_index);
 
   // We finally start the server and give it a
   // callback which states on which port the server
