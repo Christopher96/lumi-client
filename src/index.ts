@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 // it in code by writing process.env.PORT
 dotenv.config();
 
-const bootstrap = async () => {
+const bootstrap = async (): Promise<void> => {
   // We begin by calling the express function which
   // returns a server object which can register endpoints
   const app = express();
