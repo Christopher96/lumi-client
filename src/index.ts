@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { callback } from './routes';
+
 // This reads in all the varibles from the
 // .env file where we can set infromation.
 // If you set PORT=4400 in the file we can access
@@ -23,7 +25,7 @@ const bootstrap = async (): Promise<void> => {
   // We declare all the routes here. The first arguemnt is
   // the path, the second argument is the function which is to
   // be called
-  app.get('/', require('./routes/index').callback);
+  app.get('/', callback);
 
   // We finally start the server and give it a
   // callback which states on which port the server
