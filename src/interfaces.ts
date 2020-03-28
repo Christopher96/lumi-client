@@ -1,1 +1,9 @@
-../../repo-hub/src/interfaces.ts
+export interface User {
+  id: string;
+}
+
+export interface Message {
+  fromUser: User;
+  targetUser: User;
+  message: string;
+}
