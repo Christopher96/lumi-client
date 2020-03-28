@@ -1,39 +1,40 @@
-import express from 'express';
 import dotenv from 'dotenv';
-import main from './routes';
-import profile_index from './routes/profile';
-
-// This reads in all the varibles from the
-// .env file where we can set infromation.
-// If you set PORT=4400 in the file we can access
-// it in code by writing process.env.PORT
+import io from 'socket.io-client';
+import events from './events';
+import { User } from './interfaces';
+import { patchApply, patchWatch } from './watch';
 dotenv.config();
 
 const bootstrap = async (): Promise<void> => {
-  // We begin by calling the express function which
-  // returns a server object which can register endpoints
-  const app = express();
+  const host = process.env.HOST || 'localhost';
+  const port = process.env.PORT || '8080';
 
-  // Get the port from the .env file.
-  const port = process.env.PORT;
+  const serverUrl = `http://${host}:${port}`;
 
-  // If no port is found we do not have a port
-  // on which the server can start on
-  if (!port) {
-    throw new Error(` You have no port configured in the .env file 😣`);
-  }
+  const syncSource = 'test-repo';
 
-  // We declare all the routes here. The first arguemnt is
-  // the path, the second argument is the function which is to
-  // be called
-  app.get('/', main);
-  app.get('/profile', profile_index);
+  const socket = io(serverUrl, {
+    transports: ['websocket']
+  });
 
-  // We finally start the server and give it a
-  // callback which states on which port the server
-  // has been started on.
-  app.listen(port, () => {
-    console.log(`🤩 Now the server is ready at http://localhost:${port} 🤩`);
+  socket.on(events.PATCH, (patch: Diff.ParsedDiff[]) => {
+    patchApply(patch).then(() => console.log('patched'));
+  });
+
+  socket.on(events.CLIENT_CONNECT, () => {
+    console.log('connected');
+    patchWatch(syncSource).on('patched', patch => {
+      console.log('sending patch');
+      socket.emit(events.PATCH, patch);
+    });
+  });
+
+  socket.on(events.LIST_USERS, (users: User[]) => {
+    console.log(users);
+  });
+
+  socket.on(events.MESSAGE, (msg: string) => {
+    console.log(msg);
   });
 };
 
