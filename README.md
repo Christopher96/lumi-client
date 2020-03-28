@@ -2,10 +2,9 @@
 
 In the project directory, you can run:
 
-### `nodemon`
+### `npm run start:watch`
 
 Runs the app in the development mode on the port set in your .env file.<br />
-Make sure you have installed nodemon globally: `sudo npm i -g nodemon`
 
 
 ### `npm start`
