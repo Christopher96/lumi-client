@@ -30,7 +30,7 @@ export const patchWatch = (syncSource: string): EventEmitter => {
       if (event == 'update') {
         let sourcePath = sourceFile.split(nodePath.sep);
         sourcePath[0] = syncShadow;
-        const shadowFile = nodePath.resolve(...sourcePath);
+        const shadowFile = nodePath.join(...sourcePath);
 
         const sourceData = readFileGo(sourceFile);
         const shadowData = readFileGo(shadowFile);
