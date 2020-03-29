@@ -3,6 +3,7 @@ import readFileGo from 'readfile-go';
 import fs from 'fs-extra';
 import watch from 'node-watch';
 import EventEmitter from 'events';
+import nodePath from 'path';
 
 const syncDirs = (syncSource: string, syncShadow: string): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -27,13 +28,15 @@ export const patchWatch = (syncSource: string): EventEmitter => {
   const watchDir = (sourceDir: string): void => {
     watch(sourceDir, { recursive: true }, (event, sourceFile) => {
       if (event == 'update') {
-        const path = sourceFile.substr(sourceFile.indexOf('/'));
-        const shadowFile = `${syncShadow}${path}`;
+        let sourcePath = sourceFile.split(nodePath.sep);
+        sourcePath[0] = syncShadow;
+        const shadowFile = nodePath.resolve(...sourcePath);
 
         const sourceData = readFileGo(sourceFile);
         const shadowData = readFileGo(shadowFile);
 
         const patchData = diff.createPatch(shadowFile, shadowData, sourceData);
+
         const patch = diff.parsePatch(patchData);
         emitter.emit('patched', patch);
       }

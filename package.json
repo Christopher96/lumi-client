@@ -23,6 +23,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.3",
     "node-watch": "^0.6.3",
+    "path": "^0.12.7",
     "readfile-go": "^1.0.7",
     "reflect-metadata": "^0.1.13",
     "socket.io-client": "^2.3.0"
@@ -32,7 +33,7 @@
     "@types/diff": "^4.0.2",
     "@types/fs-extra": "^8.1.0",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.7",
+    "@types/node": "^12.12.32",
     "@types/node-fetch": "^2.5.4",
     "@types/socket.io-client": "^1.4.32",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
