@@ -1,3 +1,4 @@
+// Specification of socket payloads
 export interface User {
   id: string;
 }

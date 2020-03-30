@@ -1,3 +1,4 @@
+// Global events for client and server
 const enum events {
   SERVER_CONNECT = 'connection',
   CLIENT_CONNECT = 'connect',
