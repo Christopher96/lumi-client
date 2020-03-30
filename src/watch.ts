@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import watch from 'node-watch';
 import EventEmitter from 'events';
 import nodePath from 'path';
+import slash from 'slash';
 
 // Takes a source and destination and synchronize them
 const syncDirs = (syncSource: string, syncShadow: string): Promise<void> => {
@@ -45,7 +46,7 @@ export const patchWatch = (syncSource: string): EventEmitter => {
         const shadowData = readFileGo(shadowFile);
 
         // Diff the of the source and shadow file
-        const patchData = diff.createPatch(shadowFile, shadowData, sourceData);
+        const patchData = diff.createPatch(slash(shadowFile), shadowData, sourceData);
 
         // Create a patch from the diff
         const patch = diff.parsePatch(patchData);
@@ -73,18 +74,23 @@ export const patchWatch = (syncSource: string): EventEmitter => {
 };
 
 // Apply a patch from another client
-export const patchApply = (patch: Diff.ParsedDiff[]): Promise<void> => {
+export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
   return new Promise((resolve, reject) => {
     // For each specific file patch in the patch
-    patch.forEach(filePatch => {
+    diffs.forEach(patch => {
+      // Resolve paths to current operating system
+      patch.index = nodePath.resolve(patch.index);
+      patch.oldFileName = nodePath.resolve(patch.oldFileName);
+      patch.newFileName = nodePath.resolve(patch.newFileName);
+
       // Which file do we want to patch?
-      const filePath = filePatch.index;
+      const filePath = patch.index;
 
       // Get the old data from the file we want to change
       const oldData = readFileGo(filePath);
 
       // Apply the patch to the old data
-      const appliedData = diff.applyPatch(oldData, filePatch);
+      const appliedData = diff.applyPatch(oldData, patch);
 
       // Write the new data the the file
       fs.writeFile(filePath, appliedData, err => {
