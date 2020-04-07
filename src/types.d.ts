@@ -1,1 +1,1 @@
-declare module 'readfile-go';
+../../repo-hub/src/types.d.ts

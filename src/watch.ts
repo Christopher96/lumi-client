@@ -1,31 +1,11 @@
 import * as diff from 'diff';
 import readFileGo from 'readfile-go';
-import fs from 'fs-extra';
 import watch from 'node-watch';
 import EventEmitter from 'events';
 import nodePath from 'path';
 
-// Takes a source and destination and synchronize them
-const syncDirs = (syncSource: string, syncShadow: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    if (fs.existsSync(syncShadow)) {
-      resolve();
-    } else {
-      // Copies the source repo to a shadow copy recursively
-      fs.copy(syncSource, syncShadow, err => {
-        if (err) {
-          reject(err);
-        }
-        resolve();
-      });
-    }
-  });
-};
-
 // Watches a source repository for changes and sends patches
-export const patchWatch = (syncSource: string): EventEmitter => {
-  const syncShadow = `.${syncSource}.shadow`;
-
+export const patchWatch = (source: string, copy: string): EventEmitter => {
   // Create emitter so we can send multiple paches
   const emitter = new EventEmitter();
 
@@ -35,62 +15,31 @@ export const patchWatch = (syncSource: string): EventEmitter => {
       if (event == 'update') {
         // Split the path to an array (windows and unix path harmony)
         const sourcePath = sourceFile.split(nodePath.sep);
-        // Change the directory to the shadow
-        sourcePath[0] = syncShadow;
-        // Construct the path for the shadow file
-        const shadowFile = nodePath.join(...sourcePath);
 
-        // Read the source and shadow file
+        // Set the folder path to the copy folder
+        sourcePath[0] = copy;
+
+        // Construct the path for the copy file
+        const copyFile = nodePath.join(...sourcePath);
+
+        // Read the source and copy file
         const sourceData = readFileGo(sourceFile);
-        const shadowData = readFileGo(shadowFile);
+        const copyData = readFileGo(copyFile);
 
-        // Diff the of the source and shadow file
-        const patchData = diff.createPatch(shadowFile, shadowData, sourceData);
+        // Diff the of the source and copy file
+        const diffData = diff.createPatch(copyFile, copyData, sourceData);
 
         // Create a patch from the diff
-        const patch = diff.parsePatch(patchData);
+        const patch = diff.parsePatch(diffData);
 
         // Send the patch back to the caller
-        emitter.emit('patched', patch);
+        emitter.emit('patch', patch);
       }
     });
   };
 
-  fs.lstat(syncSource)
-    .then(stat => {
-      // Check if the source is a directory
-      if (stat.isDirectory()) {
-        // Create the shadow directory
-        return syncDirs(syncSource, syncShadow);
-      } else {
-        throw 'path is not a directory';
-      }
-    })
-    // Listen for changes in the source
-    .then(() => watchDir(syncSource));
+  // Copy source then listen for file changes
+  watchDir(source);
 
   return emitter;
-};
-
-// Apply a patch from another client
-export const patchApply = (patch: Diff.ParsedDiff[]): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    // For each specific file patch in the patch
-    patch.forEach(filePatch => {
-      // Which file do we want to patch?
-      const filePath = filePatch.index;
-
-      // Get the old data from the file we want to change
-      const oldData = readFileGo(filePath);
-
-      // Apply the patch to the old data
-      const appliedData = diff.applyPatch(oldData, filePatch);
-
-      // Write the new data the the file
-      fs.writeFile(filePath, appliedData, err => {
-        if (err) reject('could not write to file');
-        resolve();
-      });
-    });
-  });
 };

@@ -36,6 +36,7 @@
     "@types/node": "^12.12.32",
     "@types/node-fetch": "^2.5.4",
     "@types/socket.io-client": "^1.4.32",
+    "@types/uuid": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
     "chai": "^4.2.0",
