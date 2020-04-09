@@ -3,6 +3,7 @@ import readFileGo from 'readfile-go';
 import watch from 'node-watch';
 import EventEmitter from 'events';
 import nodePath from 'path';
+import slash from 'slash';
 
 // Watches a source repository for changes and sends patches
 export const patchWatch = (source: string, roomId: string): EventEmitter => {
