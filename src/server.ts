@@ -1,43 +1,34 @@
-import events from './events';
-import { User, Room } from './interfaces';
+import events from './common/events';
+import { User, Room, Chunk, Message } from './common/interfaces';
 import { patchWatch } from './watch';
-import { patchApply } from './apply';
-import { readChunks } from './read';
-import { copySource } from './copy';
+import { patchApply } from './common/apply';
+import { readChunks } from './common/read';
+import { writeChunk } from './common/copy';
 
 export const serverHandler = (server: SocketIOClient.Socket): void => {
   // Set the path to the repo you want to synchronize
   // TODO Add a selection in frontend
-  const source = 'test-repo';
 
-  server.emit(events.CREATE_ROOM, source);
+  let filesToUpload = 0;
 
   server.on(events.ROOM_CREATED, (room: Room) => {
     console.log(`created room ${room.id}`);
 
-    copySource(source, room.copy).then(() => {
-      readChunks(source)
-        .on('chunk', chunk => {
-          console.log(`uploading ${chunk.path}`);
-          server.emit(events.UPLOAD_CHUNK, {
-            room,
-            chunk
-          });
-        })
-        .on('done', () => {
-          server.emit(events.JOIN_ROOM, room);
-        });
+    const { files, emitter } = readChunks(room.source);
+    filesToUpload = files.length;
+
+    emitter.on('chunk', chunk => {
+      console.log(`uploading ${chunk.path}`);
+      server.emit(events.DOWNLOAD_CHUNK, {
+        room,
+        chunk
+      });
     });
   });
-
-  server.on(events.UPLOAD_ERR, () => {
-    // TODO Stop stream on upload error
-  });
-
   server.on(events.ROOM_AUTH, (room: Room) => {
     console.log('watching for changes...');
     // Watch the specified repository for changes
-    patchWatch(source, room.copy).on('patch', diffs => {
+    patchWatch(room.source, room.id).on('patch', diffs => {
       console.log('sending patch');
       // Send the patch to the server
       server.emit(events.PATCH, {
@@ -45,6 +36,31 @@ export const serverHandler = (server: SocketIOClient.Socket): void => {
         diffs
       });
     });
+  });
+
+  server.on(events.DOWNLOAD_OK, data => {
+    const { room } = data;
+
+    filesToUpload--;
+
+    if (filesToUpload == 0) {
+      server.emit(events.JOIN_ROOM, room);
+    }
+  });
+
+  server.on(events.DOWNLOAD_CHUNK, data => {
+    const { chunk } = data;
+    writeChunk(chunk)
+      .then(() => {
+        server.emit(events.DOWNLOAD_OK, data);
+      })
+      .catch(() => {
+        server.emit(events.DOWNLOAD_ERR, data);
+      });
+  });
+
+  server.on(events.DOWNLOAD_ERR, () => {
+    // TODO Stop stream on upload error
   });
 
   // On incoming patches of other clients
@@ -65,7 +81,7 @@ export const serverHandler = (server: SocketIOClient.Socket): void => {
   });
 
   // On message from other client
-  server.on(events.MESSAGE, (msg: string) => {
+  server.on(events.MESSAGE, (msg: Message) => {
     console.log(msg);
   });
 };

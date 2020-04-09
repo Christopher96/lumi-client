@@ -5,7 +5,7 @@ import EventEmitter from 'events';
 import nodePath from 'path';
 
 // Watches a source repository for changes and sends patches
-export const patchWatch = (source: string, copy: string): EventEmitter => {
+export const patchWatch = (source: string, roomId: string): EventEmitter => {
   // Create emitter so we can send multiple paches
   const emitter = new EventEmitter();
 
@@ -16,11 +16,8 @@ export const patchWatch = (source: string, copy: string): EventEmitter => {
         // Split the path to an array (windows and unix path harmony)
         const sourcePath = sourceFile.split(nodePath.sep);
 
-        // Set the folder path to the copy folder
-        sourcePath[0] = copy;
-
         // Construct the path for the copy file
-        const copyFile = nodePath.join(...sourcePath);
+        const copyFile = nodePath.join(roomId, ...sourcePath);
 
         // Read the source and copy file
         const sourceData = readFileGo(sourceFile);
