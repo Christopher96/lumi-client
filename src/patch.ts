@@ -3,7 +3,8 @@ import readFileGo from 'readfile-go';
 import watch from 'node-watch';
 import EventEmitter from 'events';
 import nodePath from 'path';
-import slash from 'slash';
+import events from './common/events';
+import { patchApply } from './common/apply';
 
 // Watches a source repository for changes and sends patches
 export const patchWatch = (source: string, roomId: string): EventEmitter => {
@@ -40,4 +41,18 @@ export const patchWatch = (source: string, roomId: string): EventEmitter => {
   watchDir(source);
 
   return emitter;
+};
+
+export const patchEvents = (server: SocketIOClient.Socket): void => {
+  // On incoming patches of other clients
+  server.on(events.PATCH, (patch: Diff.ParsedDiff[]) => {
+    // Apply the patch to the shadow directory
+    patchApply(patch).then(() => console.log('patched'));
+  });
+
+  // On patches that have been sent but not accepted by the server
+  server.on(events.PATCH_ERR, () => {
+    // TODO Alert the user that the patch could not be applied
+    console.log('invalid patch, could not apply it');
+  });
 };

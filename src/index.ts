@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import io from 'socket.io-client';
 import events from './common/events';
-import { serverHandler } from './server';
+import { socketHandler } from './socket';
 import { Room } from './common/interfaces';
 dotenv.config();
 
@@ -19,14 +19,25 @@ const bootstrap = async (): Promise<void> => {
     transports: ['websocket']
   });
 
-  // On connection to the server
-  server.on(events.CLIENT_CONNECT, () => {
-    console.log('connected');
-    serverHandler(server);
-    menu();
-  });
+  const selectRoom = (rooms: Room[]): void => {
+    const options = rooms.map(room => `[${room.id}]: ${room.source}`);
 
-  const menu = () => {
+    inquirer
+      .prompt([
+        {
+          message: 'Which room do you want to join?',
+          type: 'list',
+          choices: options,
+          name: 'option'
+        }
+      ])
+      .then(answers => {
+        const option = options.indexOf(answers.option);
+        server.emit(events.JOIN_ROOM, rooms[option]);
+      });
+  };
+
+  const menu = (): void => {
     const options = ['Create a room', 'Join a room'];
 
     inquirer
@@ -48,7 +59,7 @@ const bootstrap = async (): Promise<void> => {
             break;
           case 1:
             server.emit(events.LIST_ROOMS);
-            server.on(events.LIST_ROOMS, (rooms: SocketIO.Room[]) => {
+            server.on(events.LIST_ROOMS, (rooms: Room[]) => {
               selectRoom(rooms);
             });
             break;
@@ -56,23 +67,12 @@ const bootstrap = async (): Promise<void> => {
       });
   };
 
-  const selectRoom = rooms => {
-    const options = rooms.map(room => `[${room.id}]: ${room.source}`);
-
-    inquirer
-      .prompt([
-        {
-          message: 'Which room do you want to join?',
-          type: 'list',
-          choices: options,
-          name: 'option'
-        }
-      ])
-      .then(answers => {
-        const option = options.indexOf(answers.option);
-        server.emit(events.JOIN_ROOM, rooms[option]);
-      });
-  };
+  // On connection to the server
+  server.on(events.CLIENT_CONNECT, () => {
+    console.log('connected');
+    socketHandler(server);
+    menu();
+  });
 };
 
 bootstrap();

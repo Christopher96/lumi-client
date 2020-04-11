@@ -1,6 +1,2 @@
-<<<<<<< HEAD
 hello
-swaggity
-=======
-hello
->>>>>>> 19a25e6a30bc9e513f24174362e28c32cb17daa7
+asdf
