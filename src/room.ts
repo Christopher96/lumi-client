@@ -1,25 +1,36 @@
-import { uploadSource } from './transfer';
+import { DownloadEvents } from './transfer';
 import events from './common/events';
 import { patchWatch } from './patch';
-import { Room } from './common/interfaces';
+import { Room, EventHandler } from './common/interfaces';
 
-export const roomEvents = (server: SocketIOClient.Socket): void => {
-  server.on(events.ROOM_CREATED, (room: Room) => {
-    console.log(`created room ${room.id}`);
-    uploadSource(server, room);
-  });
+export class RoomEvents implements EventHandler {
+  private downloadEvents: DownloadEvents;
 
-  server.on(events.ROOM_AUTH, (room: Room) => {
-    console.log('watching for changes...');
-    // Watch the specified repository for changes
+  constructor(private server: SocketIOClient.Socket) {
+    // Create events for incoming downloads
+    this.downloadEvents = new DownloadEvents(this.server);
+    this.addEvents();
+  }
 
-    patchWatch(room.source, room.id).on('patch', diffs => {
-      console.log('sending patch');
-      // Send the patch to the server
-      server.emit(events.PATCH, {
-        room,
-        diffs
+  addEvents(): void {
+    this.server.on(events.ROOM_CREATED, (room: Room) => {
+      console.log(`created room ${room.id}`);
+      // When the room is created upload the source
+      this.downloadEvents.uploadSource(this.server, room);
+    });
+
+    this.server.on(events.ROOM_AUTH, (room: Room) => {
+      console.log('watching for changes...');
+      // Watch the specified repository for changes
+
+      patchWatch(room.source, room.id).on('patch', diffs => {
+        console.log('sending patch');
+        // Send the patch to the server
+        this.server.emit(events.PATCH, {
+          room,
+          diffs
+        });
       });
     });
-  });
-};
+  }
+}

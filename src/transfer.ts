@@ -1,46 +1,65 @@
 import events from './common/events';
 import { writeChunk } from './common/copy';
 import { readChunks } from './common/read';
-import { Room } from './common/interfaces';
+import { Room, EventHandler } from './common/interfaces';
 
-let filesToUpload = 0;
+export class DownloadEvents implements EventHandler {
+  constructor(private socket: SocketIOClient.Socket) {
+    this.addEvents();
+  }
 
-export const uploadSource = (client: SocketIOClient.Socket, room: Room): void => {
-  const { files, emitter } = readChunks(room.source);
-  filesToUpload = files.length;
+  private filesToUpload: number;
 
-  emitter.on('chunk', chunk => {
-    console.log(`uploading ${chunk.path}`);
-    client.emit(events.DOWNLOAD_CHUNK, {
-      room,
-      chunk
-    });
-  });
-};
+  uploadSource(server: SocketIOClient.Socket, room: Room): void {
+    // Read the chunks from the source
+    const { files, emitter } = readChunks(room.source);
 
-export const downloadEvents = (socket: SocketIOClient.Socket): void => {
-  socket.on(events.DOWNLOAD_OK, data => {
-    const { room } = data;
+    // Update the number of files we want to upload
+    this.filesToUpload = files.length;
 
-    filesToUpload--;
-
-    if (filesToUpload == 0) {
-      socket.emit(events.JOIN_ROOM, room);
-    }
-  });
-
-  socket.on(events.DOWNLOAD_CHUNK, data => {
-    const { chunk } = data;
-    writeChunk(chunk)
-      .then(() => {
-        socket.emit(events.DOWNLOAD_OK, data);
-      })
-      .catch(() => {
-        socket.emit(events.DOWNLOAD_ERR, data);
+    // When a file in the source has been read
+    emitter.on('chunk', chunk => {
+      console.log(`uploading ${chunk.path}`);
+      // Send it to the server
+      server.emit(events.DOWNLOAD_CHUNK, {
+        room,
+        chunk
       });
-  });
+    });
+  }
 
-  socket.on(events.DOWNLOAD_ERR, () => {
-    // TODO Stop stream on upload error
-  });
-};
+  addEvents(): void {
+    // The server successfully downloaded the file
+    this.socket.on(events.DOWNLOAD_OK, data => {
+      const { room } = data;
+
+      // Decrement the number of files to upload
+      this.filesToUpload--;
+
+      if (this.filesToUpload == 0) {
+        // Join the room once all files are uploaded
+        this.socket.emit(events.JOIN_ROOM, room);
+      }
+    });
+
+    // When we get a file from the server
+    this.socket.on(events.DOWNLOAD_CHUNK, data => {
+      const { chunk } = data;
+
+      // Write it locally
+      writeChunk(chunk)
+        .then(() => {
+          // We acknowledge and respond to the incoming file
+          this.socket.emit(events.DOWNLOAD_OK, data);
+        })
+        .catch(() => {
+          // We could not write the file
+          this.socket.emit(events.DOWNLOAD_ERR, data);
+        });
+    });
+
+    this.socket.on(events.DOWNLOAD_ERR, () => {
+      // TODO Stop stream on upload error
+    });
+  }
+}

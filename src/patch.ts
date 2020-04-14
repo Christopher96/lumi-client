@@ -5,6 +5,7 @@ import EventEmitter from 'events';
 import nodePath from 'path';
 import events from './common/events';
 import { patchApply } from './common/apply';
+import { EventHandler } from './common/interfaces';
 
 // Watches a source repository for changes and sends patches
 export const patchWatch = (source: string, roomId: string): EventEmitter => {
@@ -43,16 +44,22 @@ export const patchWatch = (source: string, roomId: string): EventEmitter => {
   return emitter;
 };
 
-export const patchEvents = (server: SocketIOClient.Socket): void => {
-  // On incoming patches of other clients
-  server.on(events.PATCH, (patch: Diff.ParsedDiff[]) => {
-    // Apply the patch to the shadow directory
-    patchApply(patch).then(() => console.log('patched'));
-  });
+export class PatchEvents implements EventHandler {
+  constructor(private server: SocketIOClient.Socket) {
+    this.addEvents();
+  }
 
-  // On patches that have been sent but not accepted by the server
-  server.on(events.PATCH_ERR, () => {
-    // TODO Alert the user that the patch could not be applied
-    console.log('invalid patch, could not apply it');
-  });
-};
+  addEvents(): void {
+    // On incoming patches of other clients
+    this.server.on(events.PATCH, (patch: Diff.ParsedDiff[]) => {
+      // Apply the patch to the shadow directory
+      patchApply(patch).then(() => console.log('patched'));
+    });
+
+    // On patches that have been sent but not accepted by the server
+    this.server.on(events.PATCH_ERR, () => {
+      // TODO Alert the user that the patch could not be applied
+      console.log('invalid patch, could not apply it');
+    });
+  }
+}

@@ -1,21 +1,25 @@
 import events from './common/events';
-import { User, Room, Chunk, Message } from './common/interfaces';
-import { patchEvents } from './patch';
-import { roomEvents } from './room';
-import { downloadEvents } from './transfer';
+import { User, Message, EventHandler } from './common/interfaces';
+import { PatchEvents } from './patch';
+import { RoomEvents } from './room';
 
-export const socketHandler = (server: SocketIOClient.Socket): void => {
-  downloadEvents(server);
-  roomEvents(server);
-  patchEvents(server);
+export class SocketHandler implements EventHandler {
+  constructor(private server: SocketIOClient.Socket) {
+    new RoomEvents(this.server);
+    new PatchEvents(this.server);
 
-  // On response from server with list of users
-  server.on(events.LIST_USERS, (users: User[]) => {
-    console.log(users);
-  });
+    this.addEvents();
+  }
 
-  // On message from other client
-  server.on(events.MESSAGE, (msg: Message) => {
-    console.log(msg);
-  });
-};
+  addEvents(): void {
+    // On response from server with list of users
+    this.server.on(events.LIST_USERS, (users: User[]) => {
+      console.log(users);
+    });
+
+    // On message from other client
+    this.server.on(events.MESSAGE, (msg: Message) => {
+      console.log(msg);
+    });
+  }
+}
