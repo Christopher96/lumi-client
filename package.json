@@ -14,7 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/socket.io": "^2.1.4",
     "chalk": "^2.4.2",
     "deepmerge": "^4.2.2",
     "diff": "^4.0.2",
@@ -32,6 +31,7 @@
     "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
+    "@types/socket.io": "^2.1.4",
     "@types/chai": "^4.2.7",
     "@types/diff": "^4.0.2",
     "@types/fs-extra": "^8.1.0",

@@ -1,7 +1,7 @@
-import events from './common/events';
-import { User, Message, EventHandler } from './common/interfaces';
-import { PatchEvents } from './patch';
-import { RoomEvents } from './room';
+import events from 'common/events';
+import { User, Message, EventHandler } from 'common/interfaces';
+import { PatchEvents } from 'patch';
+import { RoomEvents } from 'room';
 
 export class SocketHandler implements EventHandler {
   constructor(private server: SocketIOClient.Socket) {

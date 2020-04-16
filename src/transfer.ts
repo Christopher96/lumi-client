@@ -1,7 +1,7 @@
-import events from './common/events';
-import { writeChunk } from './common/copy';
-import { readChunks } from './common/read';
-import { Room, EventHandler } from './common/interfaces';
+import events from 'common/events';
+import { writeChunk } from 'common/copy';
+import { readChunks } from 'common/read';
+import { Room, EventHandler } from 'common/interfaces';
 
 export class DownloadEvents implements EventHandler {
   constructor(private socket: SocketIOClient.Socket) {
