@@ -1,6 +1,6 @@
 import { DownloadEvents } from 'transfer';
 import events from 'common/events';
-import { patchWatch } from 'patch';
+import { patchWatch } from './patch';
 import { Room, EventHandler } from 'common/interfaces';
 
 export class RoomEvents implements EventHandler {

@@ -25,7 +25,7 @@ export class InteractiveCLI {
   }
 
   // Creates a menu with different options
-  menu = (): void => {
+  menu(): void {
     const options = ['Create a room', 'Join a room'];
 
     inquirer
@@ -45,18 +45,18 @@ export class InteractiveCLI {
             // TODO Select the source folder interactively or through command
             const source = 'test-repo';
             // Create the room with the chosen source folder
-            server.emit(events.CREATE_ROOM, source);
+            this.server.emit(events.CREATE_ROOM, source);
             break;
           case 1:
             // Ask for a list of rooms
-            server.emit(events.LIST_ROOMS);
+            this.server.emit(events.LIST_ROOMS);
             // When we get the rooms back
-            server.on(events.LIST_ROOMS, (rooms: Room[]) => {
+            this.server.on(events.LIST_ROOMS, (rooms: Room[]) => {
               // Send them to next dialog handler
-              selectRoom(rooms);
+              this.selectRoom(rooms);
             });
             break;
         }
       });
-  };
+  }
 }

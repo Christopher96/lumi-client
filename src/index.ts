@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
 import io from 'socket.io-client';
 import events from 'common/events';
-import { SocketHandler } from 'socket';
-import { InteractiveCLI } from 'cli/interactive';
+import { SocketHandler } from 'events/socket';
+import { CLI } from 'cli';
+import { API } from 'api';
 dotenv.config();
 
 class Bootstrap {
@@ -25,10 +26,11 @@ class Bootstrap {
       // Handle the connection to the server
       new SocketHandler(server);
 
-      // TODO Create a CLI with options
+      // Start a CLI
+      new CLI(server);
 
-      // --interactive
-      new InteractiveCLI(server);
+      // Start express API
+      new API(server);
     });
   }
 }
