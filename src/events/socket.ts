@@ -1,7 +1,7 @@
 import fs from 'fs';
-import events from 'common/events';
-import usersDb from 'database/users.json';
-import { User, Message, EventHandler } from 'common/interfaces';
+import events from '../common/events';
+import { User, Message, EventHandler } from '../common/interfaces';
+import usersDb from '../database/users.json';
 import { PatchEvents } from './patch';
 import { RoomEvents } from './room';
 
@@ -16,7 +16,7 @@ export class SocketHandler implements EventHandler {
   addEvents(): void {
     // On response from server with list of users
     this.server.on(events.LIST_USERS, (users: User[]) => {
-      fs.writeFile(usersDb, users);
+      // TODO Write users to json file
     });
 
     // On message from other client

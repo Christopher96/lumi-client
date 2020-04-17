@@ -3,9 +3,9 @@ import readFileGo from 'readfile-go';
 import watch from 'node-watch';
 import EventEmitter from 'events';
 import nodePath from 'path';
-import events from 'common/events';
-import { patchApply } from 'common/apply';
-import { EventHandler } from 'common/interfaces';
+import events from '../common/events';
+import { patchApply } from '../common/apply';
+import { EventHandler } from '../common/interfaces';
 
 // Watches a source repository for changes and sends patches
 export const patchWatch = (source: string, roomId: string): EventEmitter => {

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    "resolveJsonModule": true,
     "target": "es6",
     "module": "commonjs",
     "outDir": "dist",

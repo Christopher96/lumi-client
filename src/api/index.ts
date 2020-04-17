@@ -1,11 +1,11 @@
 import express from 'express';
-import events from 'common/events';
+import events from '../common/events';
 
 export class API {
-  app: Express;
+  app: express.Application;
 
   constructor(private server: SocketIOClient.Socket, port: number) {
-    this.app = new express();
+    this.app = express();
 
     this.app.listen(port, () => {
       console.log('app started');

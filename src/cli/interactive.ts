@@ -1,9 +1,11 @@
 import inquirer from 'inquirer';
-import events from 'common/events';
-import { Room } from 'common/interfaces';
+import events from '../common/events';
+import { Room } from '../common/interfaces';
 
 export class InteractiveCLI {
-  constructor(private server: SocketIOClient.Socket) {}
+  constructor(private server: SocketIOClient.Socket) {
+    this.menu();
+  }
 
   // Gives the user the option to select a room from a list
   selectRoom(rooms: Room[]): void {

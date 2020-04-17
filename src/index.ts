@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 import io from 'socket.io-client';
-import events from 'common/events';
-import { SocketHandler } from 'events/socket';
-import { CLI } from 'cli';
-import { API } from 'api';
+import events from './common/events';
+import { SocketHandler } from './events/socket';
+import { CLI } from './cli';
+import { API } from './api';
 dotenv.config();
 
 class Bootstrap {
@@ -30,7 +30,7 @@ class Bootstrap {
       new CLI(server);
 
       // Start express API
-      new API(server);
+      new API(server, 4000);
     });
   }
 }

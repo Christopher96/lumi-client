@@ -1,7 +1,7 @@
-import { DownloadEvents } from 'transfer';
-import events from 'common/events';
+import { DownloadEvents } from './transfer';
 import { patchWatch } from './patch';
-import { Room, EventHandler } from 'common/interfaces';
+import events from '../common/events';
+import { Room, EventHandler } from '../common/interfaces';
 
 export class RoomEvents implements EventHandler {
   private downloadEvents: DownloadEvents;
