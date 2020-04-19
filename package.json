@@ -4,12 +4,12 @@
   "description": "",
   "main": "dist",
   "scripts": {
-    "test": "mocha -r ts-node/register tests/**/*.test.ts",
-    "test:setup": "mocha -r ts-node/register tests/setup.test.ts",
     "start": "ts-node ./src",
     "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
     "start:watch": "nodemon",
-    "build": "tsc"
+    "build": "tsc",
+    "test:all": "npm test tests/**/*.test.ts",
+    "test": "mocha --exit -r ts-node/register tests/helper.test.ts"
   },
   "author": "",
   "license": "ISC",
@@ -54,7 +54,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-standard": "^4.0.1",
-    "mocha": "^6.2.0",
+    "mocha": "^6.2.3",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "ts-node": "^8.4.1",

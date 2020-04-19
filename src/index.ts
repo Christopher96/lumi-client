@@ -6,7 +6,7 @@ import { CLI } from './cli';
 import { API } from './api';
 dotenv.config();
 
-class Bootstrap {
+export class Bootstrap {
   constructor() {
     // Configure PORT and HOST to the environment variables set in .env
     // or use localhost:8080 locally
