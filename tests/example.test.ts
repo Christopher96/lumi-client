@@ -6,3 +6,5 @@ describe('We shall be able to do something!', () => {
     assert.exists(Bootstrap);
   });
 });
+
+//michael skriver test-text
