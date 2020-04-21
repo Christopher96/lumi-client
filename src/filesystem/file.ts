@@ -6,20 +6,12 @@ import fs from 'fs-extra';
  * Written: 2020-04-21
  */
 
-export const createFile = (source: string, copy: string): Promise<void> => {
-  fs.lstat(source).then(stat => {});
+export const createFile = (path: string) => {
+  fs.ensureDir(path)
+    .then(() => {
+      console.log('success!');
+    })
+    .catch(err => {
+      console.error(err);
+    });
 };
-
-export default class File {
-  /**
-   * The path where the file is located before the operation.
-   * For file-creation cases, this is where the file will be created.
-   */
-  private filePath: string;
-  /**
-   * A file has a name.
-   */
-  private name: string;
-
-  public create(filePath): void {}
-}
