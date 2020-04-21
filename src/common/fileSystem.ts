@@ -1,4 +1,4 @@
-import fs, { createFile } from 'fs-extra';
+import fs from 'fs-extra';
 
 /**
  * The FileSystem functions are used for handling file operations such as creating, removing and moving files and folders.
@@ -8,22 +8,20 @@ import fs, { createFile } from 'fs-extra';
 
 // to create a file
 export const fileCreate = (path: string) => {
-  fs.ensureFile(path).catch(err => {
-    console.error(err);
-  });
+  fs.ensureFile(path);
 };
 
 // to create a folder
 export const folderCreate = (path: string) => {
-  fs.ensureDir(path).catch(err => {
-    console.error(err);
-  });
+  fs.ensureDir(path);
 };
 
 // to remove a file
 export const fileRemove = (path: string) => {
   fs.remove(path, err => {
     if (err) return console.error(err);
+
+    console.log('success!'); // I just deleted my entire HOME directory.
   });
 };
 
@@ -31,5 +29,7 @@ export const fileRemove = (path: string) => {
 export const folderRemove = (path: string) => {
   fs.remove(path, err => {
     if (err) return console.error(err);
+
+    console.log('success!'); // I just deleted my entire HOME directory.
   });
 };

@@ -54,7 +54,7 @@ describe('We shall be able to manage files!', () => {
      * Picking a relative directory within the project to use.
      * process.cwd() returns the global path to the "lumi-client"-folder.
      */
-    const directory = process.cwd() + '/folderTest-DeleteMe/test.txt';
+    const directory = process.cwd() + '/folderTest-DeleteMe/FileTest-DeleteMe.txt';
     /*
      * Executing the file-deletion-function:
      */
