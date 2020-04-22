@@ -1,7 +1,8 @@
 import events from '../common/events';
-import { Room, EventHandler } from '../common/interfaces';
+import { IRoom, EventHandler } from '../common/interfaces';
 import { writeChunk } from '../common/copy';
 import { readChunks } from '../common/read';
+import RoomClass from '../classes/Room';
 
 export class DownloadEvents implements EventHandler {
   constructor(private socket: SocketIOClient.Socket) {
@@ -10,9 +11,9 @@ export class DownloadEvents implements EventHandler {
 
   private filesToUpload: number;
 
-  uploadSource(server: SocketIOClient.Socket, room: Room): void {
+  uploadSource(server: SocketIOClient.Socket, room: RoomClass): void {
     // Read the chunks from the source
-    const { files, emitter } = readChunks(room.source);
+    const { files, emitter } = readChunks(room.sourceFolderPath);
 
     // Update the number of files we want to upload
     this.filesToUpload = files.length;
