@@ -41,5 +41,3 @@ export class SourceFolderHandler {
     });
   }
 }
-
-new SourceFolderHandler('test-repo');
