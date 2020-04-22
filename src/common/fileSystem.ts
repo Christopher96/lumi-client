@@ -8,28 +8,20 @@ import fs from 'fs-extra';
 
 // to create a file
 export const fileCreate = (path: string) => {
-  fs.ensureFile(path);
+  fs.ensureFileSync(path);
 };
 
 // to create a folder
 export const folderCreate = (path: string) => {
-  fs.ensureDir(path);
+  fs.ensureDirSync(path);
 };
 
 // to remove a file
 export const fileRemove = (path: string) => {
-  fs.remove(path, err => {
-    if (err) return console.error(err);
-
-    console.log('success!'); // I just deleted my entire HOME directory.
-  });
+  fs.removeSync(path);
 };
 
 // to remove a folder
 export const folderRemove = (path: string) => {
-  fs.remove(path, err => {
-    if (err) return console.error(err);
-
-    console.log('success!'); // I just deleted my entire HOME directory.
-  });
+  fs.removeSync(path);
 };
