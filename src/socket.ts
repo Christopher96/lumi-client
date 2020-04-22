@@ -18,7 +18,8 @@ export default class Socket {
       new SocketHandler(server);
 
       // Start a CLI
-      new CLI(server);
+      //new CLI(server);
+      new CLI();
 
       // Start express API
       new API(server, 4000);
