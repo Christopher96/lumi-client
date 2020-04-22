@@ -29,3 +29,9 @@ export interface Message {
   targetUser: User;
   message: string;
 }
+
+export interface IRoom {
+  roomID: string;
+  roomFolderPath: string;
+  sourceFolderPath: string;
+}
