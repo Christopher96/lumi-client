@@ -8,7 +8,7 @@ export class CLI {
      * Creates a new room, assigning the creator as a host.
      */
     function create() {
-      var id = 'LUMI1234';
+      const id = 'LUMI1234';
       console.log('LUMI: Creating room with ID: ' + id);
     }
 

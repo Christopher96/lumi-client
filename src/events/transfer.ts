@@ -1,8 +1,6 @@
 import events from '../common/events';
-import { IRoom, EventHandler } from '../common/interfaces';
+import { EventHandler } from '../common/interfaces';
 import { writeChunk } from '../common/copy';
-import { readChunks } from '../common/read';
-import RoomClass from '../classes/Room';
 
 export class DownloadEvents implements EventHandler {
   constructor(private socket: SocketIOClient.Socket) {
@@ -11,23 +9,23 @@ export class DownloadEvents implements EventHandler {
 
   private filesToUpload: number;
 
-  uploadSource(server: SocketIOClient.Socket, room: RoomClass): void {
-    // Read the chunks from the source
-    const { files, emitter } = readChunks(room.sourceFolderPath);
+  // uploadSource(server: SocketIOClient.Socket, room: Room): void {
+  //   // Read the chunks from the source
+  //   const { files, emitter } = readChunks(room.sourceFolderPath);
 
-    // Update the number of files we want to upload
-    this.filesToUpload = files.length;
+  //   // Update the number of files we want to upload
+  //   this.filesToUpload = files.length;
 
-    // When a file in the source has been read
-    emitter.on('chunk', chunk => {
-      console.log(`uploading ${chunk.path}`);
-      // Send it to the server
-      server.emit(events.DOWNLOAD_CHUNK, {
-        room,
-        chunk
-      });
-    });
-  }
+  //   // When a file in the source has been read
+  //   emitter.on('chunk', chunk => {
+  //     console.log(`uploading ${chunk.path}`);
+  //     // Send it to the server
+  //     server.emit(events.DOWNLOAD_CHUNK, {
+  //       room,
+  //       chunk
+  //     });
+  //   });
+  // }
 
   addEvents(): void {
     // The server successfully downloaded the file
