@@ -1,10 +1,11 @@
 import express from 'express';
 import events from '../common/events';
+import Socket from '../socket';
 
 export class API {
   app: express.Application;
 
-  constructor(private server: SocketIOClient.Socket, port: number) {
+  constructor(port: number) {
     this.app = express();
 
     this.app.listen(port, () => {
@@ -15,7 +16,7 @@ export class API {
   createEndpoints(): void {
     this.app.get('/users', (req, res) => {
       console.log('hello world');
-      this.server.emit(events.LIST_USERS);
+      Socket.get().emit(events.LIST_USERS);
     });
   }
 }

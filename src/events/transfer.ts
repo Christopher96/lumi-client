@@ -1,21 +1,16 @@
 import events from '../common/events';
 import { Room, EventHandler } from '../common/interfaces';
 import { writeChunk } from '../common/copy';
-import { readChunks } from '../common/read';
+import { readZip } from '../common/read';
 
 export class DownloadEvents implements EventHandler {
   constructor(private socket: SocketIOClient.Socket) {
     this.addEvents();
   }
 
-  private filesToUpload: number;
-
   uploadSource(server: SocketIOClient.Socket, room: Room): void {
     // Read the chunks from the source
-    const { files, emitter } = readChunks(room.source);
-
-    // Update the number of files we want to upload
-    this.filesToUpload = files.length;
+    const emitter = readZip(room.source);
 
     // When a file in the source has been read
     emitter.on('chunk', chunk => {

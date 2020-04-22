@@ -1,10 +1,10 @@
 import { InteractiveCLI } from './interactive';
 
 export class CLI {
-  constructor(private server: SocketIOClient.Socket) {
+  constructor() {
     // TODO Create a CLI with options instead of interactive
 
     // --interactive
-    new InteractiveCLI(server);
+    new InteractiveCLI();
   }
 }
