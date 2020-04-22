@@ -2,7 +2,7 @@ import io from 'socket.io-client';
 import events from './common/events';
 import { SocketHandler } from './events/socket';
 import { CLI } from './cli';
-import { API } from './api';
+import { API } from './api/api';
 
 export default class Socket {
   static startSocket(serverUrl: string): SocketIOClient.Socket {
