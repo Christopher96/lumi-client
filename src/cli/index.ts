@@ -13,7 +13,7 @@ export class CLI {
       //Set the ID to a randomized value.
       //Randomized value is based on a set of parameters.
       //var id = CreateID();
-      var id = 'LUMI1234';
+      const id = 'LUMI1234';
 
       //Call room create function.
       //Room_Create(ID);
