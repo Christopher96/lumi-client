@@ -6,22 +6,29 @@ import fs from 'fs-extra';
  * Written: 2020-04-21
  */
 
+/**
+ *
+ *
+ *
+ *
+ */
+
 // to create a file
-export const fileCreate = (path: string) => {
-  fs.ensureFileSync(path);
+export const fileCreate = (dir: string) => {
+  fs.ensureFileSync(dir);
 };
 
 // to create a folder
-export const folderCreate = (path: string) => {
-  fs.ensureDirSync(path);
+export const folderCreate = (dir: string) => {
+  fs.ensureDirSync(dir);
 };
 
 // to remove a file
-export const fileRemove = (path: string) => {
-  fs.removeSync(path);
+export const fileRemove = (dir: string) => {
+  fs.removeSync(dir);
 };
 
 // to remove a folder
-export const folderRemove = (path: string) => {
-  fs.removeSync(path);
+export const folderRemove = (dir: string) => {
+  fs.removeSync(dir);
 };
