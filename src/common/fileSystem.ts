@@ -1,4 +1,6 @@
 import fs from 'fs-extra';
+import { SourceFolderWatcher } from '../fs/sourceFolderWatcher';
+import { FileEventType } from '../fs/fileEventType';
 
 /**
  * The FileSystem functions are used for handling file operations such as creating, removing and moving files and folders.
@@ -12,6 +14,18 @@ import fs from 'fs-extra';
  *
  *
  */
+
+export class FilesTest {
+  constructor() {
+    const watcher = new SourceFolderWatcher('test-repo');
+    watcher.onFileChange((event: FileEventType, path: string) => {
+      console.log('path: ' + path);
+      console.log('event: ' + event);
+    });
+  }
+}
+
+new FilesTest();
 
 // to create a file
 export const fileCreate = (dir: string) => {

@@ -5,6 +5,7 @@
   "main": "dist",
   "scripts": {
     "start": "ts-node ./src",
+    "temp": "ts-node ./src/fs/shadowHandler.ts",
     "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
     "start:watch": "nodemon",
     "build": "tsc",
