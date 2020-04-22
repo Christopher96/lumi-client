@@ -5,10 +5,12 @@
   "main": "dist",
   "scripts": {
     "start": "ts-node ./src",
+    "temp": "ts-node ./src/fs/sourceFolderHandler.ts",
     "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
     "start:watch": "nodemon",
     "build": "tsc",
     "test:all": "npm test tests/**/*.test.ts",
+    "lint": "tsc --noEmit && eslint \"./src/**/*.ts\" --fix",
     "test": "mocha --exit -r ts-node/register tests/helper.test.ts"
   },
   "author": "",

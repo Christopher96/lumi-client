@@ -1,7 +1,7 @@
 import { DownloadEvents } from './transfer';
 import { patchWatch } from './patch';
 import events from '../common/events';
-import { Room, EventHandler } from '../common/interfaces';
+import { IRoom, EventHandler, Room } from '../common/interfaces';
 
 export class RoomEvents implements EventHandler {
   private downloadEvents: DownloadEvents;
@@ -13,17 +13,17 @@ export class RoomEvents implements EventHandler {
   }
 
   addEvents(): void {
-    this.server.on(events.ROOM_CREATED, (room: Room) => {
-      console.log(`created room ${room.id}`);
+    this.server.on(events.ROOM_CREATED, (room: IRoom) => {
+      console.log(`created room ${room.roomID}`);
       // When the room is created upload the source
-      this.downloadEvents.uploadSource(this.server, room);
+      // this.downloadEvents.uploadSource(this.server, room);
     });
 
-    this.server.on(events.ROOM_AUTH, (room: Room) => {
+    this.server.on(events.ROOM_AUTH, (room: IRoom) => {
       console.log('watching for changes...');
       // Watch the specified repository for changes
 
-      patchWatch(room.source, room.id).on('patch', diffs => {
+      patchWatch(room.roomFolderPath, room.roomID).on('patch', diffs => {
         console.log('sending patch');
         // Send the patch to the server
         this.server.emit(events.PATCH, {
