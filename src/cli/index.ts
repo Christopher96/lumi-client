@@ -2,7 +2,7 @@ import { InteractiveCLI } from './interactive';
 import { program } from 'commander';
 
 export class CLI {
-  constructor(private server: SocketIOClient.Socket) {
+  constructor(/*private server: SocketIOClient.Socket*/) {
     /*
 [create]: '-c' '--create' (+) <ID>
     Creates a new Lumi room, with either the provided ID or a randomly selected ID.
