@@ -5,23 +5,30 @@ import fs from 'fs-extra';
 describe('We shall be able to zip and unzip directories', () => {
   const zipper = new Zip();
 
+  const repo = 'test-repo';
+  const file1 = 'test';
+  const file2 = 'hello/hello.txt';
+
+  const zipfile = 'archive.zip';
+  const zipdest = 'archive';
+
   it('shall exist a "test-repo" folder with a predetermined structure', () => {
-    assert.equal(fs.existsSync('test-repo/test'), true);
-    assert.equal(fs.existsSync('test-repo/hello/hello.txt'), true);
+    assert.equal(fs.existsSync(repo + '/' + file1), true);
+    assert.equal(fs.existsSync(repo + '/' + file2), true);
   });
 
   it('shall zip directories to specified folder', () => {
-    zipper.pack('test-repo', 'archive.zip');
-    assert.equal(fs.existsSync('archive.zip'), true);
+    zipper.pack(repo, zipfile);
+    assert.equal(fs.existsSync(zipfile), true);
   });
 
   it('shall unzip archive to specified folder', () => {
-    zipper.unpack('archive.zip', './archive/');
-    assert.equal(fs.existsSync('./archive'), true);
+    zipper.unpack(zipfile, zipdest);
+    assert.equal(fs.existsSync(zipdest), true);
   });
 
   it('shall exist an "archive" folder with the same structure as "test-repo"', () => {
-    assert.equal(fs.existsSync('archive/test'), true);
-    assert.equal(fs.existsSync('archive/hello/hello.txt'), true);
+    assert.equal(fs.existsSync(zipdest + '/' + file1), true);
+    assert.equal(fs.existsSync(zipdest + '/' + file2), true);
   });
 });
