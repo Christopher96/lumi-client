@@ -21,10 +21,14 @@ export class RoomEvents implements EventHandler {
     });
 
     Socket.get().on(events.ROOM_AUTH, (room: Room) => {
+      console.log(`created room ${room.roomID}`);
+      // When the room is created upload the source
+      // this.downloadEvents.uploadSource(this.server, room);
+    });
       console.log('watching for changes...');
       // Watch the specified repository for changes
 
-      patchWatch(room.source, room.id).on('patch', diffs => {
+      patchWatch(room.roomFolderPath, room.roomID).on('patch', diffs => {
         console.log('sending patch');
         // Send the patch to the server
         Socket.get().emit(events.PATCH, {

@@ -1,7 +1,6 @@
 import { assert } from 'chai';
 import Bootstrap from '../src/bootstrap';
 import Socket from '../src/socket';
-import events from '../src/common/events';
 
 describe('We shall run a socket from an URL', () => {
   it('We need a Socket class', () => {
