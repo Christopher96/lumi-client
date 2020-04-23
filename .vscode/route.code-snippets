@@ -39,7 +39,7 @@
       "\t}",
       "",
       "",
-      "\t public exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): void {",
+      "\t public async exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): Promise<void> {",
       "\tconst event = this.parseReq<{ arg: string }>(req);",
       "\tconst { args, params } = event;",
       "\tres.send(`You arguments where ${args.join(',')} and your arg params where ${params.arg}`);",

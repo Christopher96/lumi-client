@@ -2,6 +2,7 @@ import express from 'express';
 import events from '../common/events';
 import { Route } from './routes/route';
 import { EchoRoute } from './routes/echo';
+import { VersionRoute } from './routes/version';
 
 export class API {
   app: express.Application;
@@ -10,6 +11,8 @@ export class API {
     this.app = express();
 
     this.register(new EchoRoute());
+    this.register(new VersionRoute());
+
     this.app.listen(port, () => {
       console.log('app started');
     });
