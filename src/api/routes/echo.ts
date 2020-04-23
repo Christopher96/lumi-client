@@ -1,4 +1,4 @@
-import { Route, RouteParams, RouteParamsTypes } from './route';
+import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 
@@ -45,7 +45,10 @@ export class EchoRoute extends Route {
   protected readonly numberOfArguments = 1;
 
   /**
-   * Function which is called when executing the route
+   * Function which is called when executing the route. Looks
+   * at the args string and repeats it and reverses it if it
+   * is set to reversed.
+   *
    * @param req the request from the user
    * @param res a helper object which can send information to
    * the user.
