@@ -18,6 +18,7 @@ export type RouteParams = {
   [key: string]: {
     optional: boolean;
     type: RouteParamsTypes;
+    description?: string;
   };
 };
 
