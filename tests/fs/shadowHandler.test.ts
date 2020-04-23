@@ -77,11 +77,7 @@ describe('We shall be able to add, modify and delete files and folders with the 
   // recursive test function for the shadow handler is executed here:
   recursiveFSTest('', false, 7);
 
-  /*
-  TODO:
-  it('should be able to delete the .shadow folder', function() {
-    console.log('shadow folder: ' + sh.getShadowFolder());
-    sh.update(FileEventType.DIR_DELETED, sh.getShadowFolder());
-    assert.equal(fs.existsSync(sh.getShadowFolder()), false);
-  }); */
+  after('removing the .shadow folder', function() {
+    fs.removeSync(sh.getShadowFolder());
+  });
 });
