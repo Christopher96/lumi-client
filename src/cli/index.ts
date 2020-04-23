@@ -78,18 +78,30 @@ export class CLI {
       .action(async function(_, cmdObj) {
         const i = await Action.preform(cmdObj);
         console.log(i);
+        process.exit();
       });
 
+    //Defining the commands for the program's CLI client using Commander's API.
+    program
+      //Echo test command
+      .command('version')
+      .description('Echoes two strings provided by the user. For testing purposes.')
+      .alias('ec')
+      .option('-a, --api', 'Remove recursively')
+      .option('-c, --cli', 'Remove recursively')
+      .action(async function(cmdObj) {
+        const i = await Action.preform(cmdObj);
+        console.log(i);
+        process.exit();
+      });
     program
       //Create room, host session
       .command('create <path>')
       .description('Creates a new session and a room from a path to a repository.')
       .alias('c')
       .option('--test')
-
       .action(path => {
         create(path);
-
         Action.preform('/heartbeat');
       });
 

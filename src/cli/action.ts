@@ -4,7 +4,7 @@ import { spawn } from 'child_process';
 export class Action {
   static async preform(cmd: any): Promise<string> {
     const maxAttempts = 10;
-    const msBetweenTries = 1000;
+    const msBetweenTries = 2000;
     let attempts = 0;
 
     const checkServer = async (): Promise<boolean> => {
@@ -39,6 +39,7 @@ export class Action {
   }
 
   static startServer(): void {
+    console.log('Starting server');
     const cmd = 'node';
     spawn(cmd, ['dist', 'START_SERVER'], {
       detached: true
