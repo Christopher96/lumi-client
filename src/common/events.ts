@@ -12,8 +12,9 @@ const enum events {
   JOIN_ROOM = 'join_room',
   ROOM_AUTH = 'room_auth',
   UPLOAD_OK = 'upload_ok',
-  DOWNLOAD_CHUNK = 'download_chunk',
-  DOWNLOAD_ERR = 'download_err'
+  UPLOAD_DONE = 'upload_done',
+  UPLOAD_ERR = 'upload_err',
+  DOWNLOAD_CHUNK = 'download_chunk'
 }
 
 export default events;

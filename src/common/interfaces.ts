@@ -4,35 +4,35 @@ export interface EventHandler {
 }
 
 // Specification of socket payloads
-export interface User {
+export interface IUser {
   id: string;
 }
 
-export interface Room {
-  id: string;
-  source: string;
-}
-
-export interface IChunk {
+export interface Chunk {
   source: string;
   progress: number;
   done: boolean;
   data: Buffer;
 }
 
-export interface Patch {
-  room: Room;
+export interface IChunk {
+  chunk: Chunk;
+  room: IRoom;
+}
+
+export interface IPatch {
+  room: IRoom;
   diffs: Diff.ParsedDiff[];
 }
 
-export interface Message {
-  fromUser: User;
-  targetUser: User;
+export interface IMessage {
+  fromUser: IUser;
+  targetUser: IUser;
   message: string;
 }
 
 export interface IRoom {
-  roomID: string;
+  id: string;
   roomFolderPath: string;
   sourceFolderPath: string;
 }
