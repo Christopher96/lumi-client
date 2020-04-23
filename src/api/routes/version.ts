@@ -10,14 +10,16 @@ export class YourRoute extends Route {
   protected readonly description = 'this is an auto generated desc. Please change me';
   protected readonly numberOfArguments = 0;
 
-  private getVersion() {
-    return;
+  private getApiVersion() {
+    return -1;
   }
 
   public exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): void {
     const event = this.parseReq<null>(req);
     const { args } = event;
     const localVersion = process.env.BUILD_VERSION;
-    const apiVersion = res.send({ localVersion, apiVersion });
+    const apiVersion = this.getApiVersion();
+
+    res.send({ localVersion, apiVersion });
   }
 }
