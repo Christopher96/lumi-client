@@ -4,5 +4,6 @@ declare namespace NodeJS {
     SOCKET_HOST: string;
     SOCKET_PORT: string;
     SOCKET_URL: string;
+    BUILD_VERSION: string;
   }
 }
