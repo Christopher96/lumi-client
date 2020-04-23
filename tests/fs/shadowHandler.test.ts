@@ -19,12 +19,12 @@ describe('We shall be able to add, modify and delete files and folders with the 
 
   /**
    * The recusriveFSTest-function creates a directory with many folders and files recursively and then removes every item to test that the system behaves correctly.
-   * @param directory is the path to the folder which will be populated by the function.
+   * @param shadowDir is the path to the folder which will be populated by the function.
    * @param isFile is a boolean, if true: creates a file, if false: creates a folder.
    * @param count is a countdown to limit the size of the test.
    */
   const recursiveFSTest = (shadowDir: string, isFile: boolean, count: number) => {
-    //end case is when count is not more than 0
+    // end case is when count is not more than 0
     if (count > 0) {
       // local variables for each file/folder item
       const name = 'test' + count;
