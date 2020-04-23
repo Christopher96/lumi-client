@@ -1,3 +1,5 @@
-import { CLI } from './cli';
+import Bootstrap from './bootstrap';
+import Socket from './socket';
 
-new CLI();
+const serverUrl = Bootstrap.init();
+Socket.create(serverUrl);

@@ -1,4 +1,3 @@
-import { patchWatch } from './patch';
 import events from '../common/events';
 import { EventHandler, IRoom } from '../common/interfaces';
 import { UploadEvents } from './upload';
@@ -17,11 +16,11 @@ export class RoomEvents implements EventHandler {
     Socket.get().on(events.ROOM_CREATED, (room: IRoom) => {
       console.log(`created room ${room.id}`);
       // When the room is created upload the source
-      this.uploadEvents.uploadSource(room.source);
+      this.uploadEvents.uploadSource(room);
     });
 
     Socket.get().on(events.ROOM_AUTH, (room: IRoom) => {
-      console.log(`created room ${room.roomID}`);
+      console.log(`created room ${room.id}`);
       // When the room is created upload the source
       // this.downloadEvents.uploadSource(this.server, room);
 
