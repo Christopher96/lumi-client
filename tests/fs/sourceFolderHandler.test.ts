@@ -10,7 +10,7 @@ import { FileEventType } from '../../src/fs/fileEventType';
  * @date 2020-04-22
  */
 
-describe('We shall be able to identify and send source content updates', function() {
+describe('We shall be able to create a running SourceFolderHandler', function() {
   const sfh = new SourceFolderHandler('test-repo');
 
   it('should be able to create a sourceFolderHandler file', function() {

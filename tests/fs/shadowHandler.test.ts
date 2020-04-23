@@ -10,39 +10,74 @@ import { FileEventType } from '../../src/fs/fileEventType';
  * @date 2020-04-22
  */
 
-describe('We shall be able to handle shadow-file changes', function() {
-  const shadowTest = new ShadowHandler('test-repo');
-  const testFolderPath = path.join(shadowTest.getShadowFolder(), 'test-folder1');
-  const testFilePath = path.join(shadowTest.getShadowFolder(), 'test-file1');
+describe('We shall be able to add, modify and delete files and folders with the ShadowHandler', function() {
+  const sh = new ShadowHandler('test-repo');
 
   it('shadowHandler should exist', function() {
-    assert.exists(shadowTest);
+    assert.exists(sh);
   });
 
-  it('should be able to add a new folder', function() {
-    shadowTest.update(FileEventType.DIR_CREATED, 'test-folder1');
-    assert.equal(fs.lstatSync(testFolderPath).isDirectory(), true);
-  });
+  /**
+   * The recusriveFSTest-function creates a directory with many folders and files recursively and then removes every item to test that the system behaves correctly.
+   * @param shadowDir is the path to the folder which will be populated by the function.
+   * @param isFile is a boolean, if true: creates a file, if false: creates a folder.
+   * @param count is a countdown to limit the size of the test.
+   */
+  const recursiveFSTest = (shadowDir: string, isFile: boolean, count: number) => {
+    // end case is when count is not more than 0
+    if (count > 0) {
+      // local variables for each file/folder item
+      const name = 'test' + count;
+      const fromShadowDir = path.join(shadowDir, name);
+      const fromRootDir = path.join(sh.getShadowFolder(), fromShadowDir);
 
-  it('should be able to delete a folder', function() {
-    shadowTest.update(FileEventType.DIR_DELETED, 'test-folder1');
-    assert.equal(fs.existsSync(testFolderPath), false);
-  });
+      if (isFile) {
+        // add a new file
+        it('should be able to add a new file: ' + name, function() {
+          sh.update(FileEventType.FILE_CREATED, fromShadowDir, '');
+          assert.equal(fs.lstatSync(fromRootDir).isDirectory(), false);
+        });
 
-  it('should be able to add a new file', function() {
-    shadowTest.update(FileEventType.FILE_CREATED, 'test-file1', '');
-    assert.equal(fs.lstatSync(testFilePath).isDirectory(), false);
-  });
+        // modify this new file
+        it('should be able to modify a new file: ' + name, function() {
+          assert.equal(fs.readFileSync(fromRootDir).toString(), '');
+          sh.update(FileEventType.FILE_MODIFIED, fromShadowDir, 'test hej_' + count);
+          assert.equal(fs.lstatSync(fromRootDir).isDirectory(), false);
+          assert.equal(fs.readFileSync(fromRootDir).toString(), 'test hej_' + count);
+        });
 
-  it('should be able to modify a new file', function() {
-    assert.equal(fs.readFileSync(testFilePath).toString(), '');
-    shadowTest.update(FileEventType.FILE_MODIFIED, 'test-file1', 'test123');
-    assert.equal(fs.lstatSync(testFilePath).isDirectory(), false);
-    assert.equal(fs.readFileSync(testFilePath).toString(), 'test123');
-  });
+        // add more files in the same folder as this new file
+        recursiveFSTest(shadowDir, count < 5, --count);
 
-  it('should be able to delete a file', function() {
-    shadowTest.update(FileEventType.FILE_DELETED, 'test-file1');
-    assert.equal(fs.existsSync(testFilePath), false);
+        // delete this new file
+        it('should be able to delete a file', function() {
+          sh.update(FileEventType.FILE_DELETED, fromShadowDir);
+          assert.equal(fs.existsSync(fromRootDir), false);
+        });
+      } else {
+        // add a new folder
+        it('should be able to add a new folder: ' + name, function() {
+          sh.update(FileEventType.DIR_CREATED, fromShadowDir);
+          assert.equal(fs.lstatSync(fromRootDir).isDirectory(), true);
+        });
+
+        // populate this new folder with more data
+        recursiveFSTest(fromShadowDir, count < 5, --count);
+        recursiveFSTest(fromShadowDir, true, --count);
+
+        // delete this folder
+        it('should be able to delete a folder', function() {
+          sh.update(FileEventType.DIR_DELETED, fromShadowDir);
+          assert.equal(fs.existsSync(fromRootDir), false);
+        });
+      }
+    }
+  };
+
+  // recursive test function for the shadow handler is executed here:
+  recursiveFSTest('', false, 7);
+
+  after('removing the .shadow folder', function() {
+    fs.removeSync(sh.getShadowFolder());
   });
 });
