@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import events from './common/events';
-import { SocketHandler } from './events/socket';
+// import { SocketHandler } from './events/socket';
 import { CLI } from './cli';
 import { API } from './api';
 
@@ -14,7 +14,7 @@ export default class Socket {
     return this.socket;
   }
 
-  static create(serverUrl: string): SocketIOClient.Socket {
+  static create(serverUrl: string): void {
     // Create the server instance with the server
     this.socket = io(serverUrl, {
       transports: ['websocket']
@@ -24,7 +24,7 @@ export default class Socket {
     this.socket.on(events.CLIENT_CONNECT, () => {
       console.log('connected');
       // Handle the connection to the server
-      new SocketHandler();
+      // new SocketHandler();
 
       // Start a CLI
       new CLI();
