@@ -5,10 +5,12 @@
   "main": "dist",
   "scripts": {
     "start": "ts-node ./src",
+    "temp": "ts-node ./src/fs/shadowHandler.ts",
     "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
     "start:watch": "nodemon",
     "build": "tsc",
     "test:all": "npm test tests/**/*.test.ts",
+    "lint": "tsc --noEmit && eslint \"./src/**/*.ts\" --fix",
     "test": "mocha --exit -r ts-node/register tests/helper.test.ts"
   },
   "author": "",
@@ -26,13 +28,15 @@
     "inquirer": "^7.1.0",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.3",
+    "node-fetch": "^2.6.0",
     "node-watch": "^0.6.3",
     "path": "^0.12.7",
     "readfile-go": "^1.0.7",
     "reflect-metadata": "^0.1.13",
     "slash": "^3.0.0",
     "socket.io-client": "^2.3.0",
-    "tspath": "^1.3.7"
+    "tspath": "^1.3.7",
+    "zip-local": "^0.3.4"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
