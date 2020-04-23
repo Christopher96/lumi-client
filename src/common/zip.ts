@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 
 export default class Zip {
   currentFileCounter: number;
-  constructor(private dest: string) {
+  constructor() {
     this.currentFileCounter = 0;
   }
   /**
