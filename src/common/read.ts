@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import { EventEmitter } from 'events';
+import { IChunk } from './interfaces';
 
 const walk = (source: string): string[] => {
   let results = [];
@@ -38,4 +39,28 @@ export const readChunks = (source: string): { files: string[]; emitter: EventEmi
   });
 
   return { files, emitter };
+};
+
+export const readZip = (source: string): EventEmitter => {
+  // Create emitter so we can send stream the data
+  const emitter = new EventEmitter();
+
+  const readStream = fs.createReadStream(source);
+  const totalBytes = fs.statSync(source).size;
+
+  readStream.on('data', function(data) {
+    const progress = readStream.bytesRead / totalBytes;
+    const done = progress == 1;
+
+    const chunk: IChunk = {
+      source,
+      progress,
+      done,
+      data
+    };
+
+    emitter.emit('chunk', chunk);
+  });
+
+  return emitter;
 };
