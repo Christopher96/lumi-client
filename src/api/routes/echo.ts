@@ -2,7 +2,7 @@ import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 
-/**
+/*i
  * Class which echos the response from the user
  * mainly used for testing.
  */

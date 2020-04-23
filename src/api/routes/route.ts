@@ -162,7 +162,17 @@ export abstract class Route {
     return [false, paramOrArgument];
   }
 
-  public static getUrlFromCommands(commands: string[] | string) {
+  public static getUrlFromArgsAndOptions(args: string[], options: Record<string, string>): string {
+    const urlParam = new URLSearchParams();
+    let hasParams = false;
+    for (const i in options) {
+      hasParams = true;
+      urlParam.set(i, options[i]);
+    }
+    return `${args.join('/')}${hasParams ? '?' : ''}${urlParam.toString()}`;
+  }
+
+  public static getUrlFromCommands(commands: string[] | string): string {
     const joinedCommands = Array.isArray(commands) ? commands.join(' ') : commands;
     const wordsInCommand = joinedCommands.split(' ');
     const args = [];
@@ -194,13 +204,7 @@ export abstract class Route {
       }
     }
 
-    const urlParam = new URLSearchParams();
-    let hasParams = false;
-    for (const i in params) {
-      hasParams = true;
-      urlParam.set(i, params[i]);
-    }
-    return `${args.join('/')}${hasParams ? '?' : ''}${urlParam.toString()}`;
+    return Route.getUrlFromArgsAndOptions(args, params);
   }
 }
 
