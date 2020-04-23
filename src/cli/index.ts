@@ -1,5 +1,6 @@
 import { InteractiveCLI } from './interactive';
 import { program } from 'commander';
+import e from 'express';
 
 export class CLI {
   constructor() {
@@ -7,9 +8,9 @@ export class CLI {
      * Command [Create]: '-c' '--create'
      * Creates a new room, assigning the creator as a host.
      */
-    function create() {
+    function create(path) {
       var id = 'LUMI1234';
-      console.log('LUMI: Creating room with ID: ' + id);
+      console.log('LUMI: Creating room with ID: ' + id + ' from folder at path: ' + path);
     }
 
     /**
@@ -60,15 +61,56 @@ export class CLI {
      */
     function log() {}
 
+    //Defining the options for the program's CLI client using Commander's API.
+    program
+    .version('0.0.1')
+    .description('This is a CLI for LUMI.')
+
+    .option('-l', '--log', log);
+
     //Defining the commands for the program's CLI client using Commander's API.
     program
-      .version('0.0.1')
-      .description('This is a test CLI for LUMI.')
-      .option('-c, --create', 'Creates a room with a randomized ID.', create)
-      .option('-e, --end <string>', 'Closes the room with the specified ID.', end)
-      .option('-j, --join <string>', 'Connects a client to the room with the specified ID.', join)
-      .option('-l, --leave', 'Disconnects the client from the room it is connected to.', leave)
-      .option('-i --id', 'Returns the current room ID.', getID)
-      .parse(process.argv); //End the process by parsing the input.
+      //Echo test command
+      .command('echo <text1> <text2>')
+      .description('Echoes two strings provided by the user. For testing purposes.')
+      .alias('ec')
+      .action((text1, text2) => { console.log(text1 + text2); })
+    
+    program
+    //Create room, host session
+      .command('create <path>')
+      .description('Creates a new session and a room from a path to a repository.')
+      .alias('c')
+      .action((path) => { create(path); })
+
+    program
+    //End session
+      .command('end <id>')
+      .description('Ends a session, disconnecting all connected clients.')
+      .alias('e')
+      .action((id) => { end(id); })
+
+    program
+    //Joins a session
+      .command('join <id>')
+      .description('Joins an active session.')
+      .alias('j')
+      .action((id) => { join(id); })
+
+    program
+    //Leave session
+      .command('leave')
+      .description('Leaves the session to which you are connected.')
+      .alias('l')
+      .action(() => { leave(); })
+
+    program
+    //Get current session ID.
+      .command('getid')
+      .description('Returns the ID of the current session.')
+      .alias('id')
+      .action(() => { getID(); })
+
+    program.parse(process.argv); //End the process by parsing the input.*/
   }
 }
