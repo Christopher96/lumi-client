@@ -1,35 +1,28 @@
-import extract from 'extract-zip';
+import zipper from 'zip-local';
 import fs from 'fs-extra';
-import archiver from 'archiver';
 
-export class Zip {
+export default class Zip {
   /**
-   *
-   * @param sourcefile - The name of the zip file to be unpacked.
+   * Synchronous method to extract a zip archive to a specified file or folder.
+   * @param source - The name of the zip file to be unpacked.
    * @param dest - The destination folder where the contents will be unpacked. Requires an absolute path.
    */
-  public zipUnpack(sourcefile: string, dest: string): void {
-    extract(sourcefile, { dir: dest });
-    console.log('unzipped');
+  public unpack(source: string, dest: string): void {
+    if (!fs.existsSync(dest)) {
+      fs.mkdirSync(dest);
+    }
+    zipper.sync.unzip(source).save(dest);
   }
 
   /**
-   *
-   * @param sourcefile - The name of the file or folder to be zipped.
+   * Synchronous method to create a zip archive from a specified file or folder.
+   * @param source - The name of the file or folder to be zipped.
    * @param dest - The destination folder to write the zip archive. Requires relative path.
    */
-  public zipPack(sourcefile: string, dest: string): Promise<void> {
-    const archive = archiver('zip', { zlib: { level: 9 } });
-    const stream = fs.createWriteStream(dest);
-
-    return new Promise((resolve, reject) => {
-      archive
-        .directory(sourcefile, false)
-        .on('error', err => reject(err))
-        .pipe(stream);
-
-      stream.on('close', () => resolve());
-      archive.finalize();
-    });
+  public pack(source: string, dest: string): void {
+    zipper.sync
+      .zip(source)
+      .compress()
+      .save(dest);
   }
 }
