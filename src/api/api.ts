@@ -33,5 +33,7 @@ export class API {
         this.app.get('/' + route.getPath().url, route.callExec());
         this.app.get('/' + route.getPath().shortUrl, route.callExec());
     }
+
+    route.register();
   }
 }

@@ -40,6 +40,10 @@ type Method = 'GET';
 
 export abstract class Route {
   /**
+   * Keeps track on all the registered routes
+   */
+  private static allRoutes: Map<string, Route> = new Map();
+  /**
    * This is the description for the route. This will be used
    * with the help command.
    */
@@ -68,6 +72,20 @@ export abstract class Route {
    */
   protected readonly method?: Method;
 
+  register(): void {
+    const name = this.getName();
+
+    if (Route.allRoutes.has(name)) {
+      throw new Error('You are not allowed to add more than one with the same name: ' + name);
+    } else {
+      Route.allRoutes.set(name, this);
+    }
+  }
+
+  public getName(): string {
+    return this.name;
+  }
+
   protected abstract exec(
     req: Request<ParamsDictionary, any, any, Query>,
     res: Response<any>,
@@ -82,7 +100,7 @@ export abstract class Route {
    */
   protected parseReq<T extends ParamsDictionary>(req: Request<ParamsDictionary, any, any, Query>): ParsedReq<T> {
     const args = Object.values(req.params);
-    const params = req.query as T;
+    const params = Object.keys(req.query).length > 0 && (req.query as T);
 
     return {
       args,
@@ -127,6 +145,61 @@ export abstract class Route {
   public callExec() {
     return (req: Request<ParamsDictionary, any, any, Query>, res: Response<any>, next: NextFunction) =>
       this.exec(req, res, next);
+  }
+
+  public static checkIfIsParam(paramOrArgument: string): [boolean, string] {
+    const isParam = paramOrArgument[0] == '-';
+
+    if (isParam) {
+      if (paramOrArgument.includes('--')) {
+        return [true, paramOrArgument.replace('--', '')];
+      } else {
+        return [true, paramOrArgument.replace('-', '')];
+      }
+    }
+
+    return [false, paramOrArgument];
+  }
+
+  public static getUrlFromCommands(commands: string[] | string) {
+    const joinedCommands = Array.isArray(commands) ? commands.join(' ') : commands;
+    const wordsInCommand = joinedCommands.split(' ');
+    const args = [];
+    const params: Record<string, string> = {};
+
+    while (wordsInCommand.length > 0) {
+      const command = wordsInCommand.shift();
+      const [isParam, parsedParam] = Route.checkIfIsParam(command);
+
+      if (isParam) {
+        const nextArgument = wordsInCommand.shift();
+
+        if (!nextArgument) {
+          params[parsedParam] = 'true';
+          continue;
+        }
+
+        const [nextArgumentIsParam] = Route.checkIfIsParam(nextArgument);
+
+        if (nextArgumentIsParam) {
+          params[parsedParam] = 'true';
+          wordsInCommand.unshift(nextArgument);
+          continue;
+        }
+
+        params[parsedParam] = nextArgument;
+      } else {
+        args.push(command);
+      }
+    }
+
+    const urlParam = new URLSearchParams();
+    let hasParams = false;
+    for (const i in params) {
+      hasParams = true;
+      urlParam.set(i, params[i]);
+    }
+    return `${args.join('/')}${hasParams ? '?' : ''}${urlParam.toString()}`;
   }
 }
 
