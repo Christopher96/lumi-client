@@ -47,7 +47,6 @@ export const readZip = (source: string): EventEmitter => {
 
   const readStream = fs.createReadStream(source);
   const totalBytes = fs.statSync(source).size;
-  console.log(source);
 
   readStream.on('data', function(data) {
     const progress = readStream.bytesRead / totalBytes;

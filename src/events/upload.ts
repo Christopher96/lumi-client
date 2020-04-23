@@ -1,7 +1,8 @@
 import events from '../common/events';
-import { IRoom, EventHandler } from '../common/interfaces';
+import { IRoom, EventHandler, IChunk } from '../common/interfaces';
 import { readZip } from '../common/read';
 import Socket from '../socket';
+import Zip from '../common/zip';
 
 export class UploadEvents implements EventHandler {
   constructor() {
@@ -9,12 +10,18 @@ export class UploadEvents implements EventHandler {
   }
 
   uploadSource(room: IRoom): void {
-    // Read the chunks from the source
-    const emitter = readZip(room.sourceFolderPath);
+    const zip = new Zip();
+    const source = room.sourceFolderPath;
+    const dest = `${source}.zip`;
+
+    zip.pack(source, dest);
+
+    // Read the chunks from the zip
+    const emitter = readZip(dest);
 
     // When a file in the source has been read
-    emitter.on('chunk', chunk => {
-      console.log(`uploading ${chunk.path}`);
+    emitter.on('chunk', (chunk: IChunk) => {
+      console.log(`uploading chunk, progress: ${chunk.progress}`);
       // Send it to the server
       Socket.get().emit(events.DOWNLOAD_CHUNK, {
         room,
