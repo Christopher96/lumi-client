@@ -8,11 +8,6 @@ export interface User {
   id: string;
 }
 
-export interface Room {
-  id: string;
-  source: string;
-}
-
 export interface IChunk {
   source: string;
   progress: number;
@@ -21,7 +16,7 @@ export interface IChunk {
 }
 
 export interface Patch {
-  room: Room;
+  room: IRoom;
   diffs: Diff.ParsedDiff[];
 }
 
