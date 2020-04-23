@@ -23,6 +23,9 @@ export class ShadowHandler {
     // setting the local variable shadowFolder to the directory of the shadow folder
     this.shadowFolder = path.join(sourceFolder, '.shadow');
 
+    // removes old shadow files.
+    fs.removeSync(this.shadowFolder);
+
     // creating the shadow folder at the shadowFolder directory.
     fs.ensureDirSync(this.shadowFolder);
   }
