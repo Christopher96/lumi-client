@@ -37,3 +37,5 @@ export class API {
     route.register();
   }
 }
+
+export default API;
