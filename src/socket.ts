@@ -1,8 +1,7 @@
 import io from 'socket.io-client';
 import events from './common/events';
 // import { SocketHandler } from './events/socket';
-import { CLI } from './cli';
-import { API } from './api/api';
+import Bootstrap from './bootstrap';
 
 export default class Socket {
   private static socket: SocketIOClient.Socket;
@@ -14,7 +13,9 @@ export default class Socket {
     return this.socket;
   }
 
-  static create(serverUrl: string): void {
+  static create(): void {
+    const serverUrl = Bootstrap.init();
+
     // Create the server instance with the server
     this.socket = io(serverUrl, {
       transports: ['websocket']
@@ -25,12 +26,6 @@ export default class Socket {
       console.log('connected');
       // Handle the connection to the server
       // new SocketHandler();
-
-      // Start a CLI
-      new CLI();
-
-      // Start express API
-      new API(null, 4000);
     });
   }
 }

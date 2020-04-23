@@ -32,7 +32,7 @@ export interface Message {
 }
 
 export interface IRoom {
-  roomID: string;
+  id: string;
   roomFolderPath: string;
   sourceFolderPath: string;
 }
