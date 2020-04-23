@@ -33,13 +33,14 @@ export class ShadowHandler {
   /**
    * The update method should be called when a file change has been received from the server.
    * This file change then results in the coresponding modification of the source folder.
-   * @param event
-   * @param path example: 'src/index.ts'
+   * @param event The type of file change event that has occured.
+   * @param path Example: 'src/index.ts'.
+   * @param fileContent This field is used when the event is FILE_CREATED or FILE_MODIFIED.
    */
   public update(event: FileEventType, relativePath: string, fileContent?: string): Promise<void> {
     const operationPath = path.join(this.shadowFolder, relativePath);
 
-    // Runs the appropriate file operation that was sent from the client.
+    // Runs the appropriate file operation that was sent from the server.
     switch (event) {
       case FileEventType.FILE_CREATED:
       case FileEventType.FILE_MODIFIED:
