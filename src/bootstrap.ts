@@ -4,6 +4,8 @@ import path from 'path';
 // funcitonality
 import 'reflect-metadata';
 import dotenv from 'dotenv';
+import API from './api/api';
+import Socket from './socket';
 
 export default class Bootstrap {
   static init(): string {
