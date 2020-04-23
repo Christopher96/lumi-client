@@ -3,6 +3,7 @@ import events from '../common/events';
 import { Route } from './routes/route';
 import { EchoRoute } from './routes/echo';
 import { VersionRoute } from './routes/version';
+import { JoinRoute } from './routes/join';
 
 export class API {
   app: express.Application;
@@ -12,6 +13,7 @@ export class API {
 
     this.register(new EchoRoute());
     this.register(new VersionRoute());
+    this.register(new JoinRoute());
 
     this.app.listen(port, () => {
       console.log('app started');
