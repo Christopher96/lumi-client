@@ -1,3 +1,5 @@
-import { CLI } from './cli';
+import { CLI } from './cli/cli';
+import Socket from './socket';
 
-new CLI();
+Socket.create();
+// new CLI();

@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import { EventEmitter } from 'events';
-import { IChunk } from './interfaces';
+import { IRoom, Chunk } from './interfaces';
 
 const walk = (source: string): string[] => {
   let results = [];
@@ -52,7 +52,7 @@ export const readZip = (source: string): EventEmitter => {
     const progress = readStream.bytesRead / totalBytes;
     const done = progress == 1;
 
-    const chunk: IChunk = {
+    const chunk: Chunk = {
       source,
       progress,
       done,

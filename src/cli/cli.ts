@@ -1,7 +1,6 @@
 import { InteractiveCLI } from './interactive';
 import { program } from 'commander';
 import e from 'express';
-import Action from './action';
 
 export class CLI {
   constructor() {
@@ -66,43 +65,26 @@ export class CLI {
     program
       .version('0.0.1')
       .description('This is a CLI for LUMI.')
+
       .option('-l', '--log', log);
 
     //Defining the commands for the program's CLI client using Commander's API.
     program
       //Echo test command
-      .command('echo <test>')
+      .command('echo <text1> <text2>')
       .description('Echoes two strings provided by the user. For testing purposes.')
       .alias('ec')
-      .option('-r, --recursive', 'Remove recursively')
-      .action(async function(_, cmdObj) {
-        const i = await Action.preform(cmdObj);
-        console.log(i);
-        process.exit();
+      .action((text1, text2) => {
+        console.log(text1 + text2);
       });
 
-    //Defining the commands for the program's CLI client using Commander's API.
-    program
-      //Echo test command
-      .command('version')
-      .description('Echoes two strings provided by the user. For testing purposes.')
-      .alias('ec')
-      .option('-a, --api', 'Remove recursively')
-      .option('-c, --cli', 'Remove recursively')
-      .action(async function(cmdObj) {
-        const i = await Action.preform(cmdObj);
-        console.log(i);
-        process.exit();
-      });
     program
       //Create room, host session
       .command('create <path>')
       .description('Creates a new session and a room from a path to a repository.')
       .alias('c')
-      .option('--test')
       .action(path => {
         create(path);
-        Action.preform('/heartbeat');
       });
 
     program
