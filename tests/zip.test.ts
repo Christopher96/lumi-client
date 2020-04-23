@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import fs from 'fs-extra';
 
 describe('We shall be able to zip and unzip directories', () => {
-  const zipper = new Zip('archive.zip');
+  const zipper = new Zip();
 
   const repo = 'test-repo';
   const file1 = 'test';
