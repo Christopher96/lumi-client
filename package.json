@@ -28,6 +28,7 @@
     "inquirer": "^7.1.0",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.3",
+    "node-fetch": "^2.6.0",
     "node-watch": "^0.6.3",
     "path": "^0.12.7",
     "readfile-go": "^1.0.7",
