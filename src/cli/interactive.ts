@@ -1,9 +1,10 @@
 import inquirer from 'inquirer';
 import events from '../common/events';
 import { Room } from '../common/interfaces';
+import Socket from '../socket';
 
 export class InteractiveCLI {
-  constructor(private server: SocketIOClient.Socket) {
+  constructor() {
     this.menu();
   }
 
@@ -22,7 +23,7 @@ export class InteractiveCLI {
       ])
       .then(answers => {
         const option = options.indexOf(answers.option);
-        this.server.emit(events.JOIN_ROOM, rooms[option]);
+        Socket.get().emit(events.JOIN_ROOM, rooms[option]);
       });
   }
 
@@ -47,13 +48,13 @@ export class InteractiveCLI {
             // TODO Select the source folder interactively or through command
             const source = 'test-repo';
             // Create the room with the chosen source folder
-            this.server.emit(events.CREATE_ROOM, source);
+            Socket.get().emit(events.CREATE_ROOM, source);
             break;
           case 1:
             // Ask for a list of rooms
-            this.server.emit(events.LIST_ROOMS);
+            Socket.get().emit(events.LIST_ROOMS);
             // When we get the rooms back
-            this.server.on(events.LIST_ROOMS, (rooms: Room[]) => {
+            Socket.get().on(events.LIST_ROOMS, (rooms: Room[]) => {
               // Send them to next dialog handler
               this.selectRoom(rooms);
             });

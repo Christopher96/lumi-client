@@ -11,8 +11,8 @@ const enum events {
   ROOM_CREATED = 'room_created',
   JOIN_ROOM = 'join_room',
   ROOM_AUTH = 'room_auth',
+  UPLOAD_OK = 'upload_ok',
   DOWNLOAD_CHUNK = 'download_chunk',
-  DOWNLOAD_OK = 'download_ok',
   DOWNLOAD_ERR = 'download_err'
 }
 
