@@ -37,28 +37,31 @@ export class ShadowHandler {
    * @param path example: 'src/index.ts'
    */
   public update(event: FileEventType, relativePath: string, fileContent?: string): Promise<void> {
-    return new Promise<void>(resolve => {
-      const operationPath = path.join(this.shadowFolder, relativePath);
+    const operationPath = path.join(this.shadowFolder, relativePath);
 
-      // runs the appropriate file operation that was sent from the server and received to this client.
-      switch (event) {
-        case FileEventType.FILE_CREATED:
-        case FileEventType.FILE_MODIFIED:
-          fs.writeFileSync(operationPath, fileContent);
-          break;
-        case FileEventType.DIR_CREATED:
-          fs.ensureDirSync(operationPath);
-          break;
-        case FileEventType.FILE_DELETED:
-        case FileEventType.DIR_DELETED:
-          fs.removeSync(operationPath);
-          break;
-        default:
-          throw new Error('Could not update shadow folder');
-      }
-
-      resolve();
-    });
+    // Runs the appropriate file operation that was sent from the client.
+    switch (event) {
+      case FileEventType.FILE_CREATED:
+      case FileEventType.FILE_MODIFIED:
+        return new Promise<void>((resolve, reject) => {
+          fs.writeFile(operationPath, fileContent, err => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+      case FileEventType.DIR_CREATED:
+        return fs.ensureDir(operationPath);
+      case FileEventType.FILE_DELETED:
+      case FileEventType.DIR_DELETED:
+        return new Promise<void>((resolve, reject) => {
+          fs.remove(operationPath, err => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+      default:
+        throw new Error('Could not update shadow folder');
+    }
   }
 
   /**
