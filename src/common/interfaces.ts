@@ -8,14 +8,15 @@ export interface User {
   id: string;
 }
 
-// TODO Add proper typing of ID
 export interface Room {
   id: string;
   source: string;
 }
 
-export interface Chunk {
-  path: string;
+export interface IChunk {
+  source: string;
+  progress: number;
+  done: boolean;
   data: Buffer;
 }
 

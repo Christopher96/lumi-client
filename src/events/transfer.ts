@@ -7,15 +7,12 @@ export class DownloadEvents implements EventHandler {
     this.addEvents();
   }
 
-  private filesToUpload: number;
-
   // uploadSource(server: SocketIOClient.Socket, room: Room): void {
   //   // Read the chunks from the source
   //   const { files, emitter } = readChunks(room.sourceFolderPath);
 
   //   // Update the number of files we want to upload
   //   this.filesToUpload = files.length;
-
   //   // When a file in the source has been read
   //   emitter.on('chunk', chunk => {
   //     console.log(`uploading ${chunk.path}`);
