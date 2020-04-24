@@ -2,7 +2,7 @@ import fs from 'fs';
 import events from '@common/events';
 import { EventHandler, IRoom } from '@common/interfaces';
 import { UploadEvents } from './upload';
-import Socket from '../socket';
+import Socket from '@src/socket';
 
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;

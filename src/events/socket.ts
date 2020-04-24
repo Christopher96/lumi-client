@@ -2,7 +2,7 @@ import events from '@common/events';
 import { EventHandler, IUser, IMessage } from '@common/interfaces';
 // import { PatchEvents } from './patch';
 import { RoomEvents } from './room';
-import Socket from '../socket';
+import Socket from '@src/socket';
 
 export class SocketHandler implements EventHandler {
   constructor() {
