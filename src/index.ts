@@ -1,3 +1,4 @@
+require('module-alias/register');
 import { CLI } from './cli/cli';
 import Socket from './socket';
 
