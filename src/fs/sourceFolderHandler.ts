@@ -1,7 +1,6 @@
 import { FileEventType } from './fileEventType';
 import { SourceFolderWatcher } from './sourceFolderWatcher';
 import fs from 'fs';
-import path from 'path';
 
 /**
  * The SourceFolderHandler class uses the sourceFolderWatcher to receive file and folder updates and then
@@ -27,13 +26,15 @@ export class SourceFolderHandler {
     // starting to listen to any file changes from the sourceFolderWatcher.
     this.sourceFolderWatcher.onFileChange((event: FileEventType, relativePath: string) => {
       if (event == FileEventType.FILE_CREATED || event == FileEventType.FILE_MODIFIED) {
-        const content = fs.readFileSync(relativePath).toString(); //content
+        fs.readFile(relativePath, (err: NodeJS.ErrnoException, data: Buffer) => {
+          if (err) throw err;
 
-        console.log(
-          'Should send file ' + event + '-operation to the server with path=' + relativePath + ' and content=' + content
-        );
+          console.log(
+            'Should send file ' + event + '-operation to the server with path=' + relativePath + ' and content=' + data
+          );
 
-        // TODO: send event, path and content to server
+          // TODO: send event, path and content to server
+        });
       } else {
         console.log('Should send file/folder ' + event + '-operation to the server with path=' + relativePath);
         // TODO: send event and path to server
