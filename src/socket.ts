@@ -21,6 +21,7 @@ export default class Socket {
       transports: ['websocket']
     });
 
+    console.log('>>');
     // On connection to the server
     this.socket.on(events.CLIENT_CONNECT, () => {
       console.log('connected');
