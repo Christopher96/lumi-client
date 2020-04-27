@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import { FileEventType } from './fileEventType';
 import path from 'path';
+import {}
 
 /**
  * The ShadowHandler class is used for handling file operations such as creating, removing and moving files and folders.
@@ -28,6 +29,8 @@ export class ShadowHandler {
 
     // creating the shadow folder at the shadowFolder directory.
     fs.ensureDirSync(this.shadowFolder);
+
+    
   }
 
   /**

@@ -14,6 +14,7 @@ const enum events {
   UPLOAD_OK = 'upload_ok',
   UPLOAD_DONE = 'upload_done',
   UPLOAD_ERR = 'upload_err',
+  FILE_CHANGE = 'file_change',
   DOWNLOAD_CHUNK = 'download_chunk'
 }
 

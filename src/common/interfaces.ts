@@ -1,3 +1,5 @@
+import { FileEventType } from "../fs/fileEventType";
+
 // Class interfaces
 export interface EventHandler {
   addEvents: () => void;
@@ -29,6 +31,13 @@ export interface IMessage {
   fromUser: IUser;
   targetUser: IUser;
   message: string;
+}
+
+export interface IFileChange {
+  event: FileEventType,
+  relativePath: string,
+  room: IRoom,
+  data?: Buffer,
 }
 
 export interface IRoom {
