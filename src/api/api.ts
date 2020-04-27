@@ -3,8 +3,10 @@ import events from '@common/events';
 import { Route } from './routes/route';
 import { EchoRoute } from './routes/echo';
 import { VersionRoute } from './routes/version';
+import { CreateRoute } from './routes/createRoom';
 import { JoinRoute } from './routes/join';
 import { HealthCheckRoute } from './routes/healthcheck';
+
 export class API {
   app: express.Application;
 
@@ -13,8 +15,11 @@ export class API {
 
     this.register(new EchoRoute());
     this.register(new VersionRoute());
+    this.register(new CreateRoute());
     this.register(new JoinRoute());
+    this.register(new LeaveRoute());
     this.register(new HealthCheckRoute());
+
 
     this.app.listen(port, () => {
       console.log('app started');

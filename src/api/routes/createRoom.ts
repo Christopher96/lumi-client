@@ -2,8 +2,6 @@ import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 import events from '../../common/events';
-import Socket from '../../socket';
-
 //import { Socket } from 'dgram';
 //import roomClass from classes/Room;
 
@@ -13,12 +11,12 @@ import Socket from '../../socket';
  * @author Tobias Johannesson
  * Written 2020-04-23
  */
-export class JoinRoute extends Route {
-  protected readonly name = 'join';
-  protected readonly shortName = 'j';
-  protected readonly description = 'This route enables user to request to join a specified room (roomID) sent as argument. Then gets a message when room has been joined';
-  protected readonly numberOfArguments = 0;
-  
+export class CreateRoute extends Route {
+  protected readonly name = 'createRoom';
+  protected readonly shortName = 'cRoom';
+  protected readonly description =
+    'This route enables user to request to create a room, sends sourceFolderPath, args[0]';
+  protected readonly numberOfArguments = 1;
   protected readonly params = {
     roomID: {
       optional: true,
@@ -30,18 +28,15 @@ export class JoinRoute extends Route {
     const event = this.parseReq<{ roomID: string }>(req);
     const { args, params } = event;
 
-    // ID of RoomClass client wants to join
-    const roomID = args[0];
-    
-    const socket = Socket.get();
-    //Asks server to join room with ID roomID
-    socket.emit(events.JOIN_ROOM, roomID);
+    // sourceFolderPath is where the folder to zip and transfer is located
+    const sourceFolderPath = args[0];
 
-    // TODO test if works
-    //socket.on('JOINED_ROOM', roomID => {
-    res.send('You have requested to join a room');
-    //});
-    // Sends a message to CLI that client joined room with ID = roomID
-    //res.send(You have succesfully joined a room! ${roomID});
+    // Current socket
+    const socket = io();
+    //Asks server to create room and sends with sourceFolderPath
+    socket.emit(events.CREATE_ROOM, sourceFolderPath);
+
+    // TODO test if worked
+    res.send(`You have requested to create a room`);
   }
 }
