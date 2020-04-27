@@ -1,7 +1,8 @@
-import events from '../common/events';
-import { EventHandler, IRoom } from '../common/interfaces';
+import fs from 'fs';
+import events from '@common/events';
+import { EventHandler, IRoom } from '@common/interfaces';
 import { UploadEvents } from './upload';
-import Socket from '../socket';
+import Socket from '@src/socket';
 
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;
@@ -10,6 +11,14 @@ export class RoomEvents implements EventHandler {
     // Create events for incoming downloads
     this.uploadEvents = new UploadEvents();
     this.addEvents();
+  }
+
+  createRoom(source: string) {
+    if (fs.existsSync(source)) {
+      Socket.get().emit(events.CREATE_ROOM, source);
+    } else {
+      throw new Error('Source does not exist');
+    }
   }
 
   addEvents(): void {
