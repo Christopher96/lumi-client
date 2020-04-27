@@ -33,8 +33,10 @@ export class CLI {
      *
      * @param id ID of room to join.
      */
-    function join(id: string) {
-      console.log('LUMI: Joining room with ID: ' + id);
+    async function join(cmdObj: any) {
+      const i = await Action.preform(cmdObj);
+      console.log(i);
+      process.exit();
     }
 
     /**
@@ -118,11 +120,11 @@ export class CLI {
 
     program
       //Joins a session
-      .command('join <id>')
+      .command('join')
       .description('Joins an active session.')
       .alias('j')
-      .action(id => {
-        join(id);
+      .action((cmdObj: any) => {
+        return join(cmdObj);
       });
 
     program

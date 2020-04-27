@@ -6,9 +6,10 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 import API from './api/api';
 import Socket from './socket';
+import { CLI } from './cli/cli';
 
 export default class Bootstrap {
-  static init(): string {
+  static init(): void {
     if (process.env.NODE_ENV === 'prod') {
       dotenv.config({
         path: path.resolve(process.cwd(), '.env')
@@ -19,13 +20,19 @@ export default class Bootstrap {
       });
     }
 
-    const socketHost = process.env.SOCKET_HOST;
-    const socketPort = Number.parseInt(process.env.SOCKET_PORT);
+    Socket.create();
 
-    if (!socketHost || !socketPort) {
-      throw new Error('You have to define a port for socket and rest');
+    const clientPort = process.env.CLIENT_SERVER_PORT;
+
+    if (!clientPort) {
+      throw new Error('You need to configure a client server port');
     }
 
-    return `http://${socketHost}:${socketPort}`;
+    if (process.argv[2] === 'START_SERVER') {
+      console.log('Starting server');
+      new API(Socket.get(), Number.parseFloat(clientPort));
+    } else {
+      new CLI();
+    }
   }
 }

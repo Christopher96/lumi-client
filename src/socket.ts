@@ -14,14 +14,19 @@ export default class Socket {
   }
 
   static create(): void {
-    const serverUrl = Bootstrap.init();
+    const socketHost = process.env.SOCKET_HOST;
+    const socketPort = Number.parseInt(process.env.SOCKET_PORT);
 
+    if (!socketHost || !socketPort) {
+      throw new Error('You have to define a port for socket and rest');
+    }
+
+    const serverUrl = `http://${socketHost}:${socketPort}`;
     // Create the server instance with the server
     this.socket = io(serverUrl, {
       transports: ['websocket']
     });
 
-    console.log('>>');
     // On connection to the server
     this.socket.on(events.CLIENT_CONNECT, () => {
       console.log('connected');
