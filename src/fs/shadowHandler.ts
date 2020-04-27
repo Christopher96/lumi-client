@@ -3,7 +3,7 @@ import { FileEventType } from './fileEventType';
 import path from 'path';
 import events from '../common/events';
 import Socket from '../socket';
-import { IRoom } from '../common/interfaces';
+import { IRoom, FileChange } from '../common/interfaces';
 
 /**
  * The ShadowHandler class is used for handling file operations such as creating, removing and moving files and folders.
@@ -30,25 +30,20 @@ export class ShadowHandler {
 
     // creating the shadow folder at the shadowFolder directory.
     fs.ensureDirSync(this.shadowFolder);
-
-    
   }
 
   /**
    * The update method should be called when a file change has been received from the server.
    * This file change then results in the coresponding modification of the source folder.
-   * @param event The type of file change event that has occured.
-   * @param path Example: 'src/index.ts'.
-   * @param fileContent This field is used when the event is FILE_CREATED or FILE_MODIFIED.
    */
-  public update(event: FileEventType, relativePath: string, fileContent?: Buffer): Promise<void> {
-    const operationPath = path.join(this.shadowFolder, relativePath);
+  public update(fileChange: FileChange): Promise<void> {
+    const operationPath = path.join(this.shadowFolder, fileChange.relativePath);
 
     // Runs the appropriate file operation that was sent from the server.
-    switch (event) {
+    switch (fileChange.event) {
       case FileEventType.FILE_CREATED:
         return new Promise<void>((resolve, reject) => {
-          fs.writeFile(operationPath, fileContent, err => {
+          fs.writeFile(operationPath, fileChange.data, err => {
             if (err) reject(err);
             else resolve();
           });
