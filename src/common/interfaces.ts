@@ -1,11 +1,10 @@
-import { FileEventType } from "../fs/fileEventType";
+import { FileEventType } from '@src/fs/fileEventType';
 
 // Class interfaces
 export interface EventHandler {
   addEvents: () => void;
 }
 
-// Specification of socket payloads
 export interface IUser {
   id: string;
 }
@@ -27,6 +26,17 @@ export interface IPatch {
   diffs: Diff.ParsedDiff[];
 }
 
+export interface FileChange {
+  event: FileEventType;
+  relativePath: string;
+  data?: Buffer;
+}
+
+export interface IFileChange {
+  fileChange: FileChange;
+  room: IRoom;
+}
+
 export interface IMessage {
   fromUser: IUser;
   targetUser: IUser;
@@ -34,14 +44,14 @@ export interface IMessage {
 }
 
 export interface FileChange {
-  event: FileEventType,
-  relativePath: string,
-  data?: Buffer,
+  event: FileEventType;
+  relativePath: string;
+  data?: Buffer;
 }
 
 export interface IFileChange {
-  fileChange: FileChange,
-  room: IRoom,
+  fileChange: FileChange;
+  room: IRoom;
 }
 
 export interface IRoom {

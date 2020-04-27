@@ -9,7 +9,7 @@ export class UploadEvents implements EventHandler {
     this.addEvents();
   }
 
-  uploadSource(room: IRoom): void {
+  uploadSourceFolder(room: IRoom): void {
     const zip = new Zip();
     const source = room.sourceFolderPath;
     const dest = `${source}.zip`;
@@ -21,7 +21,7 @@ export class UploadEvents implements EventHandler {
 
     // When a file in the source has been read
     emitter.on('chunk', (chunk: Chunk) => {
-      console.log(`uploading chunk, progress: ${chunk.progress}`);
+      console.log(`UPLOADING CHUNK, PROGRESS: ${chunk.progress}`);
 
       const ichunk: IChunk = {
         chunk,
@@ -35,13 +35,13 @@ export class UploadEvents implements EventHandler {
 
   addEvents(): void {
     // The server successfully downloaded the file
-    Socket.get().on(events.UPLOAD_OK, (chunk: IChunk) => {
-      console.log(chunk);
+    Socket.get().on(events.UPLOAD_OK, (ichunk: IChunk) => {
+      console.log('UPLOAD OK');
     });
 
-    Socket.get().on(events.UPLOAD_DONE, (chunk: IChunk) => {
-      console.log(chunk);
-      Socket.get().emit(events.JOIN_ROOM, chunk.room);
+    Socket.get().on(events.UPLOAD_DONE, (ichunk: IChunk) => {
+      console.log('UPLOAD DONE, JOINING ROOM');
+      Socket.get().emit(events.JOIN_ROOM, ichunk.room.id);
     });
   }
 }

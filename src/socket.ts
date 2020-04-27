@@ -23,7 +23,7 @@ export default class Socket {
 
     // On connection to the server
     this.socket.on(events.CLIENT_CONNECT, () => {
-      console.log('connected');
+      console.log('CONNECTED TO SERVER');
       // Handle the connection to the server
       new SocketHandler();
     });
