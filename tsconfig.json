@@ -5,14 +5,20 @@
     "module": "commonjs",
     "outDir": "dist",
     "sourceMap": true,
+    "declaration": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./node_modules/@types", "./src/types/cdk.d.ts"]
+    "typeRoots": ["./node_modules/@types", "./src/types/cdk.d.ts"],
+    "baseUrl": "src",
+    "paths": {
+      "@src/*": ["./*"],
+      "@api/*": ["api/*"],
+      "@cli/*": ["cli/*"],
+      "@common/*": ["common/*"],
+      "@events/*": ["events/*"]
+    }
   },
-  "env": {
-    "node": true
-  },
-  "include": ["src/**/*.ts", "src/models/procurement-entities"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "src/models/procurement-entities"],
   "exclude": ["node_modules", ".vscode"]
 }

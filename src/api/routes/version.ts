@@ -1,7 +1,7 @@
 import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
-import { RestHandler } from '../../rest-handler';
+import { RestHandler } from '@src/rest-handler';
 
 /**
  */

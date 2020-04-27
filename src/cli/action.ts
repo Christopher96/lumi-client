@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import Route from '../api/routes/route';
+import Route from '@api/routes/route';
 import { spawn } from 'child_process';
 export class Action {
   static async preform(cmd: any): Promise<string> {

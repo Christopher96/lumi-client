@@ -9,6 +9,7 @@
     "start:watch": "nodemon",
     "build": "tsc",
     "test:all": "npm test tests/**/*.test.ts",
+    "deploy": "npm run build && git push",
     "lint": "tsc --noEmit && eslint \"./src/**/*.ts\" --fix",
     "test": "mocha --exit -r ts-node/register tests/helper.test.ts"
   },
@@ -27,6 +28,7 @@
     "inquirer": "^7.1.0",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.3",
+    "module-alias": "^2.2.2",
     "node-fetch": "^2.6.0",
     "node-watch": "^0.6.3",
     "path": "^0.12.7",
@@ -66,6 +68,13 @@
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "ts-node": "^8.4.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.8.3"
+  },
+  "_moduleAliases": {
+    "@src": "src",
+    "@api": "src/api",
+    "@cli": "src/cli",
+    "@common": "src/common",
+    "@events": "src/events"
   }
 }

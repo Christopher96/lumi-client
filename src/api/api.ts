@@ -1,5 +1,5 @@
 import express from 'express';
-import events from '../common/events';
+import events from '@common/events';
 import { Route } from './routes/route';
 import { EchoRoute } from './routes/echo';
 import { VersionRoute } from './routes/version';

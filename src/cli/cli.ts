@@ -1,6 +1,5 @@
-import { InteractiveCLI } from './interactive';
 import { program } from 'commander';
-import e from 'express';
+import Action from './action';
 
 export class CLI {
   constructor() {
@@ -54,6 +53,12 @@ export class CLI {
       return 'LUMI1234';
     }
 
+    async function echo(cmdObj: any) {
+      const i = await Action.preform(cmdObj);
+      console.log(i);
+      process.exit();
+    }
+
     /**
      * Command [Log]: '-l' '--log'
      * If the user is connected to a room:
@@ -65,26 +70,41 @@ export class CLI {
     program
       .version('0.0.1')
       .description('This is a CLI for LUMI.')
-
       .option('-l', '--log', log);
 
     //Defining the commands for the program's CLI client using Commander's API.
     program
       //Echo test command
-      .command('echo <text1> <text2>')
+      .command('echo <test>')
       .description('Echoes two strings provided by the user. For testing purposes.')
       .alias('ec')
-      .action((text1, text2) => {
-        console.log(text1 + text2);
+      .option('-r, --recursive', 'Remove recursively')
+      .action(function(_1, cmdObj) {
+        return echo(cmdObj);
       });
 
+    //Defining the commands for the program's CLI client using Commander's API.
+    program
+      //Echo test command
+      .command('version')
+      .description('Echoes two strings provided by the user. For testing purposes.')
+      .alias('ec')
+      .option('-a, --api', 'Remove recursively')
+      .option('-c, --cli', 'Remove recursively')
+      .action(async function(cmdObj) {
+        const i = await Action.preform(cmdObj);
+        console.log(i);
+        process.exit();
+      });
     program
       //Create room, host session
       .command('create <path>')
       .description('Creates a new session and a room from a path to a repository.')
       .alias('c')
+      .option('--test')
       .action(path => {
         create(path);
+        Action.preform('/heartbeat');
       });
 
     program
