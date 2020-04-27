@@ -8,11 +8,16 @@ export interface IUser {
   id: string;
 }
 
-export interface IChunk {
+export interface Chunk {
   source: string;
   progress: number;
   done: boolean;
   data: Buffer;
+}
+
+export interface IChunk {
+  chunk: Chunk;
+  room: IRoom;
 }
 
 export interface IPatch {

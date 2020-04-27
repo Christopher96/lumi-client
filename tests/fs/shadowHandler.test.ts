@@ -33,32 +33,40 @@ describe('We shall be able to add, modify and delete files and folders with the 
 
       if (isFile) {
         // add a new file
-        it('should be able to add a new file: ' + name, function() {
-          sh.update(FileEventType.FILE_CREATED, fromShadowDir, '');
-          assert.equal(fs.lstatSync(fromRootDir).isDirectory(), false);
+        it('should be able to add a new file: ' + name, function(done) {
+          sh.update(FileEventType.FILE_CREATED, fromShadowDir, '').then(() => {
+            assert.equal(fs.lstatSync(fromRootDir).isDirectory(), false);
+            done();
+          });
         });
 
         // modify this new file
-        it('should be able to modify a new file: ' + name, function() {
+        it('should be able to modify a new file: ' + name, function(done) {
           assert.equal(fs.readFileSync(fromRootDir).toString(), '');
-          sh.update(FileEventType.FILE_MODIFIED, fromShadowDir, 'test hej_' + count);
-          assert.equal(fs.lstatSync(fromRootDir).isDirectory(), false);
-          assert.equal(fs.readFileSync(fromRootDir).toString(), 'test hej_' + count);
+          sh.update(FileEventType.FILE_MODIFIED, fromShadowDir, 'test hej_' + count).then(() => {
+            assert.equal(fs.lstatSync(fromRootDir).isDirectory(), false);
+            assert.equal(fs.readFileSync(fromRootDir).toString(), 'test hej_' + count);
+            done();
+          });
         });
 
         // add more files in the same folder as this new file
         recursiveFSTest(shadowDir, count < 5, --count);
 
         // delete this new file
-        it('should be able to delete a file', function() {
-          sh.update(FileEventType.FILE_DELETED, fromShadowDir);
-          assert.equal(fs.existsSync(fromRootDir), false);
+        it('should be able to delete a file: ' + name, function(done) {
+          sh.update(FileEventType.FILE_DELETED, fromShadowDir).then(() => {
+            assert.equal(fs.existsSync(fromRootDir), false);
+            done();
+          });
         });
       } else {
         // add a new folder
-        it('should be able to add a new folder: ' + name, function() {
-          sh.update(FileEventType.DIR_CREATED, fromShadowDir);
-          assert.equal(fs.lstatSync(fromRootDir).isDirectory(), true);
+        it('should be able to add a new folder: ' + name, function(done) {
+          sh.update(FileEventType.DIR_CREATED, fromShadowDir).then(() => {
+            assert.equal(fs.lstatSync(fromRootDir).isDirectory(), true);
+            done();
+          });
         });
 
         // populate this new folder with more data
@@ -66,9 +74,11 @@ describe('We shall be able to add, modify and delete files and folders with the 
         recursiveFSTest(fromShadowDir, true, --count);
 
         // delete this folder
-        it('should be able to delete a folder', function() {
-          sh.update(FileEventType.DIR_DELETED, fromShadowDir);
-          assert.equal(fs.existsSync(fromRootDir), false);
+        it('should be able to delete a folder: ' + name, function(done) {
+          sh.update(FileEventType.DIR_DELETED, fromShadowDir).then(() => {
+            assert.equal(fs.existsSync(fromRootDir), false);
+            done();
+          });
         });
       }
     }

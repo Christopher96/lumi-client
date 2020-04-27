@@ -23,6 +23,9 @@ export class ShadowHandler {
     // setting the local variable shadowFolder to the directory of the shadow folder
     this.shadowFolder = path.join(sourceFolder, '.shadow');
 
+    // removes old shadow files.
+    fs.removeSync(this.shadowFolder);
+
     // creating the shadow folder at the shadowFolder directory.
     fs.ensureDirSync(this.shadowFolder);
   }
@@ -30,28 +33,35 @@ export class ShadowHandler {
   /**
    * The update method should be called when a file change has been received from the server.
    * This file change then results in the coresponding modification of the source folder.
-   * @param event
-   * @param path example: 'src/index.ts'
+   * @param event The type of file change event that has occured.
+   * @param path Example: 'src/index.ts'.
+   * @param fileContent This field is used when the event is FILE_CREATED or FILE_MODIFIED.
    */
-  public update(event: FileEventType, relativePath: string, fileContent?: string): void {
+  public update(event: FileEventType, relativePath: string, fileContent?: string): Promise<void> {
     const operationPath = path.join(this.shadowFolder, relativePath);
 
-    // runs the appropriate file operation that was sent from the server and received to this client.
+    // Runs the appropriate file operation that was sent from the server.
     switch (event) {
       case FileEventType.FILE_CREATED:
       case FileEventType.FILE_MODIFIED:
-        fs.writeFileSync(operationPath, fileContent);
-        break;
+        return new Promise<void>((resolve, reject) => {
+          fs.writeFile(operationPath, fileContent, err => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
       case FileEventType.DIR_CREATED:
-        fs.ensureDirSync(operationPath);
-        break;
+        return fs.ensureDir(operationPath);
       case FileEventType.FILE_DELETED:
       case FileEventType.DIR_DELETED:
-        fs.removeSync(operationPath);
-        break;
+        return new Promise<void>((resolve, reject) => {
+          fs.remove(operationPath, err => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
       default:
-        console.error('Error!');
-        break;
+        throw new Error('Could not update shadow folder');
     }
   }
 
