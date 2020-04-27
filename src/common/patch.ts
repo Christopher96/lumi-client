@@ -1,6 +1,7 @@
-import * as diff from 'diff';
+import * as Diff from 'diff';
 import readFileGo from 'readfile-go';
 import fs from 'fs-extra';
+import path from 'path';
 
 // Apply a patch from another client
 export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
@@ -14,7 +15,7 @@ export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
       const oldData = readFileGo(filePath);
 
       // Apply the patch to the old data
-      const appliedData = diff.applyPatch(oldData, patch);
+      const appliedData = Diff.applyPatch(oldData, patch);
 
       // Check wheter the patch is valid or not
       if (appliedData !== 'false') {
@@ -29,4 +30,15 @@ export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
 
     resolve();
   });
+};
+
+export const patchCreate = (shadowFolderPath: string, sourceFolderPath: string, filePath: string): Buffer => {
+  const shadowFile = path.join(shadowFolderPath, filePath);
+  const sourceFile = path.join(sourceFolderPath, filePath);
+
+  const diff = Diff.createTwoFilesPatch(shadowFile, sourceFile, readFileGo(shadowFile), readFileGo(sourceFile));
+  // TODO Optimize this part
+  const patch = Buffer.from(JSON.stringify(Diff.parsePatch(diff)[0]));
+
+  return patch;
 };

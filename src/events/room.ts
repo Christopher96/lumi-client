@@ -4,9 +4,11 @@ import { EventHandler, IRoom, IFileChange } from '@common/interfaces';
 import { UploadEvents } from './upload';
 import Socket from '@src/socket';
 import { ShadowHandler } from '@src/fs/shadowHandler';
+import { SourceFolderHandler } from '@src/fs/sourceFolderHandler';
 
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;
+  private sourceFolderHandler: SourceFolderHandler;
   private shadowHandler: ShadowHandler;
 
   constructor() {
@@ -33,18 +35,7 @@ export class RoomEvents implements EventHandler {
     Socket.get().on(events.ROOM_AUTH, (room: IRoom) => {
       console.log(`created room ${room.id}`);
       this.shadowHandler = new ShadowHandler(room.sourceFolderPath);
-
-      // When the room is created upload the source
-      // this.downloadEvents.uploadSource(this.server, room);
-
-      // patchWatch(room.roomFolderPath, room.roomID).on('patch', diffs => {
-      //   console.log('sending patch');
-      //   // Send the patch to the server
-      //   Socket.get().emit(events.PATCH, {
-      //     room,
-      //     diffs
-      //   });
-      // });
+      this.sourceFolderHandler = new SourceFolderHandler(room, this.shadowHandler.getShadowFolder());
     });
 
     Socket.get().on(events.FILE_CHANGE, (ifileChange: IFileChange) => {
