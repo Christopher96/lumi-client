@@ -1,7 +1,7 @@
 import zipper from 'zip-local';
 import fs from 'fs-extra';
 
-export default class Zip {
+class Zip {
   /**
    * Synchronous method to extract a zip archive to a specified file or folder.
    * @param source - The name of the zip file to be unpacked.
@@ -26,3 +26,5 @@ export default class Zip {
       .save(dest);
   }
 }
+
+export default Zip;

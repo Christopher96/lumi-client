@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import events from './common/events';
+import events from '@common/events';
 import { SocketHandler } from './events/socket';
 import Bootstrap from './bootstrap';
 

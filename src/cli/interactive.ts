@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
-import events from '../common/events';
-import { IRoom } from '../common/interfaces';
-import Socket from '../socket';
+import events from '@common/events';
+import { IRoom } from '@common/interfaces';
+import Socket from '@src/socket';
 
 export class InteractiveCLI {
   constructor() {
