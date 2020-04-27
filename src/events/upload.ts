@@ -1,8 +1,8 @@
-import events from '../common/events';
-import { IRoom, EventHandler, Chunk, IChunk } from '../common/interfaces';
-import { readZip } from '../common/read';
-import Socket from '../socket';
-import Zip from '../common/zip';
+import events from '@common/events';
+import { IRoom, EventHandler, Chunk, IChunk } from '@common/interfaces';
+import { readZip } from '@common/read';
+import Socket from '@src/socket';
+import Zip from '@common/zip';
 
 export class UploadEvents implements EventHandler {
   constructor() {
