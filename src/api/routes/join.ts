@@ -1,17 +1,20 @@
 import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
-import { Socket } from 'dgram';
-
-import RoomClass from '../../classes/Room';
+//import { Socket } from 'dgram';
+//import roomClass from classes/Room;
 
 /**
- *
+ * This route will be accesed with a roomID when a client wants to join a room
+ * It will use the roomID and send a request to join this room
+ * @author Tobias Johannesson
+ * Written 2020-04-23
  */
 export class JoinRoute extends Route {
   protected readonly name = 'join';
   protected readonly shortName = 'j';
-  protected readonly description = 'this is an auto generated desc. Please change me';
+  protected readonly description =
+    'This route enables user to request to join a specified room (roomID) sent as argument. Then gets a message when room has been joined';
   protected readonly numberOfArguments = 1;
   protected readonly params = {
     roomID: {
@@ -24,17 +27,23 @@ export class JoinRoute extends Route {
     const event = this.parseReq<{ roomID: string }>(req);
     const { args, params } = event;
 
-    //code here
+    /**
+     * Server side, rewrite to use id instead of roomClass
+     */
 
     // ID of RoomClass client wants to join
     const roomID = args[0];
 
-    //use roomID to get Room object
-    const roomToJoin = '...';
+    // Current socket
+    const socket = io();
+    //Asks server to join room with ID roomID
+    socket.emit('events.JOIN_ROOM', roomID);
 
-    //socket.emit('events.JOIN_ROOM', roomToJoin);
-    // Socket.EventEmitter('WANT TO JOIN room', data){}
-
-    res.send(`You have succesfully joined a room! ${roomID}`); // send something to client, cli
+    // TODO test if works
+    socket.on('events.ROOM_JOINED', roomID => {
+      res.send(`You have succesfully joined a room! ${roomID}`);
+    });
+    // Sends a message to CLI that client joined room with ID = roomID
+    //res.send(`You have succesfully joined a room! ${roomID}`);
   }
 }
