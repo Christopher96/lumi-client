@@ -31,4 +31,19 @@ describe('We shall be able to zip and unzip directories', () => {
     assert.equal(fs.existsSync(zipdest + '/' + file1), true);
     assert.equal(fs.existsSync(zipdest + '/' + file2), true);
   });
+
+  it('shall unzip directories to memory', () => {
+    let memory = zipper.unpackBuff(zipfile);
+    while (memory != null) {
+      assert.exists(memory);
+      zipper.pack(memory, zipfile);
+      memory = zipper.unpackBuff(zipfile);
+    }
+  });
+
+  it('shall zip directories to memory', () => {
+    const memory = zipper.packBuff(repo);
+    assert.exists(memory);
+    zipper.unpack(memory, zipdest);
+  });
 });
