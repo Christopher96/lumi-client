@@ -13,9 +13,9 @@ import { IRoom } from '../common/interfaces';
 export default class RoomClass implements IRoom {
   /**
    * Every room needs to be uniquely identified.
-   * We use an ID (that we call roomID) to seperate rooms from each other.
+   * We use an ID (that we call id) to seperate rooms from each other.
    */
-  public roomID: string;
+  public id: string;
 
   /**
    * A room can have several connected users.
@@ -36,7 +36,7 @@ export default class RoomClass implements IRoom {
    * Creates a new room.
    */
   constructor(sourceFolderPath: string) {
-    this.roomID = uuid.v1();
+    this.id = uuid.v1();
     //this.users = [];
     this.roomFolderPath = this.getRoomFolderPath();
     this.sourceFolderPath = sourceFolderPath;
@@ -45,15 +45,15 @@ export default class RoomClass implements IRoom {
   /**
    * Returns the room's ID.
    */
-  public getRoomID(): string {
-    return this.roomID;
+  public getid(): string {
+    return this.id;
   }
 
   /**
    * Connects a new user to the room.
    */
   public addUser(client: SocketIO.Socket): void {
-    client.join(this.roomID);
+    client.join(this.id);
   }
 
   /**
@@ -81,11 +81,11 @@ export default class RoomClass implements IRoom {
   //}
 
   /**
-   * Uses roomID to Create folder for room
+   * Uses id to Create folder for room
    */
   public getRoomFolderPath(): string {
     // gets unique folder for room
-    return path.resolve(`rooms/ ${this.getRoomID()}`);
+    return path.resolve(`rooms/ ${this.getid()}`);
   }
 
   /**

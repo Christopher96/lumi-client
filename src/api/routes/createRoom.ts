@@ -11,7 +11,7 @@ import events from '../../common/events';
  * @author Tobias Johannesson
  * Written 2020-04-23
  */
-export class JoinRoute extends Route {
+export class CreateRoute extends Route {
   protected readonly name = 'join';
   protected readonly shortName = 'j';
   protected readonly description =
@@ -33,16 +33,16 @@ export class JoinRoute extends Route {
      */
 
     // ID of RoomClass client wants to join
-    const roomID = args[0];
+    const sourceFolderPath = args[0];
 
     // Current socket
     const socket = io();
     //Asks server to join room with ID roomID
-    socket.emit(events.JOIN_ROOM, roomID);
+    socket.emit(events.CREATE_ROOM, 'here');
 
     // TODO test if works
     //socket.on('JOINED_ROOM', roomID => {
-    res.send(`You have requested to join a room`);
+    res.send(`You have requested to create a room`);
     //});
     // Sends a message to CLI that client joined room with ID = roomID
     //res.send(`You have succesfully joined a room! ${roomID}`);

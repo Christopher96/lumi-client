@@ -33,5 +33,9 @@ export class RoomEvents implements EventHandler {
       //   });
       // });
     });
+
+    Socket.get().on('ROOM_LEFT', (msgBack: string) => {
+      console.log('Left room'); // msg to CLI
+    });
   }
 }
