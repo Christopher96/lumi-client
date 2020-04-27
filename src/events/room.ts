@@ -54,6 +54,10 @@ export class RoomEvents implements EventHandler {
       console.error(err);
     });
 
+    Socket.get().on('ROOM_LEFT', (msgBack: string) => {
+      console.log('Left room'); // msg to CLI
+    });
+
     Socket.get().on(events.FILE_CHANGE, (ifileChange: IFileChange) => {
       this.shadowHandler.update(ifileChange.fileChange);
     });
