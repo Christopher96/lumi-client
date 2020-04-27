@@ -9,6 +9,7 @@
     "start:watch": "nodemon",
     "build": "tsc",
     "test:all": "npm test tests/**/*.test.ts",
+    "deploy": "npm run build && git push",
     "lint": "tsc --noEmit && eslint \"./src/**/*.ts\" --fix",
     "test": "mocha --exit -r ts-node/register tests/helper.test.ts"
   },
