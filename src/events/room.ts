@@ -5,6 +5,7 @@ import { UploadEvents } from './upload';
 import Socket from '@src/socket';
 import { ShadowHandler } from '@src/fs/shadowHandler';
 
+
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;
   private shadowHandler: ShadowHandler;

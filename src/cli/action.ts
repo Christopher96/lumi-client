@@ -35,7 +35,7 @@ export class Action {
 
     const command = cmd.parent.args.join(' ');
     const url = Route.getUrlFromCommands(command);
-    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT || 8080}/${url}`).then(v => v.text());
+    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT}/${url}`).then(v => v.text());
   }
 
   static startServer(): void {
@@ -47,7 +47,7 @@ export class Action {
   }
 
   static serverUp(): Promise<boolean> {
-    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT || 8080}/healthcheck`)
+    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT}/healthcheck`)
       .then(() => true)
       .catch(() => false);
   }
