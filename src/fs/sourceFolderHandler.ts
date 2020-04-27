@@ -3,7 +3,7 @@ import { SourceFolderWatcher } from './sourceFolderWatcher';
 import fs from 'fs';
 import Socket from '../socket';
 import events from '../common/events';
-import { IFileChange, IRoom } from '../common/interfaces';
+import { IFileChange, FileChange, IRoom } from '../common/interfaces';
 
 /**
  * The SourceFolderHandler class uses the sourceFolderWatcher to receive file and folder updates and then
@@ -37,39 +37,33 @@ export class SourceFolderHandler {
   private listenForChangesInSourceFolder() {
     // starting to listen to any file changes from the sourceFolderWatcher.
     this.sourceFolderWatcher.onFileChange((event: FileEventType, relativePath: string) => {
+         
+      const fileChange: FileChange = {
+        event,
+        relativePath
+      };
+      
       if (event == FileEventType.FILE_CREATED) {
         fs.readFile(relativePath, (err: NodeJS.ErrnoException, data: Buffer) => {
           if (err) throw err;
 
-          console.log(
-            'Should send file ' + event + '-operation to the server with path=' + relativePath + ' and content=' + data
-          );
-
-          const fileChange: IFileChange = {
-            event,
-            relativePath,
-            room: this.room,
-            data
-          };
+          fileChange.data = data;
 
           console.log(`Sent ${event}, ${relativePath} to server.`);
-          
-          // Send the file change to the server!
-          Socket.get().emit(events.FILE_CHANGE, fileChange);
+
         });
       } else if (event == FileEventType.FILE_MODIFIED) {
         // Patches can be implemented here!
       } else {
-        const fileChange: IFileChange = {
-          event,
-          relativePath,
-          room: this.room
-        };
-        
         console.log(`Sent ${event}, ${relativePath} to server.`);
-        
-        Socket.get().emit(events.FILE_CHANGE, fileChange);
       }
+
+      const ifileChange : IFileChange = {
+        room: this.room,
+        fileChange,
+      }
+
+      Socket.get().emit(events.FILE_CHANGE, ifileChange);
     });
   }
 }
