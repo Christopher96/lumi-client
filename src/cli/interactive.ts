@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 import events from '../common/events';
-import { Room } from '../common/interfaces';
+import { IRoom } from '../common/interfaces';
 import Socket from '../socket';
 
 export class InteractiveCLI {
@@ -9,8 +9,8 @@ export class InteractiveCLI {
   }
 
   // Gives the user the option to select a room from a list
-  selectRoom(rooms: Room[]): void {
-    const options = rooms.map(room => `[${room.id}]: ${room.source}`);
+  selectRoom(rooms: IRoom[]): void {
+    const options = rooms.map(room => `[${room.id}]: ${room.sourceFolderPath}`);
 
     inquirer
       .prompt([
@@ -54,7 +54,7 @@ export class InteractiveCLI {
             // Ask for a list of rooms
             Socket.get().emit(events.LIST_ROOMS);
             // When we get the rooms back
-            Socket.get().on(events.LIST_ROOMS, (rooms: Room[]) => {
+            Socket.get().on(events.LIST_ROOMS, (rooms: IRoom[]) => {
               // Send them to next dialog handler
               this.selectRoom(rooms);
             });
