@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import { EventEmitter } from 'events';
-import { IRoom, Chunk } from '@common/interfaces';
+import { IRoom, Chunk } from './interfaces';
 
 const walk = (source: string): string[] => {
   let results = [];
