@@ -12,10 +12,10 @@ import events from '../../common/events';
  * Written 2020-04-23
  */
 export class CreateRoute extends Route {
-  protected readonly name = 'join';
-  protected readonly shortName = 'j';
+  protected readonly name = 'createRoom';
+  protected readonly shortName = 'cRoom';
   protected readonly description =
-    'This route enables user to request to join a specified room (roomID) sent as argument. Then gets a message when room has been joined';
+    'This route enables user to request to create a room, sends sourceFolderPath, args[0]';
   protected readonly numberOfArguments = 1;
   protected readonly params = {
     roomID: {
@@ -28,23 +28,15 @@ export class CreateRoute extends Route {
     const event = this.parseReq<{ roomID: string }>(req);
     const { args, params } = event;
 
-    /**
-     * Server side, rewrite to use id instead of roomClass
-     */
-
-    // ID of RoomClass client wants to join
+    // sourceFolderPath is where the folder to zip and transfer is located
     const sourceFolderPath = args[0];
 
     // Current socket
     const socket = io();
-    //Asks server to join room with ID roomID
-    socket.emit(events.CREATE_ROOM, 'here');
+    //Asks server to create room and sends with sourceFolderPath
+    socket.emit(events.CREATE_ROOM, sourceFolderPath);
 
-    // TODO test if works
-    //socket.on('JOINED_ROOM', roomID => {
+    // TODO test if worked
     res.send(`You have requested to create a room`);
-    //});
-    // Sends a message to CLI that client joined room with ID = roomID
-    //res.send(`You have succesfully joined a room! ${roomID}`);
   }
 }

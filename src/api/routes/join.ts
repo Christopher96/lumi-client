@@ -15,7 +15,7 @@ export class JoinRoute extends Route {
   protected readonly name = 'join';
   protected readonly shortName = 'j';
   protected readonly description =
-    'This route enables user to request to join a specified room (roomID) sent as argument. Then gets a message when room has been joined';
+    'This route enables user to request to join a specified room with ID = (roomID), args[0].';
   protected readonly numberOfArguments = 1;
   protected readonly params = {
     roomID: {
@@ -28,23 +28,15 @@ export class JoinRoute extends Route {
     const event = this.parseReq<{ roomID: string }>(req);
     const { args, params } = event;
 
-    /**
-     * Server side, rewrite to use id instead of roomClass
-     */
-
     // ID of RoomClass client wants to join
     const roomID = args[0];
 
     // Current socket
     const socket = io();
-    //Asks server to join room with ID roomID
+    // Asks server to join room with ID = roomID
     socket.emit(events.JOIN_ROOM, roomID);
 
-    // TODO test if works
-    //socket.on('JOINED_ROOM', roomID => {
+    // Msg back to CLI
     res.send(`You have requested to join a room`);
-    //});
-    // Sends a message to CLI that client joined room with ID = roomID
-    //res.send(`You have succesfully joined a room! ${roomID}`);
   }
 }

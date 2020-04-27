@@ -14,8 +14,8 @@ import events from '../../common/events';
 export class LeaveRoute extends Route {
   protected readonly name = 'leave';
   protected readonly shortName = 'l';
-  protected readonly description = 'Allows user to leave current room';
-  protected readonly numberOfArguments = 1; //
+  protected readonly description = 'Allows user to leave current room, room with ID = roomID, args[0]';
+  protected readonly numberOfArguments = 1;
   protected readonly params = {
     roomID: {
       optional: true,
@@ -34,6 +34,6 @@ export class LeaveRoute extends Route {
     //Asks server to leave room with ID roomID
     socket.emit('LEAVE_ROOM', roomID);
 
-    res.send('Room left'); // msg to CLI
+    res.send('Requested to leave room'); // msg to CLI
   }
 }
