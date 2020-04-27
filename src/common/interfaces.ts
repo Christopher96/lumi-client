@@ -33,11 +33,15 @@ export interface IMessage {
   message: string;
 }
 
-export interface IFileChange {
+export interface FileChange {
   event: FileEventType,
   relativePath: string,
-  room: IRoom,
   data?: Buffer,
+}
+
+export interface IFileChange {
+  fileChange: FileChange,
+  room: IRoom,
 }
 
 export interface IRoom {
