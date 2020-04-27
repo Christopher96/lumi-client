@@ -23,11 +23,11 @@ export class SourceFolderHandler {
    * This constructor should be called once per connection and should run until connection closes.
    * @param sourceFolderPath
    */
-  constructor(sourceFolderPath: string, room: IRoom) {
-    console.log('Source Folder Handler has been constructed with param: ' + sourceFolderPath);
+  constructor(room: IRoom) {
+    console.log('Source Folder Handler has been constructed with param: ' + room.sourceFolderPath);
 
     // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
-    this.sourceFolderWatcher = new SourceFolderWatcher(sourceFolderPath);
+    this.sourceFolderWatcher = new SourceFolderWatcher(room.sourceFolderPath);
 
     this.room = room;
 
@@ -37,12 +37,11 @@ export class SourceFolderHandler {
   private listenForChangesInSourceFolder() {
     // starting to listen to any file changes from the sourceFolderWatcher.
     this.sourceFolderWatcher.onFileChange((event: FileEventType, relativePath: string) => {
-         
       const fileChange: FileChange = {
         event,
         relativePath
       };
-      
+
       if (event == FileEventType.FILE_CREATED) {
         fs.readFile(relativePath, (err: NodeJS.ErrnoException, data: Buffer) => {
           if (err) throw err;
@@ -50,7 +49,6 @@ export class SourceFolderHandler {
           fileChange.data = data;
 
           console.log(`Sent ${event}, ${relativePath} to server.`);
-
         });
       } else if (event == FileEventType.FILE_MODIFIED) {
         // Patches can be implemented here!
@@ -58,10 +56,10 @@ export class SourceFolderHandler {
         console.log(`Sent ${event}, ${relativePath} to server.`);
       }
 
-      const ifileChange : IFileChange = {
+      const ifileChange: IFileChange = {
         room: this.room,
-        fileChange,
-      }
+        fileChange
+      };
 
       Socket.get().emit(events.FILE_CHANGE, ifileChange);
     });

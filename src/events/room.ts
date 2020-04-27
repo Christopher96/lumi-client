@@ -4,10 +4,12 @@ import { EventHandler, IRoom, IFileChange } from '@common/interfaces';
 import { UploadEvents } from './upload';
 import Socket from '@src/socket';
 import { ShadowHandler } from '@src/fs/shadowHandler';
+import { SourceFolderHandler } from '@src/fs/sourceFolderHandler';
 
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;
   private shadowHandler: ShadowHandler;
+  private sourceFolderHandler: SourceFolderHandler;
 
   constructor() {
     // Create events for incoming downloads
@@ -28,12 +30,11 @@ export class RoomEvents implements EventHandler {
       console.log(`created room ${room.id}`);
       // When the room is created upload the source
       this.uploadEvents.uploadSource(room);
+      this.shadowHandler = new ShadowHandler(room.sourceFolderPath);
+      this.sourceFolderHandler = new SourceFolderHandler(room);
     });
 
     Socket.get().on(events.ROOM_AUTH, (room: IRoom) => {
-      console.log(`created room ${room.id}`);
-      this.shadowHandler = new ShadowHandler(room.sourceFolderPath);
-
       // When the room is created upload the source
       // this.downloadEvents.uploadSource(this.server, room);
 

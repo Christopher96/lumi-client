@@ -3,6 +3,7 @@ import { EventHandler, IUser, IMessage } from '@common/interfaces';
 // import { PatchEvents } from './patch';
 import { RoomEvents } from './room';
 import Socket from '@src/socket';
+import { SourceFolderHandler } from '@src/fs/sourceFolderHandler';
 
 export class SocketHandler implements EventHandler {
   constructor() {
