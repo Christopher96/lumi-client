@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
-import { FileEventType } from './fileEventType';
+import { FileEventType } from '../fs/fileEventType';
 import path from 'path';
-import { FileChange } from '../common/interfaces';
+import { FileChange } from './interfaces';
 
 /**
  * Used both on the server and client to update a file in the room folder / source folder.
@@ -37,7 +37,7 @@ export default class FileUpdate {
         });
       default:
         return new Promise((resolve, reject) => {
-          reject(new Error(`Could not update file ${fileChange.relativePath} in the folder: ${folderPath}.`));
+          reject(`Could not update file ${fileChange.relativePath} in the folder: ${folderPath}.`);
         });
     }
   }

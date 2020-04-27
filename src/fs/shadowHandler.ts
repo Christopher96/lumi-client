@@ -4,7 +4,7 @@ import path from 'path';
 import events from '../common/events';
 import Socket from '../socket';
 import { IRoom, FileChange } from '../common/interfaces';
-import FileUpdate from './fileUpdate';
+import FileUpdate from '../common/fileUpdate';
 
 /**
  * The ShadowHandler class is used for handling file operations such as creating, removing and moving files and folders.
