@@ -34,5 +34,5 @@ dist/
 test-source-folder
 
 # test-repo files
-test-repo
-test-repo.zip
+/test-repo
+/test-repo.zip
