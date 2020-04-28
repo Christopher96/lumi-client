@@ -1,9 +1,9 @@
 import { FileEventType } from './fileEventType';
 import { SourceFolderWatcher } from './sourceFolderWatcher';
 import fs from 'fs';
-import Socket from '../socket';
-import events from '../common/events';
-import { IFileChange, FileChange, IRoom } from '../common/interfaces';
+import Socket from '@src/socket';
+import events from '@common/events';
+import { IFileChange, FileChange, IRoom, IPatch } from '@common/interfaces';
 import { patchCreate } from '@src/common/patch';
 
 /**
@@ -27,16 +27,14 @@ export class SourceFolderHandler {
    * This constructor should be called once per connection and should run until connection closes.
    * @param sourceFolderPath
    */
-  constructor(room: IRoom, shadowFolderPath: string) {
+  constructor(room: IRoom) {
     const sourceFolderPath = room.sourceFolderPath;
     console.log('Source Folder Handler has been constructed with param: ' + sourceFolderPath);
 
     // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
     this.sourceFolderWatcher = new SourceFolderWatcher(sourceFolderPath);
-
-    this.shadowFolderPath = shadowFolderPath;
+    this.shadowFolderPath = room.shadowFolderPath;
     this.sourceFolderPath = sourceFolderPath;
-
     this.room = room;
 
     this.listenForChangesInSourceFolder();
@@ -45,31 +43,41 @@ export class SourceFolderHandler {
   private listenForChangesInSourceFolder() {
     // starting to listen to any file changes from the sourceFolderWatcher.
     this.sourceFolderWatcher.onFileChange((event: FileEventType, relativePath: string) => {
-      const fileChange: FileChange = {
-        event,
-        relativePath
-      };
+      // in case of modified file, we use patches. Here is the constuction of an iPatch data object:
+      if (event == FileEventType.FILE_MODIFIED) {
+        const diffs = patchCreate(this.shadowFolderPath, this.sourceFolderPath, relativePath);
+        const iPatch: IPatch = {
+          room: this.room,
+          diffs
+        };
 
-      if (event == FileEventType.FILE_CREATED) {
-        fs.readFile(relativePath, (err: NodeJS.ErrnoException, data: Buffer) => {
-          if (err) throw err;
-
-          fileChange.data = data;
-
-          console.log(`Sent ${event}, ${relativePath} to server.`);
-        });
-      } else if (event == FileEventType.FILE_MODIFIED) {
-        fileChange.data = patchCreate(this.shadowFolderPath, this.sourceFolderPath, fileChange.relativePath);
+        Socket.get().emit(events.FILE_PATCH, iPatch);
       } else {
-        console.log(`Sent ${event}, ${relativePath} to server.`);
+        // in case of a file update that does not involve patches, we use a FileChange data object:
+        const fileChange: FileChange = {
+          event,
+          relativePath
+        };
+
+        if (event == FileEventType.FILE_CREATED) {
+          fs.readFile(relativePath, (err: NodeJS.ErrnoException, data: Buffer) => {
+            if (err) throw err;
+
+            fileChange.data = data;
+
+            console.log(`Sent ${event}, ${relativePath} to server.`);
+          });
+        } else {
+          console.log(`Sent ${event}, ${relativePath} to server.`);
+        }
+
+        const ifileChange: IFileChange = {
+          room: this.room,
+          fileChange
+        };
+
+        Socket.get().emit(events.FILE_CHANGE, ifileChange);
       }
-
-      const ifileChange: IFileChange = {
-        room: this.room,
-        fileChange
-      };
-
-      Socket.get().emit(events.FILE_CHANGE, ifileChange);
     });
   }
 }

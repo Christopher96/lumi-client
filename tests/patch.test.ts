@@ -5,6 +5,8 @@ import { assert } from 'chai';
 
 describe('We shall be able to create diffs from files to send and apply patches', () => {
   it('testing ParsedDiff[] method', () => {
+    //fs.writeFile(operationPath, fileChange.data,
+    //fs.writeFile(operationPath, fileChange
     const source = 'test-repo/source.txt';
     const shadow = 'test-repo/shadow/source.txt';
 

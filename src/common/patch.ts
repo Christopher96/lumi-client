@@ -32,13 +32,19 @@ export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
   });
 };
 
-export const patchCreate = (shadowFolderPath: string, sourceFolderPath: string, filePath: string): Buffer => {
+export const patchCreate = (
+  shadowFolderPath: string,
+  sourceFolderPath: string,
+  filePath: string
+): Diff.ParsedDiff[] => {
   const shadowFile = path.join(shadowFolderPath, filePath);
   const sourceFile = path.join(sourceFolderPath, filePath);
 
-  const diff = Diff.createTwoFilesPatch(shadowFile, sourceFile, readFileGo(shadowFile), readFileGo(sourceFile));
-  // TODO Optimize this part
-  const patch = Buffer.from(JSON.stringify(Diff.parsePatch(diff)[0]));
+  const shadowData = readFileGo(shadowFile);
+  const sourceData = readFileGo(sourceFile);
 
-  return patch;
+  const patchData = Diff.createTwoFilesPatch(shadowFile, sourceFile, shadowData, sourceData);
+
+  return Diff.parsePatch(patchData);
+  // TODO Optimize this part
 };

@@ -38,7 +38,10 @@ export class RoomEvents implements EventHandler {
     Socket.get().on(events.JOIN_AUTH, (room: IRoom) => {
       console.log(`WATCHING ${room.id}`);
       this.shadowHandler = new ShadowHandler(room.sourceFolderPath);
-      this.sourceFolderHandler = new SourceFolderHandler(room, this.shadowHandler.getShadowFolder());
+
+      // adding the correct path to the client's shadow folder to the room interface.
+      room.shadowFolderPath = this.shadowHandler.getShadowFolder();
+      this.sourceFolderHandler = new SourceFolderHandler(room);
     });
 
     Socket.get().on(events.JOIN_ERR, (err: string) => {
