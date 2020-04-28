@@ -3,12 +3,14 @@ import events from '@common/events';
 import { EventHandler, IRoom, IFileChange } from '@common/interfaces';
 import { UploadEvents } from './upload';
 import Socket from '@src/socket';
-import { ShadowHandler } from '@src/fs/shadowHandler';
 import { DownloadEvents } from './download';
+import { SourceFolderHandler } from '@src/fs/sourceFolderHandler';
+import { ShadowFolderHandler } from '@src/fs/shadowFolderHandler';
 
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;
-  private shadowHandler: ShadowHandler;
+  private shadowFolderHandler: ShadowFolderHandler;
+  private sourceFolderHandler: SourceFolderHandler;
 
   constructor() {
     // Create events for incoming downloads
@@ -17,13 +19,17 @@ export class RoomEvents implements EventHandler {
     this.addEvents();
   }
 
-  createRoom(source: string) {
+  public static createRoom(source: string) {
     console.log('CREATING ROOM');
     if (fs.existsSync(source)) {
       Socket.get().emit(events.CREATE_ROOM, source);
     } else {
       throw new Error('Source does not exist');
     }
+  }
+
+  public static joinRoom(roomID: string) {
+    Socket.get().emit(events.JOIN_ROOM, roomID);
   }
 
   addEvents(): void {
@@ -34,20 +40,8 @@ export class RoomEvents implements EventHandler {
     });
 
     Socket.get().on(events.JOIN_AUTH, (room: IRoom) => {
-      console.log(`WATCHING ${room.id}`);
-      this.shadowHandler = new ShadowHandler(room.sourceFolderPath);
-
-      // When the room is created upload the source
-      // this.downloadEvents.uploadSource(this.server, room);
-
-      // patchWatch(room.roomFolderPath, room.roomID).on('patch', diffs => {
-      //   console.log('sending patch');
-      //   // Send the patch to the server
-      //   Socket.get().emit(events.PATCH, {
-      //     room,
-      //     diffs
-      //   });
-      // });
+      this.shadowFolderHandler = new ShadowFolderHandler(room);
+      this.sourceFolderHandler = new SourceFolderHandler(room);
     });
 
     Socket.get().on(events.JOIN_ERR, (err: string) => {
@@ -59,7 +53,7 @@ export class RoomEvents implements EventHandler {
     });
 
     Socket.get().on(events.FILE_CHANGE, (ifileChange: IFileChange) => {
-      this.shadowHandler.update(ifileChange.fileChange);
+      this.shadowFolderHandler.update(ifileChange.fileChange);
     });
   }
 }

@@ -1,7 +1,7 @@
 import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
-import events from '../../common/events';
+import { RoomEvents } from '@src/events/room';
 //import { Socket } from 'dgram';
 //import roomClass from classes/Room;
 
@@ -12,8 +12,8 @@ import events from '../../common/events';
  * Written 2020-04-23
  */
 export class CreateRoute extends Route {
-  protected readonly name = 'createRoom';
-  protected readonly shortName = 'cRoom';
+  protected readonly name = 'create';
+  protected readonly shortName = 'c';
   protected readonly description =
     'This route enables user to request to create a room, sends sourceFolderPath, args[0]';
   protected readonly numberOfArguments = 1;
@@ -31,10 +31,8 @@ export class CreateRoute extends Route {
     // sourceFolderPath is where the folder to zip and transfer is located
     const sourceFolderPath = args[0];
 
-    // Current socket
-    const socket = io();
     //Asks server to create room and sends with sourceFolderPath
-    socket.emit(events.CREATE_ROOM, sourceFolderPath);
+    RoomEvents.createRoom(sourceFolderPath);
 
     // TODO test if worked
     res.send(`You have requested to create a room`);

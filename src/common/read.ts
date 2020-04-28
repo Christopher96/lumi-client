@@ -46,13 +46,14 @@ export const readZip = (source: Buffer): EventEmitter => {
   // Create emitter so we can send stream the data
   const emitter = new EventEmitter();
 
+  const chunkSize = 8192;
   const totalBytes = source.length;
   let bytesRead = 0;
 
   const duplex = new stream.Duplex();
   duplex.on('readable', function() {
     let data;
-    while (null !== (data = duplex.read(8192))) {
+    while (null !== (data = duplex.read(chunkSize))) {
       bytesRead += data.length;
       const progress = bytesRead / totalBytes;
       const done = progress == 1;
