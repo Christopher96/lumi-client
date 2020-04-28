@@ -1,8 +1,6 @@
 const moduleAlias = require('module-alias');
-
 const destPath = process.argv[1].split(/index\...$/)[0];
 
-console.log('>>>>>>>' + destPath);
 moduleAlias.addAliases({
   '@src': `${destPath}`,
   '@api': `${destPath}/api`,
@@ -13,8 +11,6 @@ moduleAlias.addAliases({
   '@events': `${destPath}/events`
 });
 
-import { CLI } from './cli/cli';
-import Socket from './socket';
+import Bootstrap from './bootstrap';
 
-Socket.create();
-// new CLI();
+Bootstrap.init();
