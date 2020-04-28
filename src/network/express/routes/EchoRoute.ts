@@ -1,12 +1,13 @@
-import { Route, RouteParamsTypes } from './route';
+import Route from '@src/network/express/routes/Route';
+import { RouteParamsTypes } from '@src/network/express/routes/Route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 
-/*i
+/*
  * Class which echos the response from the user
  * mainly used for testing.
  */
-export class EchoRoute extends Route {
+export default class EchoRoute extends Route {
   /**
    * This is the description for the route. This will be used
    * with the help command.

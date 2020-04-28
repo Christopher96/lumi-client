@@ -1,14 +1,15 @@
 import fetch from 'node-fetch';
-import Route from '@api/routes/route';
+import Route from '@src/network/express/routes/Route';
 import { spawn } from 'child_process';
-export class Action {
+
+export default class ServerControl {
   static async preform(cmd: any): Promise<string> {
     const maxAttempts = 10;
     const msBetweenTries = 2000;
     let attempts = 0;
 
     const checkServer = async (): Promise<boolean> => {
-      const isUp = await Action.serverUp();
+      const isUp = await ServerControl.serverUp();
 
       if (maxAttempts <= attempts) {
         throw new Error('Is not able to start demon server');
@@ -16,7 +17,7 @@ export class Action {
 
       if (!isUp) {
         console.log('Trying to start server attempt ', attempts);
-        await Action.startServer();
+        await ServerControl.startServer();
         attempts++;
 
         return new Promise(res => {
@@ -35,7 +36,7 @@ export class Action {
 
     const command = cmd.parent.args.join(' ');
     const url = Route.getUrlFromCommands(command);
-    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT || 8080}/${url}`).then(v => v.text());
+    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT}/${url}`).then(v => v.text());
   }
 
   static startServer(): void {
@@ -47,10 +48,8 @@ export class Action {
   }
 
   static serverUp(): Promise<boolean> {
-    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT || 8080}/healthcheck`)
+    return fetch(`http://localhost:${process.env.CLIENT_SERVER_PORT}/healthcheck`)
       .then(() => true)
       .catch(() => false);
   }
 }
-
-export default Action;

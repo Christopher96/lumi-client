@@ -1,0 +1,14 @@
+import Route from '@src/network/express/routes/Route';
+import { Request, Response } from 'express';
+import { ParamsDictionary, Query } from 'express-serve-static-core';
+
+export default class HealthCheckRoute extends Route {
+  protected readonly name = 'healthcheck';
+  protected readonly shortName = 'hc';
+  protected readonly description = 'Checks if the server is up and running';
+  protected readonly numberOfArguments = 0;
+
+  public async exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): Promise<void> {
+    res.send(`❤️`);
+  }
+}

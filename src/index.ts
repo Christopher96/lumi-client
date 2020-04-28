@@ -13,8 +13,5 @@ moduleAlias.addAliases({
   '@events': `${destPath}/events`
 });
 
-import { CLI } from './cli/cli';
-import Socket from './socket';
-
-Socket.create();
-// new CLI();
+import Bootstrap from './Bootstrap';
+Bootstrap.init();
