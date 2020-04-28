@@ -7,6 +7,8 @@
     "start": "ts-node ./src",
     "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
     "start:watch": "nodemon",
+    "dev": "npm run start -- START_SERVER",
+    "echo": "npm run start -- echo test",
     "build": "tsc",
     "test:all": "npm test tests/**/*.test.ts",
     "deploy": "npm run build && git push",
