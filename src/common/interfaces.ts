@@ -10,7 +10,6 @@ export interface IUser {
 }
 
 export interface Chunk {
-  source: string;
   progress: number;
   done: boolean;
   data: Buffer;

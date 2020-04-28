@@ -12,12 +12,12 @@ export class UploadEvents implements EventHandler {
   uploadSourceFolder(room: IRoom): void {
     const zip = new Zip();
     const source = room.sourceFolderPath;
-    const dest = `${source}.zip`;
 
-    zip.pack(source, dest);
+    // Create the zip
+    const buf = zip.packExclude(source, room.shadowFolderPath);
 
     // Read the chunks from the zip
-    const emitter = readZip(dest);
+    const emitter = readZip(buf);
 
     // When a file in the source has been read
     emitter.on('chunk', (chunk: Chunk) => {
