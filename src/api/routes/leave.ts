@@ -15,7 +15,7 @@ export class LeaveRoute extends Route {
   protected readonly name = 'leave';
   protected readonly shortName = 'l';
   protected readonly description = 'Allows user to leave current room, room with ID = roomID, args[0]';
-  protected readonly numberOfArguments = 1;
+  protected readonly arguments = [];
   protected readonly params = {
     roomID: {
       optional: true,

@@ -11,8 +11,8 @@ export class SocketHandler implements EventHandler {
 
     this.addEvents();
 
-    // --- TEST CODE ---
-    roomEvents.createRoom('test-repo');
+    // // --- TEST CODE ---
+    // roomEvents.createRoom('test-repo');
   }
 
   addEvents(): void {

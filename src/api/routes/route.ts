@@ -66,7 +66,7 @@ export abstract class Route {
   /**
    *
    */
-  protected abstract readonly numberOfArguments: number;
+  protected abstract readonly arguments: string[];
   /**
    * The parameters which is used by the route. These are given
    * are query params when using the server.
@@ -87,12 +87,30 @@ export abstract class Route {
     return this.name;
   }
 
+  public getShortName(): string {
+    return this.shortName;
+  }
+
+  public getArgumentsNames(): string[] {
+    return this.arguments;
+  }
+
+  public getDescription(): string {
+    return this.description;
+  }
+
+  public getOptions() {
+    return this.params;
+  }
   protected abstract exec(
     req: Request<ParamsDictionary, any, any, Query>,
     res: Response<any>,
     next: NextFunction
   ): void;
 
+  static all() {
+    return this.allRoutes;
+  }
   /**
    * Helper function which takes the HTTP request from the
    * user and retrieve the infromation we are looking for.
@@ -121,7 +139,7 @@ export abstract class Route {
    *
    */
   public getPath(): { url: string; shortUrl: string } {
-    const argsAddOn = new Array(this.numberOfArguments)
+    const argsAddOn = new Array(this.arguments.length)
       .fill(1)
       .map((_, i) => '/:args' + i)
       .join('');

@@ -42,7 +42,7 @@ export class EchoRoute extends Route {
    *
    * ex : echo/my-phrase
    */
-  protected readonly numberOfArguments = 1;
+  protected readonly arguments = ['wordToEcho'];
 
   /**
    * Function which is called when executing the route. Looks

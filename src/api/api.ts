@@ -7,6 +7,7 @@ import { CreateRoute } from './routes/createRoom';
 import { JoinRoute } from './routes/join';
 import { HealthCheckRoute } from './routes/healthcheck';
 import { LeaveRoute } from './routes/leave';
+import { KillServerRoute } from './routes/killServer';
 
 export class API {
   app: express.Application;
@@ -20,6 +21,7 @@ export class API {
     this.register(new JoinRoute());
     this.register(new LeaveRoute());
     this.register(new HealthCheckRoute());
+    this.register(new KillServerRoute());
 
     this.app.listen(port, () => {
       console.log('app started');

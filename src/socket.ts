@@ -31,7 +31,7 @@ export default class Socket {
     this.socket.on(events.CLIENT_CONNECT, () => {
       console.log('CONNECTED TO SERVER');
       // Handle the connection to the server
-      new SocketHandler();
+      // new SocketHandler();
     });
   }
 }

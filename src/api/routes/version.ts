@@ -9,7 +9,7 @@ export class VersionRoute extends Route {
   protected readonly name = 'version';
   protected readonly shortName = 'v';
   protected readonly description = 'this is an auto generated desc. Please change me';
-  protected readonly numberOfArguments = 0;
+  protected readonly arguments = [];
 
   protected readonly params = {
     api: {

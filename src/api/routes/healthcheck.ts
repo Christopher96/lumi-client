@@ -8,7 +8,7 @@ export class HealthCheckRoute extends Route {
   protected readonly name = 'healthcheck';
   protected readonly shortName = 'hc';
   protected readonly description = 'Checks if the server is up and running';
-  protected readonly numberOfArguments = 0;
+  protected readonly arguments = [];
 
   public async exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): Promise<void> {
     res.send(`❤️`);

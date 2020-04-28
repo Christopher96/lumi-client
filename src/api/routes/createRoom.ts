@@ -2,6 +2,7 @@ import { Route, RouteParamsTypes } from './route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 import events from '../../common/events';
+import Socket from '../../socket';
 //import { Socket } from 'dgram';
 //import roomClass from classes/Room;
 
@@ -12,11 +13,11 @@ import events from '../../common/events';
  * Written 2020-04-23
  */
 export class CreateRoute extends Route {
-  protected readonly name = 'createRoom';
-  protected readonly shortName = 'cRoom';
+  protected readonly name = 'create';
+  protected readonly shortName = 'c';
   protected readonly description =
     'This route enables user to request to create a room, sends sourceFolderPath, args[0]';
-  protected readonly numberOfArguments = 1;
+  protected readonly arguments = ['baseUrl'];
   protected readonly params = {
     roomID: {
       optional: true,
@@ -32,11 +33,11 @@ export class CreateRoute extends Route {
     const sourceFolderPath = args[0];
 
     // Current socket
-    const socket = io();
+    const socket = Socket.get();
     //Asks server to create room and sends with sourceFolderPath
     socket.emit(events.CREATE_ROOM, sourceFolderPath);
 
+    res.send(`You have successfully created a new room based on ${sourceFolderPath}`);
     // TODO test if worked
-    res.send(`You have requested to create a room`);
   }
 }
