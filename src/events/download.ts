@@ -13,8 +13,7 @@ export class DownloadEvents implements EventHandler {
     // When we get a file from the client
     Socket.get().on(events.DOWNLOAD_CHUNK, (ichunk: IChunk) => {
       const { room, chunk } = ichunk;
-      const shadowPath = `.${room.sourceFolderPath}`;
-      const zipPath = `${shadowPath}/${chunk.source}`;
+      const zipPath = `${room.shadowFolderPath}/${chunk.source}`;
 
       // Write it locally
       writeChunk(chunk, zipPath)
@@ -23,7 +22,7 @@ export class DownloadEvents implements EventHandler {
             // We acknowledge and respond to the incoming file
             Socket.get().emit(events.UPLOAD_DONE, ichunk);
             const zip = new Zip();
-            zip.unpack(zipPath, shadowPath);
+            zip.unpack(zipPath, room.shadowFolderPath);
           } else {
             Socket.get().emit(events.UPLOAD_OK, ichunk);
           }
