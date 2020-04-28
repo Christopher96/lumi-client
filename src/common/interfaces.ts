@@ -43,19 +43,9 @@ export interface IMessage {
   message: string;
 }
 
-export interface FileChange {
-  event: FileEventType;
-  relativePath: string;
-  data?: Buffer;
-}
-
-export interface IFileChange {
-  fileChange: FileChange;
-  room: IRoom;
-}
-
 export interface IRoom {
   id: string;
+  shadowFolderPath: string;
   roomFolderPath: string;
   sourceFolderPath: string;
 }
