@@ -1,6 +1,6 @@
 import fs from 'fs';
 import events from '@common/events';
-import { EventHandler, IRoom, IFileChange } from '@common/interfaces';
+import { EventHandler, IRoom, IFileChange, IPatch } from '@common/interfaces';
 import { UploadEvents } from './upload';
 import Socket from '@src/socket';
 import { ShadowHandler } from '@src/fs/shadowHandler';
@@ -37,10 +37,10 @@ export class RoomEvents implements EventHandler {
 
     Socket.get().on(events.JOIN_AUTH, (room: IRoom) => {
       console.log(`WATCHING ${room.id}`);
-      this.shadowHandler = new ShadowHandler(room.sourceFolderPath);
+      this.shadowHandler = new ShadowHandler(room);
 
       // adding the correct path to the client's shadow folder to the room interface.
-      room.shadowFolderPath = this.shadowHandler.getShadowFolder();
+      //room.shadowFolderPath = this.shadowHandler.getShadowFolder();
       this.sourceFolderHandler = new SourceFolderHandler(room);
     });
 
@@ -54,6 +54,10 @@ export class RoomEvents implements EventHandler {
 
     Socket.get().on(events.FILE_CHANGE, (ifileChange: IFileChange) => {
       this.shadowHandler.update(ifileChange.fileChange);
+    });
+
+    Socket.get().on(events.FILE_PATCH, (iPatch: IPatch) => {
+      this.shadowHandler.updatePatch(iPatch);
     });
   }
 }

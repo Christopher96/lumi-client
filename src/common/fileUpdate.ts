@@ -22,9 +22,6 @@ export default class FileUpdate {
             else resolve();
           });
         });
-      case FileEventType.FILE_MODIFIED:
-        // TODO: Handle patches here.
-        break;
       case FileEventType.DIR_CREATED:
         return fs.ensureDir(operationPath);
       case FileEventType.FILE_DELETED:

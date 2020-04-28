@@ -45,7 +45,7 @@ export interface IMessage {
 
 export interface IRoom {
   id: string;
-  shadowFolderPath: string;
-  roomFolderPath: string;
-  sourceFolderPath: string;
+  shadowFolderPath: string; //ex: .lumi
+  roomFolderPath: string; //  ex: c:/server/rooms/room_hej123/
+  sourceFolderPath: string; //ex: c:/blabla/test-repo
 }

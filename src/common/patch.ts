@@ -2,12 +2,13 @@ import * as Diff from 'diff';
 import readFileGo from 'readfile-go';
 import fs from 'fs-extra';
 import path from 'path';
+import { IPatch, IRoom } from './interfaces';
 
 // Apply a patch from another client
-export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
+export const patchApply = (iPatch: IPatch, room: IRoom): Promise<void> => {
   return new Promise((resolve, reject) => {
     // For each specific file patch in the patch
-    diffs.forEach(patch => {
+    iPatch.diffs.forEach(patch => {
       // Which file do we want to patch?
       const filePath = patch.index;
 
