@@ -5,17 +5,20 @@ import { assert } from 'chai';
 
 describe('We shall be able to create diffs from files to send and apply patches', () => {
   it('testing ParsedDiff[] method', () => {
-    //fs.writeFile(operationPath, fileChange.data,
-    //fs.writeFile(operationPath, fileChange
     const source = 'test-repo/source.txt';
     const shadow = 'test-repo/shadow/source.txt';
 
-    const diff = Diff.createTwoFilesPatch(shadow, source, readFileGo(shadow), readFileGo(source));
-    console.log(diff);
+    const sourceData = readFileGo(source);
+    const shadowData = readFileGo(shadow);
+
+    const diff = Diff.createTwoFilesPatch(shadow, source, shadowData, sourceData);
 
     const patch = Diff.parsePatch(diff);
-    console.log(patch[0].hunks);
+    console.log(patch);
 
-    // const data = Diff.applyPatches(patch);
+    patch.forEach(part => {
+      const data = Diff.applyPatch(shadowData, part);
+      fs.writeFileSync(shadow, data);
+    });
   });
 });
