@@ -5,7 +5,7 @@ import path from 'path';
 import { IPatch, IRoom } from './interfaces';
 
 // Apply a patch from another client
-export const patchApply = (iPatch: IPatch, room: IRoom): Promise<void> => {
+export const patchApply = (iPatch: IPatch): Promise<void> => {
   return new Promise((resolve, reject) => {
     // For each specific file patch in the patch
     iPatch.diffs.forEach(patch => {

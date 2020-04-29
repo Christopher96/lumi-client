@@ -46,7 +46,7 @@ export class ShadowHandler {
 
   public updatePatch(iPatch: IPatch): Promise<void> {
     //apply patch:
-    return patchApply(iPatch, this.room);
+    return patchApply(iPatch);
   }
 
   /**

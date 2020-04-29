@@ -88,6 +88,7 @@ export class RoomEvents implements EventHandler {
      * This socket handles all the folder operation as well as creation and deletion of files.
      */
     Socket.get().on(events.FILE_CHANGE, (ifileChange: IFileChange) => {
+      console.log('Sending filechange.........');
       this.shadowHandler.update(ifileChange.fileChange);
     });
 
@@ -96,6 +97,7 @@ export class RoomEvents implements EventHandler {
      * This socket handles all the file operations that got their internal data modified.
      */
     Socket.get().on(events.FILE_PATCH, (iPatch: IPatch) => {
+      console.log('Sending patch.................');
       this.shadowHandler.updatePatch(iPatch);
     });
   }
