@@ -33,6 +33,7 @@ export class SourceFolderWatcher {
    * @param sourceFolderPath The path to the source folder in which we will listen for changes.
    */
   constructor(sourceFolderPath: string) {
+    console.log(`SOURCE FOLDER WATCHER: ${sourceFolderPath}`);
     this.sourceFolderPath = sourceFolderPath;
     this.watcher = chokidar.watch(this.sourceFolderPath, SourceFolderWatcher.watchOptions);
   }

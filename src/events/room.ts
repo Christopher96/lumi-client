@@ -3,9 +3,9 @@ import events from '@common/events';
 import { EventHandler, IRoom, IFileChange, IPatch } from '@common/interfaces';
 import { UploadEvents } from './upload';
 import Socket from '@src/socket';
-import { ShadowHandler } from '@src/fs/shadowHandler';
 import { DownloadEvents } from './download';
 import { SourceFolderHandler } from '@src/fs/sourceFolderHandler';
+import { ShadowFolderHandler } from '@src/fs/shadowFolderHandler';
 
 /**
  * RoomEvents class is used to receive events from the server which it forwards to the handler classes
@@ -16,8 +16,8 @@ import { SourceFolderHandler } from '@src/fs/sourceFolderHandler';
  */
 export class RoomEvents implements EventHandler {
   private uploadEvents: UploadEvents;
+  private shadowFolderHandler: ShadowFolderHandler;
   private sourceFolderHandler: SourceFolderHandler;
-  private shadowHandler: ShadowHandler;
 
   constructor() {
     // Create events for incoming downloads
@@ -30,7 +30,7 @@ export class RoomEvents implements EventHandler {
    * createRoom should be executed by a user when they want to create a room.
    * @param source // the folder which the room should be built from
    */
-  createRoom(source: string) {
+  public static createRoom(source: string) {
     console.log('CREATING ROOM');
     if (fs.existsSync(source)) {
       Socket.get().emit(events.CREATE_ROOM, source);
@@ -43,6 +43,10 @@ export class RoomEvents implements EventHandler {
    * Add Events holds the sockets that will be triggered when an event is received from the server.
    * The list of event-types can be found in the
    */
+  public static joinRoom(roomID: string) {
+    Socket.get().emit(events.JOIN_ROOM, roomID);
+  }
+
   addEvents(): void {
     /**
      * ROOM_CREATED
@@ -62,10 +66,7 @@ export class RoomEvents implements EventHandler {
      */
     Socket.get().on(events.JOIN_AUTH, (room: IRoom) => {
       console.log(`WATCHING ${room.id}`);
-      this.shadowHandler = new ShadowHandler(room);
-
-      // adding the correct path to the client's shadow folder to the room interface.
-      //room.shadowFolderPath = this.shadowHandler.getShadowFolder();
+      this.shadowFolderHandler = new ShadowFolderHandler(room);
       this.sourceFolderHandler = new SourceFolderHandler(room);
     });
 
@@ -89,7 +90,7 @@ export class RoomEvents implements EventHandler {
      */
     Socket.get().on(events.FILE_CHANGE, (ifileChange: IFileChange) => {
       console.log('Sending filechange.........');
-      this.shadowHandler.update(ifileChange.fileChange);
+      this.shadowFolderHandler.update(ifileChange.fileChange);
     });
 
     /**
@@ -98,7 +99,7 @@ export class RoomEvents implements EventHandler {
      */
     Socket.get().on(events.FILE_PATCH, (iPatch: IPatch) => {
       console.log('Sending patch.................');
-      this.shadowHandler.updatePatch(iPatch);
+      this.shadowFolderHandler.updatePatch(iPatch);
     });
   }
 }

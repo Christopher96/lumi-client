@@ -21,8 +21,6 @@ export class UploadEvents implements EventHandler {
 
     // When a file in the source has been read
     emitter.on('chunk', (chunk: Chunk) => {
-      console.log(`UPLOADING CHUNK, PROGRESS: ${chunk.progress}`);
-
       const ichunk: IChunk = {
         chunk,
         room
@@ -40,8 +38,8 @@ export class UploadEvents implements EventHandler {
     });
 
     Socket.get().on(events.UPLOAD_DONE, (ichunk: IChunk) => {
-      console.log('UPLOAD DONE, JOINING ROOM');
-      Socket.get().emit(events.JOIN_ROOM, ichunk.room.id);
+      console.log('UPLOAD DONE');
+      // Socket.get().emit(events.JOIN_ROOM, ichunk.room.id);
     });
   }
 }

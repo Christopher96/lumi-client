@@ -1,8 +1,5 @@
 import fs from 'fs-extra';
-import { FileEventType } from './fileEventType';
 import path from 'path';
-import events from '../common/events';
-import Socket from '../socket';
 import { IRoom, FileChange, IPatch } from '../common/interfaces';
 import FileUpdate from '../common/fileUpdate';
 import { applyPatch } from 'diff';
@@ -14,21 +11,20 @@ import { patchApply } from '@src/common/patch';
  * @author Michael Arenander peer: Marcus Alevärn
  * @date 2020-04-22
  */
-export class ShadowHandler {
+export class ShadowFolderHandler {
   // local string where the directory of the client's shadow folder shall be stored.
   private shadowFolder: string;
-  private room: IRoom;
 
   /**
    * This constructor should be called once per connection and should run until connection closes.
    * @param sourceFolder path to the root folder that shall be synced and shadowed.
    */
   constructor(room: IRoom) {
-    //console.log('Shadow Handler has been constructed with param: ' + sourceFolder);
-
     // setting the local variable shadowFolder to the directory of the shadow folder
-    this.shadowFolder = path.join(room.sourceFolderPath, room.shadowFolderPath); //.lumi-shadow
-    this.room = room;
+    this.shadowFolder = path.join(room.sourceFolderPath, room.shadowFolderPath);
+
+    console.log(`SHADOW FOLDER HANDLER: ${this.shadowFolder}`);
+
     // removes old shadow files.
     fs.removeSync(this.shadowFolder);
 

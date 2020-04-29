@@ -10,9 +10,6 @@ export class SocketHandler implements EventHandler {
     // new PatchEvents();
 
     this.addEvents();
-
-    // --- TEST CODE ---
-    roomEvents.createRoom('test-repo');
   }
 
   addEvents(): void {

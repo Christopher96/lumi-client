@@ -7,9 +7,10 @@ export class CLI {
      * Command [Create]: '-c' '--create'
      * Creates a new room, assigning the creator as a host.
      */
-    function create(path) {
-      var id = 'LUMI1234';
-      console.log('LUMI: Creating room with ID: ' + id + ' from folder at path: ' + path);
+    async function create(cmdObj: any) {
+      const i = await Action.preform(cmdObj);
+      console.log(i);
+      process.exit();
     }
 
     /**
@@ -104,9 +105,8 @@ export class CLI {
       .description('Creates a new session and a room from a path to a repository.')
       .alias('c')
       .option('--test')
-      .action(path => {
-        create(path);
-        Action.preform('/heartbeat');
+      .action(function(_1, cmdObj) {
+        return create(cmdObj);
       });
 
     program
@@ -120,11 +120,11 @@ export class CLI {
 
     program
       //Joins a session
-      .command('join')
+      .command('join <id>')
       .description('Joins an active session.')
       .alias('j')
-      .action((cmdObj: any) => {
-        return join(cmdObj);
+      .action(function(_1, cmdObj) {
+        join(cmdObj);
       });
 
     program

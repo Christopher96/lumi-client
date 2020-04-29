@@ -15,7 +15,7 @@ import { patchCreate } from '@src/common/patch';
 
 export class SourceFolderHandler {
   // local SourceFolderWatcher-object that will listen to file changes.
-  private sourceFolderWatcher;
+  private sourceFolderWatcher: SourceFolderWatcher;
 
   private shadowFolderPath: string;
   private sourceFolderPath: string;
@@ -28,13 +28,16 @@ export class SourceFolderHandler {
    * @param sourceFolderPath
    */
   constructor(room: IRoom) {
-    const sourceFolderPath = room.sourceFolderPath;
+    /**const sourceFolderPath = room.sourceFolderPath;
     console.log('Source Folder Handler has been constructed with param: ' + sourceFolderPath);
-
     // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
     this.sourceFolderWatcher = new SourceFolderWatcher(sourceFolderPath);
     this.shadowFolderPath = room.shadowFolderPath;
-    this.sourceFolderPath = sourceFolderPath;
+    this.sourceFolderPath = sourceFolderPath; */
+
+    // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
+    this.sourceFolderWatcher = new SourceFolderWatcher(room.sourceFolderPath);
+
     this.room = room;
 
     this.listenForChangesInSourceFolder();
