@@ -4,7 +4,7 @@ type MakeReqConfig = {
   url?: string;
 };
 
-export class RestHandler {
+export default class RestHandler {
   protected static readonly url = 'http://it-pr-itpro-duw4azjoa0r0-1588304925.eu-west-1.elb.amazonaws.com';
 
   protected makeReq(relativePath: string, config?: MakeReqConfig): Promise<Record<string, any> | string> {

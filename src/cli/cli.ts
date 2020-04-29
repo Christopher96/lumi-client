@@ -6,7 +6,7 @@ import { logCommand } from './commands/log';
 import { killServerCommand } from './commands/kill-server';
 import { joinCommand } from './commands/join';
 
-export class CLI {
+export default class CLI {
   constructor() {
     //Defining the options for the program's CLI client using Commander's API.
     program
@@ -25,7 +25,7 @@ export class CLI {
         return echoCommand(cmdObj);
       });
 
-    //Defining the commands for the program's CLI client using Commander's API.
+    // Version command.
     program
       //Echo test command
       .command('version')
@@ -37,6 +37,7 @@ export class CLI {
         return versionCommand(cmdObj);
       });
 
+    // Health check command.
     program
       //Create room, host session
       .command('create <path>')
@@ -47,6 +48,7 @@ export class CLI {
         return createCommand(path);
       });
 
+    // Create room command.
     program
       //End session
       .command('kill-server')
@@ -56,6 +58,7 @@ export class CLI {
         return killServerCommand(cmdObject);
       });
 
+    // Join a room command.
     program
       //Joins a session
       .command('join')

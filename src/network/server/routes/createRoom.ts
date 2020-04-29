@@ -25,8 +25,6 @@ export class CreateRoute extends Route {
     }
   };
 
-  
-
   public async exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): Promise<void> {
     const event = this.parseReq<{ roomID: string }>(req);
     const { args, params } = event;
@@ -38,7 +36,6 @@ export class CreateRoute extends Route {
     const socket = Socket.get();
 
     const createRoomId = await this.makeSocketReq(events.CREATE_ROOM, socket);
-    const joinRoom = await this.makeSocketReq(event.)
 
     res.send(createRoomId);
     // TODO test if worked

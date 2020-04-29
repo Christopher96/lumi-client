@@ -41,7 +41,7 @@ export type ParsedReq<T> = {
  */
 type Method = 'GET';
 
-export abstract class Route {
+export default abstract class Route {
   /**
    * Keeps track on all the registered routes
    */
@@ -237,5 +237,3 @@ export abstract class Route {
     return Route.getUrlFromArgsAndOptions(args, params);
   }
 }
-
-export default Route;

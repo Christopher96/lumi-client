@@ -1,11 +1,10 @@
-import { Route, RouteParamsTypes } from './route';
+import  Route from '@src/network/server/routes/Route';
+import { RouteParamsTypes } from '@src/network/server/routes/Route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
-import { RestHandler } from '@src/rest-handler';
+import RestHandler from '@src/network/server/RestHandler';
 
-/**
- */
-export class VersionRoute extends Route {
+export default class VersionRoute extends Route {
   protected readonly name = 'version';
   protected readonly shortName = 'v';
   protected readonly description = 'this is an auto generated desc. Please change me';
