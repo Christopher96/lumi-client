@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
+import io from 'socket.io';
+import Events from '../../common/events';
 
 /**
  * This will be used for validation in the future
@@ -150,6 +152,16 @@ export abstract class Route {
     };
   }
 
+  protected getSocketResponse(event: Events, socket: SocketIOClient.Socket) {
+    return new Promise(res => {
+      socket.once(event + '_res', res);
+    });
+  }
+
+  protected makeSocketReq(event: Events, socket: SocketIOClient.Socket) {
+    socket.emit(event);
+    return this.getSocketResponse(event, socket);
+  }
   /**
    * Checks if we have declared a method otherwise return GET as fallback.
    */

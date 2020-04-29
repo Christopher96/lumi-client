@@ -25,6 +25,8 @@ export class CreateRoute extends Route {
     }
   };
 
+  
+
   public async exec(req: Request<ParamsDictionary, any, any, Query>, res: Response): Promise<void> {
     const event = this.parseReq<{ roomID: string }>(req);
     const { args, params } = event;
@@ -34,10 +36,11 @@ export class CreateRoute extends Route {
 
     // Current socket
     const socket = Socket.get();
-    //Asks server to create room and sends with sourceFolderPath
-    socket.emit(events.CREATE_ROOM, sourceFolderPath);
 
-    res.send(`You have successfully created a new room based on ${sourceFolderPath}`);
+    const createRoomId = await this.makeSocketReq(events.CREATE_ROOM, socket);
+    const joinRoom = await this.makeSocketReq(event.)
+
+    res.send(createRoomId);
     // TODO test if worked
   }
 }
