@@ -1,7 +1,9 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { IRoom, FileChange } from '../common/interfaces';
+import { IRoom, FileChange, IPatch } from '../common/interfaces';
 import FileUpdate from '../common/fileUpdate';
+import { applyPatch } from 'diff';
+import { patchApply } from '@src/common/patch';
 
 /**
  * The ShadowHandler class is used for handling file operations such as creating, removing and moving files and folders.
@@ -24,7 +26,7 @@ export class ShadowFolderHandler {
     console.log(`SHADOW FOLDER HANDLER: ${this.shadowFolder}`);
 
     // removes old shadow files.
-    fs.removeSync(this.shadowFolder);
+    // fs.removeSync(this.shadowFolder);
 
     // creating the shadow folder at the shadowFolder directory.
     fs.ensureDirSync(this.shadowFolder);
@@ -36,6 +38,11 @@ export class ShadowFolderHandler {
    */
   public update(fileChange: FileChange): Promise<void> {
     return FileUpdate.update(this.shadowFolder, fileChange);
+  }
+
+  public updatePatch(iPatch: IPatch): Promise<void> {
+    //apply patch:
+    return patchApply(iPatch);
   }
 
   /**

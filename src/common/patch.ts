@@ -2,14 +2,15 @@ import * as Diff from 'diff';
 import readFileGo from 'readfile-go';
 import fs from 'fs-extra';
 import path from 'path';
+import { IPatch, IRoom } from './interfaces';
 
 // Apply a patch from another client
-export const patchApply = (diffs: Diff.ParsedDiff[]): Promise<void> => {
+export const patchApply = (iPatch: IPatch): Promise<void> => {
   return new Promise((resolve, reject) => {
     // For each specific file patch in the patch
-    diffs.forEach(patch => {
+    iPatch.diffs.forEach(patch => {
       // Which file do we want to patch?
-      const filePath = patch.index;
+      const filePath = patch.oldFileName;
 
       // Get the old data from the file we want to change
       const oldData = readFileGo(filePath);
@@ -37,7 +38,8 @@ export const patchCreate = (
   sourceFolderPath: string,
   filePath: string
 ): Diff.ParsedDiff[] => {
-  const shadowFile = path.join(shadowFolderPath, filePath);
+  // TODO Fix Linux-Windows synergy
+  const shadowFile = path.join(sourceFolderPath, shadowFolderPath, filePath);
   const sourceFile = path.join(sourceFolderPath, filePath);
 
   const shadowData = readFileGo(shadowFile);
@@ -46,5 +48,4 @@ export const patchCreate = (
   const patchData = Diff.createTwoFilesPatch(shadowFile, sourceFile, shadowData, sourceData);
 
   return Diff.parsePatch(patchData);
-  // TODO Optimize this part
 };

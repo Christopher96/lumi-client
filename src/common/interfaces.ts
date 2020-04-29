@@ -25,12 +25,6 @@ export interface IPatch {
   diffs: Diff.ParsedDiff[];
 }
 
-export interface IMessage {
-  fromUser: IUser;
-  targetUser: IUser;
-  message: string;
-}
-
 export interface FileChange {
   event: FileEventType;
   relativePath: string;
@@ -42,9 +36,15 @@ export interface IFileChange {
   room: IRoom;
 }
 
+export interface IMessage {
+  fromUser: IUser;
+  targetUser: IUser;
+  message: string;
+}
+
 export interface IRoom {
   id: string;
-  shadowFolderPath: string;
-  roomFolderPath: string;
-  sourceFolderPath: string;
+  shadowFolderPath: string; //ex: .lumi
+  roomFolderPath: string; //  ex: c:/server/rooms/room_hej123/
+  sourceFolderPath: string; //ex: c:/blabla/test-repo
 }

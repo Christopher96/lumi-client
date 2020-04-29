@@ -1,5 +1,7 @@
 import chokidar, { FSWatcher, WatchOptions } from 'chokidar';
 import { FileEventType } from './fileEventType';
+import path from 'path';
+import Separator from 'inquirer/lib/objects/separator';
 
 /**
  * This class makes it possible to detect file changes in the source folder.
@@ -67,10 +69,13 @@ export class SourceFolderWatcher {
    *                 the relative path to the file that has been changed
    *                 and lastly one optional parameter for the file size in bytes.
    */
-  public onFileChange(listener: (eventType: FileEventType, path: string, fileSize?: number) => void): void {
-    this.watcher.on('all', (event, path, stats) => {
-      if (stats !== undefined) listener(event as FileEventType, path, stats.size);
-      else listener(event as FileEventType, path);
+  public onFileChange(listener: (eventType: FileEventType, relativePath: string, fileSize?: number) => void): void {
+    this.watcher.on('all', (event, relativePath, stats) => {
+      const pathObj = relativePath.split(path.sep);
+      pathObj.shift();
+      relativePath = path.join(...pathObj);
+      if (stats !== undefined) listener(event as FileEventType, relativePath, stats.size);
+      else listener(event as FileEventType, relativePath);
     });
   }
 }
