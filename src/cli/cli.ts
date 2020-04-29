@@ -9,8 +9,9 @@ export default class CLI {
     // Echo command.
     program
       .command('echo <test>')
-      .description('Will echo back the string')
-      .action(async cmdObj => {
+      .description('This echos the response')
+      .alias('e')
+      .action(async (_, cmdObj) => {
         const i = await Action.preform(cmdObj);
         console.log(i);
         process.exit();
@@ -24,30 +25,52 @@ export default class CLI {
       .option('-a, --api', 'API version')
       .option('-c, --cli', 'CLI version')
       .action(async cmdObj => {
-        const i = await Action.preform(cmdObj);
-        console.log(i);
+        const version = await Action.preform(cmdObj);
+        console.log(version);
+        process.exit();
+      });
+
+    // Health check command.
+    program
+      .command('healthcheck')
+      .description('Returns ❤️ if the client server is alive')
+      .alias('hc')
+      .action(async cmdObj => {
+        const heart = await Action.preform(cmdObj);
+        console.log(heart);
         process.exit();
       });
 
     // Create room command.
     program
-      .command('create')
+      .command('create <path>')
       .description('Creates a new room on the server')
       .alias('c')
-      .action(async cmdObj => {
-        const i = await Action.preform(cmdObj);
-        console.log(i);
+      .action(async (_, cmdObj) => {
+        const roomID = await Action.preform(cmdObj);
+        console.log(`A new room has been created: ${roomID}`);
         process.exit();
       });
 
     // Join a room command.
     program
-      .command('join <roomID>')
+      .command('join <path> <roomID>')
       .description('Joins a room with a specific ID')
       .alias('j')
+      .action(async (_1, _2, cmdObj: any) => {
+        const couldJoin = await Action.preform(cmdObj);
+        console.log(couldJoin ? 'You have joined the room' : 'Could not join the room');
+        process.exit();
+      });
+
+    // Leave a room command.
+    program
+      .command('leave')
+      .description('Leaves a room')
+      .alias('l')
       .action(async (cmdObj: any) => {
-        const i = await Action.preform(cmdObj);
-        console.log(i);
+        const answer = await Action.preform(cmdObj);
+        console.log(answer);
         process.exit();
       });
 

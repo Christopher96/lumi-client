@@ -3,12 +3,8 @@ import path from 'path';
 import Zip from '@src/fs/Zip';
 
 export default class ShadowDirectoryUpdater {
-  public static removeShadowDirectory(sourceDirectoryPath: string): Promise<void> {
-    return fs.remove(path.join(sourceDirectoryPath, '.shadow'));
-  }
-
-  public static createShadowDirectory(sourceDirectoryPath: string): Promise<void> {
-    return fs.ensureDir(path.join(sourceDirectoryPath, '.shadow'));
+  public static clearShadowDirectory(sourceDirectoryPath: string): Promise<void> {
+    return fs.emptyDir(path.join(sourceDirectoryPath, '.shadow'));
   }
 
   public static unzipInShadowDirectory(sourceDirectoryPath: string, buffer: Buffer): Promise<void> {

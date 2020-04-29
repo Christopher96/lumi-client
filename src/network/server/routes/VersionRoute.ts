@@ -1,8 +1,8 @@
-import  Route from '@src/network/express/routes/Route';
-import { RouteParamsTypes } from './route';
+import  Route from '@src/network/server/routes/Route';
+import { RouteParamsTypes } from '@src/network/server/routes/Route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
-import RestHandler from '@src/network/express/RestHandler';
+import RestHandler from '@src/network/server/RestHandler';
 
 export default class VersionRoute extends Route {
   protected readonly name = 'version';

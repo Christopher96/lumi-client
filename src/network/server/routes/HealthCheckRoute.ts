@@ -1,4 +1,4 @@
-import Route from '@src/network/express/routes/Route';
+import Route from '@src/network/server/routes/Route';
 import { Request, Response } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 

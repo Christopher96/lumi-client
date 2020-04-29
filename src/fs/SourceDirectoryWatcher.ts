@@ -3,8 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { FileEvent } from './fileEvent';
 
-export class SourceDirectoryWatcher {
-  private sourceDirectoryPath: string;
+export default class SourceDirectoryWatcher {
 
   private watcher: FSWatcher;
 
@@ -17,24 +16,24 @@ export class SourceDirectoryWatcher {
     ignoreInitial: true
   };
 
-  constructor(sourceDirectoryPath: string) {
-    this.sourceDirectoryPath = sourceDirectoryPath;
-    this.watcher = chokidar.watch(this.sourceDirectoryPath, SourceDirectoryWatcher.watchOptions);
-  }
-
-  public onFileChange(listener: (fileEventType: FileEvent, filename: string, fileData?: Buffer) => void): void {
+  public onFileChange(sourceDirectoryPath: string, listener: (fileEventType: FileEvent, filename: string, fileData?: Buffer) => void): void {
+    this.watcher = chokidar.watch(sourceDirectoryPath, SourceDirectoryWatcher.watchOptions);
     this.watcher.on('all', (event: string, filename: string) => {
       if (event === 'add' || event === 'change') {
         fs.readFile(filename, (err, data: Buffer) => {
           if (err) {
             throw err;
           } else {
-            listener(event as FileEvent, path.relative(this.sourceDirectoryPath, filename), data);
+            listener(event as FileEvent, path.relative(sourceDirectoryPath, filename), data);
           }
         });
       } else {
-        listener(event as FileEvent, path.relative(this.sourceDirectoryPath, filename));
+        listener(event as FileEvent, path.relative(sourceDirectoryPath, filename));
       }
     });
+  }
+
+  public close(): Promise<void> {
+    return this.watcher.close(); 
   }
 }

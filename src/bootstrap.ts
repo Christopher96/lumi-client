@@ -5,7 +5,7 @@ import path from 'path';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import CLI from '@src/cli/CLI';
-import ExpressServer from '@src/network/express/ExpressServer';
+import ExpressServer from '@src/network/server/ExpressServer';
 
 export default class Bootstrap {
   static init(): void {
@@ -19,15 +19,17 @@ export default class Bootstrap {
       });
     }
 
-    const clientPort = process.env.CLIENT_SERVER_PORT;
+    const socketHost = process.env.SOCKET_HOST;
+    const socketPort = process.env.SOCKET_PORT;
+    const clientServerPort = process.env.CLIENT_SERVER_PORT;
 
-    if (!clientPort) {
-      throw new Error('You need to configure a client server port');
+    if (!clientServerPort || !socketHost || !socketPort) {
+      throw new Error('You need to configure host and port.');
     }
 
     if (process.argv[2] === 'START_SERVER') {
       console.log('Starting server');
-      new ExpressServer(Number.parseInt(clientPort));
+      new ExpressServer(Number.parseInt(clientServerPort), socketHost, Number.parseInt(socketPort));
     } else {
       new CLI();
     }

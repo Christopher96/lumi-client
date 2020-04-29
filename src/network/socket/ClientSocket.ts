@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 import ShadowDirectoryUpdater from '@src/fs/ShadowDirectoryUpdater';
 import Zip from '@src/fs/Zip';
-import { NetworkEvent } from '@src/network/networkEvent';
+import { NetworkEvent } from '@src/network/socket/networkEvent';
 import { FileEvent } from '@src/fs/fileEvent';
 
 export default class ClientSocket {
@@ -15,7 +15,7 @@ export default class ClientSocket {
 
   public connect(): Promise<void> {
     return new Promise<void>(resolve => {
-      this.socket.on(NetworkEvent.CONNECT, () => resolve());
+      this.socket.once(NetworkEvent.CONNECT, () => resolve());
     });
   }
 
@@ -23,44 +23,63 @@ export default class ClientSocket {
     this.socket.disconnect();
   }
 
-  public createRoom(): Promise<string> {
+  public createRoom(sourceDirectoryPath: string): Promise<string> {
     this.socket.emit(NetworkEvent.CREATE_ROOM);
-    return new Promise<string>(resolve => {
-      this.socket.once(NetworkEvent.CREATE_ROOM, (roomID: string) => resolve(roomID));
-    });
-  }
-
-  public joinRoom(roomID: string): Promise<boolean> {
-    this.socket.emit(NetworkEvent.JOIN_ROOM, roomID);
-    return new Promise<boolean>(resolve => {
-      this.socket.once(NetworkEvent.JOIN_ROOM, (couldJoin: boolean) => resolve(couldJoin));
-    });
-  }
-
-  public exchangeZipFiles(roomID: string, sourceDirectoryPath: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      ShadowDirectoryUpdater.removeShadowDirectory(sourceDirectoryPath)
+    return new Promise<string>((resolve, reject) => {
+      this.sendZip(sourceDirectoryPath)
         .then(() => {
-          Zip.zip(sourceDirectoryPath)
-            .then((zipData: Buffer) => {
-              ShadowDirectoryUpdater.createShadowDirectory(sourceDirectoryPath)
-                .then(() => {
-                  this.socket.emit(NetworkEvent.ZIP, roomID, zipData);
-                  this.socket.once(NetworkEvent.ZIP, (zipData: Buffer) => {
-                    ShadowDirectoryUpdater.unzipInShadowDirectory(sourceDirectoryPath, zipData)
-                      .then(() => resolve())
-                      .catch(err => reject(err));
-                  });
-                })
-                .catch(err => reject(err));
-            })
-            .catch(err => {
-              reject(err);
-            });
+          this.socket.once(NetworkEvent.CREATE_ROOM, (roomID: string) => resolve(roomID));
         })
-        .catch(err => {
-          reject(err);
-        });
+        .catch(err => reject(err));
+    });
+  }
+
+  public joinRoom(sourceDirectoryPath: string, roomID: string): Promise<boolean> {
+    this.socket.emit(NetworkEvent.JOIN_ROOM, roomID);
+    return new Promise<boolean>((resolve, reject) => {
+      this.socket.once(NetworkEvent.JOIN_ROOM, (couldJoin: boolean) => {
+        if (couldJoin) {
+          this.receiveZip(sourceDirectoryPath)
+            .then(() => {
+              resolve();
+            })
+            .catch(err => reject(err));
+        }
+
+        resolve(couldJoin);
+      });
+    });
+  }
+
+  public leaveRoom(): void {
+    this.socket.emit(NetworkEvent.LEAVE_ROOM);
+    this.socket.off(NetworkEvent.FILE_CHANGE, null);
+  }
+
+  public sendZip(sourceDirectoryPath: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      Zip.zip(sourceDirectoryPath)
+        .then((zipData: Buffer) => {
+          this.socket.emit(NetworkEvent.ZIP, zipData);
+          resolve();
+        })
+        .catch(err => reject(err));
+    });
+  }
+
+  public receiveZip(sourceDirectoryPath: string) {
+    return new Promise<void>((resolve, reject) => {
+      ShadowDirectoryUpdater.clearShadowDirectory(sourceDirectoryPath)
+        .then(() => {
+          this.socket.once(NetworkEvent.ZIP, (zipData: Buffer) => {
+            ShadowDirectoryUpdater.unzipInShadowDirectory(sourceDirectoryPath, zipData)
+              .then(() => {
+                resolve();
+              })
+              .catch(err => reject(err));
+          });
+        })
+        .catch(err => reject(err));
     });
   }
 

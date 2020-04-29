@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import Route from '@src/network/express/routes/Route';
+import Route from '@src/network/server/routes/Route';
 import { spawn } from 'child_process';
 
 export default class ServerControl {
