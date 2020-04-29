@@ -1,5 +1,6 @@
 import zipper from 'zip-local';
 import fs from 'fs-extra';
+import stream from 'stream';
 
 export default class Zip {
   currentFileCounter: number;
@@ -28,6 +29,12 @@ export default class Zip {
       .zip(source)
       .compress()
       .save(dest);
+  }
+
+  public packExclude(source: string | Buffer, exclude: string): Buffer {
+    const zip = zipper.sync.zip(source);
+    zip.lowLevel().remove(exclude);
+    return zip.compress().memory();
   }
 
   public unpackBuff(source: string | Buffer): Buffer {

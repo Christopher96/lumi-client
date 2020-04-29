@@ -10,7 +10,6 @@ export interface IUser {
 }
 
 export interface Chunk {
-  source: string;
   progress: number;
   done: boolean;
   data: Buffer;
@@ -24,17 +23,6 @@ export interface IChunk {
 export interface IPatch {
   room: IRoom;
   diffs: Diff.ParsedDiff[];
-}
-
-export interface FileChange {
-  event: FileEventType;
-  relativePath: string;
-  data?: Buffer;
-}
-
-export interface IFileChange {
-  fileChange: FileChange;
-  room: IRoom;
 }
 
 export interface IMessage {
@@ -56,6 +44,7 @@ export interface IFileChange {
 
 export interface IRoom {
   id: string;
+  shadowFolderPath: string;
   roomFolderPath: string;
   sourceFolderPath: string;
 }

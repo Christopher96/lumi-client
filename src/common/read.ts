@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import { EventEmitter } from 'events';
 import { IRoom, Chunk } from './interfaces';
+import stream from 'stream';
 
 const walk = (source: string): string[] => {
   let results = [];
@@ -41,26 +42,33 @@ export const readChunks = (source: string): { files: string[]; emitter: EventEmi
   return { files, emitter };
 };
 
-export const readZip = (source: string): EventEmitter => {
+export const readZip = (source: Buffer): EventEmitter => {
   // Create emitter so we can send stream the data
   const emitter = new EventEmitter();
 
-  const readStream = fs.createReadStream(source);
-  const totalBytes = fs.statSync(source).size;
+  const chunkSize = 8192;
+  const totalBytes = source.length;
+  let bytesRead = 0;
 
-  readStream.on('data', function(data) {
-    const progress = readStream.bytesRead / totalBytes;
-    const done = progress == 1;
+  const duplex = new stream.Duplex();
+  duplex.on('readable', function() {
+    let data;
+    while (null !== (data = duplex.read(chunkSize))) {
+      bytesRead += data.length;
+      const progress = bytesRead / totalBytes;
+      const done = progress == 1;
 
-    const chunk: Chunk = {
-      source,
-      progress,
-      done,
-      data
-    };
-
-    emitter.emit('chunk', chunk);
+      const chunk: Chunk = {
+        progress,
+        done,
+        data
+      };
+      emitter.emit('chunk', chunk);
+    }
   });
+
+  duplex.push(source);
+  duplex.push(null);
 
   return emitter;
 };
