@@ -26,7 +26,7 @@ export class ShadowFolderHandler {
     console.log(`SHADOW FOLDER HANDLER: ${this.shadowFolder}`);
 
     // removes old shadow files.
-    fs.removeSync(this.shadowFolder);
+    // fs.removeSync(this.shadowFolder);
 
     // creating the shadow folder at the shadowFolder directory.
     fs.ensureDirSync(this.shadowFolder);

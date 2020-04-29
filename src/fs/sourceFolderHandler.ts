@@ -28,14 +28,14 @@ export class SourceFolderHandler {
    * @param sourceFolderPath
    */
   constructor(room: IRoom) {
-    /**const sourceFolderPath = room.sourceFolderPath;
-    console.log('Source Folder Handler has been constructed with param: ' + sourceFolderPath);
-    // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
-    this.sourceFolderWatcher = new SourceFolderWatcher(sourceFolderPath);
-    this.shadowFolderPath = room.shadowFolderPath;
-    this.sourceFolderPath = sourceFolderPath; */
+    // const sourceFolderPath = room.sourceFolderPath;
+    // console.log('Source Folder Handler has been constructed with param: ' + sourceFolderPath);
+    // // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
+    // this.sourceFolderWatcher = new SourceFolderWatcher(sourceFolderPath);
 
     // setting the local variable sourceFolderWatcher to a SourceFolderWatcher-object.
+    this.sourceFolderPath = room.sourceFolderPath;
+    this.shadowFolderPath = room.shadowFolderPath;
     this.sourceFolderWatcher = new SourceFolderWatcher(room.sourceFolderPath);
 
     this.room = room;

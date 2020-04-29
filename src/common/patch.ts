@@ -10,7 +10,7 @@ export const patchApply = (iPatch: IPatch): Promise<void> => {
     // For each specific file patch in the patch
     iPatch.diffs.forEach(patch => {
       // Which file do we want to patch?
-      const filePath = patch.index;
+      const filePath = patch.oldFileName;
 
       // Get the old data from the file we want to change
       const oldData = readFileGo(filePath);
@@ -38,7 +38,8 @@ export const patchCreate = (
   sourceFolderPath: string,
   filePath: string
 ): Diff.ParsedDiff[] => {
-  const shadowFile = path.join(shadowFolderPath, filePath);
+  // TODO Fix Linux-Windows synergy
+  const shadowFile = path.join(sourceFolderPath, shadowFolderPath, filePath);
   const sourceFile = path.join(sourceFolderPath, filePath);
 
   const shadowData = readFileGo(shadowFile);
@@ -47,5 +48,4 @@ export const patchCreate = (
   const patchData = Diff.createTwoFilesPatch(shadowFile, sourceFile, shadowData, sourceData);
 
   return Diff.parsePatch(patchData);
-  // TODO Optimize this part
 };
