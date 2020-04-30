@@ -6,6 +6,7 @@ import { joinRoomCommand } from './commands/joinRoom';
 import { checkRoomCommand } from './commands/checkRoom';
 import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
+import { getJesse } from './commands/getJesse';
 
 export default class CLI {
   constructor() {
@@ -28,6 +29,12 @@ export default class CLI {
         return pingCommand();
       });
 
+    program
+      .command('getJesse')
+      .description('gets jesse Command')
+      .action(function() {
+        getJesse();
+      });
     // Version command.
     // program
     //   //Echo test command
