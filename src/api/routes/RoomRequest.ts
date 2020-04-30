@@ -1,6 +1,5 @@
 import { API, DefaultServerResponse } from '../API';
 import io from 'socket.io-client';
-import { Console } from '../../lib/utils/Console';
 import { Events } from './SocketEvents';
 
 export class RoomRequest {
