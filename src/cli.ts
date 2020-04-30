@@ -53,7 +53,7 @@ export default class CLI {
     program
       .command('check <roomId>')
       .description('Check out a specific room.')
-      .alias('c')
+      .alias('ch')
       .action((roomId: any) => {
         return checkRoomCommand(roomId);
       });
