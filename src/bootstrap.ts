@@ -2,10 +2,9 @@ import path from 'path';
 
 // This is a file which sets up all the
 // funcitonality
+import CLI from './cli';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
-import CLI from '@src/cli/CLI';
-import ExpressServer from '@src/network/server/ExpressServer';
 
 export default class Bootstrap {
   static init(): void {
@@ -19,19 +18,12 @@ export default class Bootstrap {
       });
     }
 
-    const socketHost = process.env.SOCKET_HOST;
-    const socketPort = process.env.SOCKET_PORT;
-    const clientServerPort = process.env.CLIENT_SERVER_PORT;
+    const serverEndpoint = process.env.SERVER_ENDPOINT;
 
-    if (!clientServerPort || !socketHost || !socketPort) {
+    if (!serverEndpoint) {
       throw new Error('You need to configure host and port.');
     }
 
-    if (process.argv[2] === 'START_SERVER') {
-      console.log('Starting server');
-      new ExpressServer(Number.parseInt(clientServerPort), socketHost, Number.parseInt(socketPort));
-    } else {
-      new CLI();
-    }
+    new CLI();
   }
 }

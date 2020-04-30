@@ -1,51 +1,36 @@
-import express from 'express';
-import events from '@common/events';
-import { Route } from './routes/route';
-import { EchoRoute } from './routes/echo';
-import { VersionRoute } from './routes/version';
-import { CreateRoute } from './routes/createRoom';
-import { JoinRoute } from './routes/join';
-import { HealthCheckRoute } from './routes/healthcheck';
-import { LeaveRoute } from './routes/leave';
-import { KillServerRoute } from './routes/killServer';
+import httpFetch from 'node-fetch';
+import { RoomRequest } from './routes/RoomRequest';
+import { BasicRequest } from './routes/BasicRequest';
+import FormData from 'form-data';
+
+export type DefaultServerResponse = { message: string };
 
 export class API {
-  app: express.Application;
+  static RoomRequest = RoomRequest;
+  static BasicRequest = BasicRequest;
 
-  constructor(private server: SocketIOClient.Socket, port: number) {
-    this.app = express();
-
-    this.register(new EchoRoute());
-    this.register(new VersionRoute());
-    this.register(new CreateRoute());
-    this.register(new JoinRoute());
-    this.register(new LeaveRoute());
-    this.register(new HealthCheckRoute());
-    this.register(new KillServerRoute());
-
-    this.app.listen(port, () => {
-      console.log('app started');
-    });
+  public get<T>(relativePath: string) {
+    return httpFetch(process.env.SERVER_ENDPOINT + relativePath).then(v => v.json() as Promise<T>);
   }
 
-  createEndpoints(): void {
-    this.app.get('/users', (req, res) => {
-      console.log('hello world');
-      this.server.emit(events.LIST_USERS);
-    });
+  public post<T>(relativePath: string, body: string | FormData) {
+    return httpFetch(process.env.SERVER_ENDPOINT + relativePath, {
+      method: 'POST',
+      body
+    }).then(v => v.json() as Promise<T>);
   }
 
-  register(route: Route): void {
-    console.log('Registering route:', route.getPath().shortUrl);
-    console.log('Registering route:', route.getPath().url);
-    switch (route.getMethod()) {
-      case 'GET':
-        this.app.get('/' + route.getPath().url, route.callExec());
-        this.app.get('/' + route.getPath().shortUrl, route.callExec());
-    }
+  public upload<T>(relativePath: string, file: Buffer) {
+    const formData = new FormData();
+    formData.append('data', file);
+    return this.post<T>(relativePath, formData);
+  }
 
-    route.register();
+  public download(relativePath: string): Promise<Buffer> {
+    return httpFetch(process.env.SERVER_ENDPOINT + relativePath).then(v => v.buffer());
+  }
+
+  public status(relativePath: string) {
+    return httpFetch(process.env.SERVER_ENDPOINT + relativePath).then(v => ({ status: v.status }));
   }
 }
-
-export default API;
