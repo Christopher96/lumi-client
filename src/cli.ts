@@ -6,6 +6,7 @@ import { joinRoomCommand } from './commands/joinRoom';
 import { checkRoomCommand } from './commands/checkRoom';
 import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
+import { allahCommand } from './commands/allah';
 
 export default class CLI {
   constructor() {
@@ -26,6 +27,15 @@ export default class CLI {
       .alias('ec')
       .action(function() {
         return pingCommand();
+      });
+
+    program
+      //Echo test command
+      .command('allah <bomb>')
+      .description('Plants the bomb on the server')
+      .alias('ak')
+      .action(function(bomb) {
+        return allahCommand(bomb);
       });
 
     // Version command.
