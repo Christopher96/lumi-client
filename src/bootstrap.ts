@@ -2,11 +2,9 @@ import path from 'path';
 
 // This is a file which sets up all the
 // funcitonality
+import CLI from './cli';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
-import API from './api/api';
-import Socket from './socket';
-import { CLI } from './cli/cli';
 
 export default class Bootstrap {
   static init(): void {
@@ -20,19 +18,12 @@ export default class Bootstrap {
       });
     }
 
-    Socket.create();
+    const serverEndpoint = process.env.SERVER_ENDPOINT;
 
-    const clientPort = process.env.CLIENT_SERVER_PORT;
-
-    if (!clientPort) {
-      throw new Error('You need to configure a client server port');
+    if (!serverEndpoint) {
+      throw new Error('You need to configure host and port.');
     }
 
-    if (process.argv[2] === 'START_SERVER') {
-      console.log('Starting server');
-      new API(Socket.get(), Number.parseFloat(clientPort));
-    } else {
-      new CLI();
-    }
+    new CLI();
   }
 }
