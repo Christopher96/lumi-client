@@ -7,6 +7,7 @@ import { checkRoomCommand } from './commands/checkRoom';
 import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
 import { allahCommand } from './commands/allah';
+import { getJesse } from './commands/getJesse';
 
 export default class CLI {
   constructor() {
@@ -38,6 +39,12 @@ export default class CLI {
         return allahCommand(bomb);
       });
 
+    program
+      .command('getJesse')
+      .description('gets jesse Command')
+      .action(function() {
+        getJesse();
+      });
     // Version command.
     // program
     //   //Echo test command
