@@ -27,27 +27,33 @@ export default class CLI {
       });
 
     program
-      .command('create <path>')
-      .description('Creates a new room using a specific path.')
+      .command('create')
+      .description('Creates a new room.')
       .alias('c')
-      .action(path => {
-        return createRoomCommand(path);
+      .option('-d, --dir <path>', 'Use a custom directory.')
+      .action(obj => {
+        if (obj.dir) return createRoomCommand(obj.dir);
+        else return createRoomCommand(__dirname);
       });
 
     program
-      .command('start <path>')
-      .description('Creates a new room using a specific path and joins the newly created room.')
+      .command('start')
+      .description('Creates a new room and joins it.')
       .alias('s')
-      .action(path => {
-        return startCommand(path);
+      .option('-d, --dir <path>', 'Use a custom directory.')
+      .action(obj => {
+        if (obj.dir) return startCommand(obj.dir);
+        else return startCommand(__dirname);
       });
 
     program
-      .command('join <roomId> <path>')
+      .command('join <roomId>')
       .description('Joins a specific room.')
       .alias('j')
-      .action((roomId: string, relativePath: string) => {
-        return joinRoomCommand(roomId, relativePath);
+      .option('-d, --dir <path>', 'Use a custom directory.')
+      .action((roomId: string, obj) => {
+        if (obj.dir) return joinRoomCommand(roomId, obj.dir);
+        else return joinRoomCommand(roomId, __dirname);
       });
 
     program
