@@ -7,6 +7,7 @@ import zipper from 'zip-local';
 import chokidar, { FSWatcher, WatchOptions } from 'chokidar';
 import { readFile, mkdirSync } from 'fs';
 import fse from 'fs-extra';
+import { Console } from '../utils/Console';
 export type FileSystemChangeType = { buffer: Buffer; path: string; event: FileEvent };
 export type SubscribeToChangeCallback = (input: IPatch) => void;
 export type SubscribeToCreateCallback = (input: IPatch) => void;
@@ -39,10 +40,7 @@ export class FS {
     );
   }
 
-  // NEED FIX!
   static applyPatchs(sourceFolderPath: string, iPatch: IPatch) {
-    console.log(iPatch);
-    console.log('Applying patch');
     return new Promise((resolve, reject) => {
       // For each specific file patch in the patch
       iPatch.diffs.forEach(patch => {
@@ -131,7 +129,7 @@ export class FS {
   }
 
   static createShadow(folderPath: string, buffer: Buffer) {
-    const shadowPath = path.join(folderPath, FS.SHADOW_RELATIVE_PATH); 
+    const shadowPath = path.join(folderPath, FS.SHADOW_RELATIVE_PATH);
     fse.emptyDirSync(shadowPath);
     return FS.unzip(shadowPath, buffer);
   }
