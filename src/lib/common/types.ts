@@ -6,14 +6,20 @@ export enum FileEvent {
   DIR_DELETED = 'unlinkDir'
 }
 
+export interface IFileChange {
+  event: FileEvent;
+  path: string;
+  buffer?: Buffer;
+}
+
 export interface IPatch {
   diffs?: Diff.ParsedDiff[];
   event: FileEvent;
   buffer?: Buffer;
-  path?: string;
+  path: string;
 }
 
 export interface FileEventRequest {
-  patch: IPatch;
+  change: IPatch | IFileChange;
   roomId: string;
 }

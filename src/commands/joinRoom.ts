@@ -2,37 +2,42 @@ import { Console } from '../lib/utils/Console';
 import { API } from '../api/API';
 import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
-import { FileEvent, IPatch, FileEventRequest } from '../lib/common/types';
+import { FileEvent, FileEventRequest } from '../lib/common/types';
 import * as path from 'path';
+import { parsePatch } from 'diff';
+import { IFileChange } from '../lib/common/types';
+import { IPatch } from '../lib/common/types';
 
-export const joinRoomCommand = async (roomId: string, relativePath: string) => {
+export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
 
   const socket = await API.RoomRequest.joinRoom(roomId);
 
   const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-  await FS.createShadow(relativePath, zippedRoom);
+  await FS.createShadow(sourceFolderPath, zippedRoom);
 
   const onError = (error: { message: string }) => {
     Console.error(error.message);
     process.exit();
   };
 
-  const onFilePatch = (patch: FileEventRequest) => {
-    FS.handleEvent(patch.patch);
-  };
+  FS.listenForFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
+    socket.emit(Events.room_file_change, { change: fileChange, roomId })
+  });
+  FS.listenForPatches(sourceFolderPath, (patch: IPatch) => {
+    socket.emit(Events.room_file_change, { change: patch, roomId });
+  });
 
-  const onLocalChange = (patch: IPatch) => {
-    const obj: FileEventRequest = {
-      patch,
-      roomId
-    };
-    socket.emit(Events.room_file_change, obj);
-  };
+  socket.on(Events.room_file_change_res, (fileEventRequest: FileEventRequest) => {
+    console.log(fileEventRequest.change.path);
+    if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
+      const patch = fileEventRequest.change as IPatch;
+      FS.applyPatchs(sourceFolderPath, patch);
+    } else {
+      const fileChange = fileEventRequest.change as IFileChange;
+      FS.applyFileChange(sourceFolderPath, fileChange);
+    }
+  });
 
-  FS.subscribeToChange(relativePath, onLocalChange);
-  FS.subscribeToCreate(relativePath, onLocalChange);
-
-  socket.on(Events.room_file_change_res, onFilePatch);
   socket.on(Events.room_file_change_err, onError);
 };
