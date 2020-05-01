@@ -14,7 +14,7 @@ export default class CLI {
       .command('echo <thingToEcho>')
       .description('Echoes two strings provided by the user. For testing purposes.')
       .alias('e')
-      .action((thingToEcho: any) => {
+      .action((thingToEcho: string) => {
         return echoCommand(thingToEcho);
       });
 
@@ -43,18 +43,18 @@ export default class CLI {
       });
 
     program
-      .command('join <roomId>')
+      .command('join <roomId> <path>')
       .description('Joins a specific room.')
       .alias('j')
-      .action((roomId: any) => {
-        return joinRoomCommand(roomId);
+      .action((roomId: string, relativePath: string) => {
+        return joinRoomCommand(roomId, relativePath);
       });
 
     program
       .command('check <roomId>')
       .description('Check out a specific room.')
       .alias('ch')
-      .action((roomId: any) => {
+      .action((roomId: string) => {
         return checkRoomCommand(roomId);
       });
 
@@ -62,7 +62,7 @@ export default class CLI {
       .command('list')
       .description('Will list all rooms.')
       .alias('l')
-      .action((roomId: any) => {
+      .action((roomId: string) => {
         return listRoomsCommand(roomId);
       });
 
