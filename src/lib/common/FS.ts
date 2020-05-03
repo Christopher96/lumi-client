@@ -44,7 +44,10 @@ export class FS {
     return new Promise((resolve, reject) => {
       // For each specific file patch in the patch
       iPatch.diffs.forEach(patch => {
-        const filePath = patch.oldFileName;
+        // We split on any delimter and use the join function to
+        // make sure that the delimiter which is used is the correct
+        // for the OS.
+        const filePath = path.join(...patch.oldFileName.split(/\/|\\/g));
         const oldData = readFileGo(filePath);
         const appliedData = Diff.applyPatch(oldData, patch);
 
@@ -101,27 +104,29 @@ export class FS {
   }
 
   static applyFileChange(sourceFolderPath: string, fileChange: IFileChange) {
+    const osSpecific = path.join(...fileChange.path.split(/\/|\\/g));
+
     switch (fileChange.event) {
       case FileEvent.FILE_DELETED: {
-        fse.remove(path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path));
+        fse.remove(path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific));
         return;
       }
 
       case FileEvent.FILE_CREATED: {
-        const filePath = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        const filePath = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific);
         fse.ensureDirSync(path.dirname(filePath));
         fse.writeFile(filePath, fileChange.buffer);
         return;
       }
 
       case FileEvent.DIR_CREATED: {
-        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific);
         fse.ensureDirSync(dirName);
         return;
       }
 
       case FileEvent.DIR_DELETED: {
-        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific);
         fse.remove(dirName);
         return;
       }
