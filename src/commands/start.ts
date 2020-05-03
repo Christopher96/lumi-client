@@ -10,5 +10,5 @@ export const startCommand = async (relativePath: string) => {
   const serverResponse = await API.RoomRequest.create(buffer);
   Console.success('\n' + serverResponse.message, serverResponse.roomId);
 
-  return joinRoomCommand(serverResponse.roomId);
+  return joinRoomCommand(serverResponse.roomId, relativePath);
 };

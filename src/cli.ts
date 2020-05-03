@@ -61,11 +61,11 @@ export default class CLI {
     // Join a room command.
     program
       //Joins a session
-      .command('join <roomId>')
+      .command('join <roomId> <path>')
       .description('Joins an active session.')
       .alias('j')
-      .action((roomId: any) => {
-        return joinRoomCommand(roomId);
+      .action((roomId: any, path: string) => {
+        return joinRoomCommand(roomId, path);
       });
 
     // Join a room command.

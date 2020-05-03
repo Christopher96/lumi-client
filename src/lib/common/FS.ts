@@ -74,7 +74,7 @@ export class FS {
   static subscribeToChange(source: string, callback: SubscribeToChangeCallback) {
     const watcher = chokidar.watch(source, FS.watchOptions);
     watcher.on('change', filePath => {
-      const absoluteShadowPath = path.join(source, this.SHADOW_RELATIVE_PATH);
+      const absoluteShadowPath = this.SHADOW_RELATIVE_PATH;
       const relativeFilePath = path.relative(source, filePath);
       const diffs = this.getDiff(source, absoluteShadowPath, relativeFilePath);
       callback({ diffs, event: FileEvent.FILE_MODIFIED });
@@ -88,7 +88,7 @@ export class FS {
     }
 
     const watcher = chokidar.watch(source, FS.watchOptions);
-    watcher.on('all', (event, filePath, buffer) => {
+    watcher.on('all', (event, filePath) => {
       // Checks that the event is one the select ones.
       if (event == 'change') return;
       if (events && !events.includes(event as FileEvent)) return;
@@ -118,7 +118,8 @@ export class FS {
       }
 
       case FileEvent.FILE_CREATED: {
-        const filePath = path.join(FS.SHADOW_RELATIVE_PATH, event.path);
+        const filePath = path.join(path.dirname(event.path), FS.SHADOW_RELATIVE_PATH, path.basename(event.path));
+        console.log('event:', event.event, ':<>', filePath);
         fse.ensureDirSync(path.dirname(filePath));
         fse.writeFile(filePath, event.buffer);
         return;

@@ -5,10 +5,9 @@ import { FS } from '../lib/common/FS';
 import { FileEvent, IPatch, FileEventRequest } from '../lib/common/types';
 import * as path from 'path';
 
-export const joinRoomCommand = async (roomId: string) => {
+export const joinRoomCommand = async (roomId: string, relativePath: string) => {
   Console.title('Joining room with roomId', roomId);
 
-  const relativePath = './';
   const socket = await API.RoomRequest.joinRoom(roomId);
 
   const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
@@ -20,6 +19,7 @@ export const joinRoomCommand = async (roomId: string) => {
   };
 
   const onFilePatch = (patch: FileEventRequest) => {
+    console.log(patch);
     FS.handleEvent(patch.patch);
   };
 
