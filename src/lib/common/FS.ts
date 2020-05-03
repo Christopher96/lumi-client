@@ -1,12 +1,13 @@
 import * as Diff from 'diff';
 import readFileGo from 'readfile-go';
 
-import { IPatch, FileEvent } from './types';
+import { IPatch, FileEvent, IFileChange } from './types';
 import * as path from 'path';
 import zipper from 'zip-local';
 import chokidar, { FSWatcher, WatchOptions } from 'chokidar';
 import { readFile, mkdirSync } from 'fs';
 import fse from 'fs-extra';
+import { Console } from '../utils/Console';
 export type FileSystemChangeType = { buffer: Buffer; path: string; event: FileEvent };
 export type SubscribeToChangeCallback = (input: IPatch) => void;
 export type SubscribeToCreateCallback = (input: IPatch) => void;
@@ -39,9 +40,7 @@ export class FS {
     );
   }
 
-  static applyPatchs(iPatch: IPatch) {
-    console.log(iPatch);
-    console.log('Applying patch');
+  static applyPatchs(sourceFolderPath: string, iPatch: IPatch) {
     return new Promise((resolve, reject) => {
       // For each specific file patch in the patch
       iPatch.diffs.forEach(patch => {
@@ -61,7 +60,7 @@ export class FS {
   }
 
   static getDiff(sourceFolderPath: string, shadowFolderPath: string, filePath: string) {
-    const shadowFile = path.join(sourceFolderPath, shadowFolderPath, filePath);
+    const shadowFile = path.join(shadowFolderPath, filePath);
     const sourceFile = path.join(sourceFolderPath, filePath);
     const shadowData = readFileGo(shadowFile);
     const sourceData = readFileGo(sourceFile);
@@ -71,68 +70,59 @@ export class FS {
     return Diff.parsePatch(patchData);
   }
 
-  static subscribeToChange(source: string, callback: SubscribeToChangeCallback) {
+  static listenForPatches(source: string, onPatch: (patch: IPatch) => void) {
     const watcher = chokidar.watch(source, FS.watchOptions);
     watcher.on('change', filePath => {
       const absoluteShadowPath = this.SHADOW_RELATIVE_PATH;
       const relativeFilePath = path.relative(source, filePath);
       const diffs = this.getDiff(source, absoluteShadowPath, relativeFilePath);
-      callback({ diffs, event: FileEvent.FILE_MODIFIED });
+      onPatch({ path: relativeFilePath, diffs, event: FileEvent.FILE_MODIFIED });
     });
   }
 
-  static subscribeToCreate(source: string, callback: SubscribeToCreateCallback, events?: FileEvent[]) {
-    // Checks if the users subscribes to changes. this is not allowed.
-    if (events && events.includes(FileEvent.FILE_MODIFIED)) {
-      throw new Error('This method should not be used for checking how a file changes. Use subscribeToChange instead');
-    }
-
+  static listenForFileChanges(source: string, onFileChange: (fileChange: IFileChange) => void) {
     const watcher = chokidar.watch(source, FS.watchOptions);
     watcher.on('all', (event, filePath) => {
       // Checks that the event is one the select ones.
       if (event == 'change') return;
-      if (events && !events.includes(event as FileEvent)) return;
-      if (event === 'unlink' || event === 'unlinkDir') {
-        callback({ buffer: null, path: filePath, event: event as FileEvent });
+
+      const relativeFilePath = path.relative(source, filePath);
+
+      if (event === 'addDir' || event === 'unlink' || event === 'unlinkDir') {
+        onFileChange({ path: relativeFilePath, event: event as FileEvent });
         return;
       }
 
       readFile(filePath, (err, buffer) => {
         if (err) throw err;
-        else callback({ buffer, path: filePath, event: event as FileEvent });
+        else onFileChange({ buffer, path: relativeFilePath, event: event as FileEvent });
       });
     });
   }
 
-  static handleEvent(event: IPatch) {
-    switch (event.event) {
-      case FileEvent.DIR_CREATED: {
-        const filePath = path.join(FS.SHADOW_RELATIVE_PATH, event.path);
-        fse.ensureDirSync(path.dirname(filePath));
-        return;
-      }
-
+  static applyFileChange(sourceFolderPath: string, fileChange: IFileChange) {
+    switch (fileChange.event) {
       case FileEvent.FILE_DELETED: {
-        fse.writeFile(path.join(FS.SHADOW_RELATIVE_PATH, event.path), event.buffer);
+        fse.remove(path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path));
         return;
       }
 
       case FileEvent.FILE_CREATED: {
-        const filePath = path.join(path.dirname(event.path), FS.SHADOW_RELATIVE_PATH, path.basename(event.path));
-        console.log('event:', event.event, ':<>', filePath);
+        const filePath = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
         fse.ensureDirSync(path.dirname(filePath));
-        fse.writeFile(filePath, event.buffer);
+        fse.writeFile(filePath, fileChange.buffer);
         return;
       }
 
       case FileEvent.DIR_CREATED: {
-        const dirName = path.join(FS.SHADOW_RELATIVE_PATH, event.path);
+        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
         fse.ensureDirSync(dirName);
         return;
       }
 
-      case FileEvent.FILE_MODIFIED: {
-        FS.applyPatchs(event);
+      case FileEvent.DIR_DELETED: {
+        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        fse.remove(dirName);
         return;
       }
     }
@@ -140,7 +130,7 @@ export class FS {
 
   static createShadow(folderPath: string, buffer: Buffer) {
     const shadowPath = path.join(folderPath, FS.SHADOW_RELATIVE_PATH);
-    fse.ensureDirSync(shadowPath);
+    fse.emptyDirSync(shadowPath);
     return FS.unzip(shadowPath, buffer);
   }
 }

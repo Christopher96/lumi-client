@@ -1,4 +1,4 @@
-import { API } from '../API';
+import { API, DefaultServerResponse } from '../API';
 
 export class BasicRequest {
   static ping() {

@@ -11,80 +11,64 @@ export default class CLI {
   constructor() {
     //Defining the commands for the program's CLI client using Commander's API.
     program
-      //Echo test command
       .command('echo <thingToEcho>')
       .description('Echoes two strings provided by the user. For testing purposes.')
-      .alias('ec')
-      .action(function(thingToEcho) {
+      .alias('e')
+      .action((thingToEcho: string) => {
         return echoCommand(thingToEcho);
       });
 
     program
-      //Echo test command
       .command('ping')
-      .description('Echoes two strings provided by the user. For testing purposes.')
-      .alias('ec')
-      .action(function() {
+      .description('Will try to ping the server.')
+      .alias('p')
+      .action(() => {
         return pingCommand();
       });
 
-    // Version command.
-    // program
-    //   //Echo test command
-    //   .command('version')
-    //   .description('Echoes two strings provided by the user. For testing purposes.')
-    //   .alias('ec')
-    //   .option('-a, --api', 'Remove recursively')
-    //   .option('-c, --cli', 'Remove recursively')
-    //   .action(async function(cmdObj) {
-    //     return versionCommand(cmdObj);
-    //   });
-
     program
-      //Create room, host session
-      .command('create <path>')
-      .description('Creates a new session and a room from a path to a repository.')
+      .command('create')
+      .description('Creates a new room.')
       .alias('c')
-      .action(path => {
-        return createRoomCommand(path);
+      .option('-d, --dir <path>', 'Use a custom directory.')
+      .action(obj => {
+        if (obj.dir) return createRoomCommand(obj.dir);
+        else return createRoomCommand(process.cwd());
       });
 
     program
-      //Create room, host session
-      .command('start <path>')
-      .description('Creates a new session and a room from a path to a repository.')
-      .alias('c')
-      .action(path => {
-        return startCommand(path);
+      .command('start')
+      .description('Creates a new room and joins it.')
+      .alias('s')
+      .option('-d, --dir <path>', 'Use a custom directory.')
+      .action(obj => {
+        if (obj.dir) return startCommand(obj.dir);
+        else return startCommand(process.cwd());
       });
 
-    // Join a room command.
     program
-      //Joins a session
-      .command('join <roomId> <path>')
-      .description('Joins an active session.')
+      .command('join <roomId>')
+      .description('Joins a specific room.')
       .alias('j')
-      .action((roomId: any, path: string) => {
-        return joinRoomCommand(roomId, path);
+      .option('-d, --dir <path>', 'Use a custom directory.')
+      .action((roomId: string, obj) => {
+        if (obj.dir) return joinRoomCommand(roomId, obj.dir);
+        else return joinRoomCommand(roomId, process.cwd());
       });
 
-    // Join a room command.
     program
-      //Joins a session
       .command('check <roomId>')
-      .description('Joins an active session.')
-      .alias('j')
-      .action((roomId: any) => {
+      .description('Check out a specific room.')
+      .alias('ch')
+      .action((roomId: string) => {
         return checkRoomCommand(roomId);
       });
 
-    // Join a room command.
     program
-      //Joins a session
       .command('list')
-      .description('Joins an active session.')
-      .alias('j')
-      .action((roomId: any) => {
+      .description('Will list all rooms.')
+      .alias('l')
+      .action((roomId: string) => {
         return listRoomsCommand(roomId);
       });
 
