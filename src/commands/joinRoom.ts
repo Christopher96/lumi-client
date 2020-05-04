@@ -21,22 +21,22 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     process.exit();
   };
 
-  FS.listenForFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
+  FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
     socket.emit(Events.room_file_change, { change: fileChange, roomId });
   });
-  FS.listenForPatches(sourceFolderPath, (patch: IPatch) => {
+  FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
     socket.emit(Events.room_file_change, { change: patch, roomId });
   });
 
-  socket.on(Events.room_file_change_res, (fileEventRequest: FileEventRequest) => {
+  socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
       Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
       const patch = fileEventRequest.change as IPatch;
-      FS.applyPatchs(sourceFolderPath, patch);
+      await FS.applyPatches(sourceFolderPath, patch);
     } else {
       Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
       const fileChange = fileEventRequest.change as IFileChange;
-      FS.applyFileChange(sourceFolderPath, fileChange);
+      await FS.applyFileChange(sourceFolderPath, fileChange);
     }
   });
 

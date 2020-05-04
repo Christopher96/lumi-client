@@ -40,7 +40,6 @@
     "node-fetch": "^2.6.0",
     "node-watch": "^0.6.3",
     "path": "^0.12.7",
-    "readfile-go": "^1.0.7",
     "reflect-metadata": "^0.1.13",
     "slash": "^3.0.0",
     "socket.io-client": "^2.3.0",
