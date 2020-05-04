@@ -81,7 +81,7 @@ export class FS {
   }
 
   /**
-   * This method will compare two files and return the result.
+   * This method will compare two files and return the difference.
    * @param sourceFolderPath the source folder path.
    * @param filePath the path to the file that we want to use in the comparison.
    */
