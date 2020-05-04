@@ -33,7 +33,7 @@ export default class CLI {
       .option('-d, --dir <path>', 'Use a custom directory.')
       .action(obj => {
         if (obj.dir) return createRoomCommand(obj.dir);
-        else return createRoomCommand(__dirname);
+        else return createRoomCommand(process.cwd());
       });
 
     program
@@ -43,7 +43,7 @@ export default class CLI {
       .option('-d, --dir <path>', 'Use a custom directory.')
       .action(obj => {
         if (obj.dir) return startCommand(obj.dir);
-        else return startCommand(__dirname);
+        else return startCommand(process.cwd());
       });
 
     program
@@ -53,7 +53,7 @@ export default class CLI {
       .option('-d, --dir <path>', 'Use a custom directory.')
       .action((roomId: string, obj) => {
         if (obj.dir) return joinRoomCommand(roomId, obj.dir);
-        else return joinRoomCommand(roomId, __dirname);
+        else return joinRoomCommand(roomId, process.cwd());
       });
 
     program

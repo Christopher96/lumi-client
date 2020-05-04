@@ -1,9 +1,13 @@
 {
-  "name": "lumi-client",
-  "version": "0.0.0",
+  "name": "lumi-cli",
+  "version": "0.0.16",
   "description": "",
+  "bin": {
+    "lumi": "./bin/index"
+  },
   "main": "dist",
   "scripts": {
+    "prepublish": "npm run build",
     "start": "ts-node ./src",
     "start:aws": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -e \"if (process.env.STAGE == 'prod') {process.env.NODE_ENV = 'production'}else{process.env.NODE_ENV = 'dev';};require('./src');\"",
     "start:watch": "nodemon",
@@ -20,6 +24,7 @@
   "dependencies": {
     "archiver": "^4.0.1",
     "chalk": "^2.4.2",
+    "chokidar": "^3.4.0",
     "commander": "^5.0.0",
     "deepmerge": "^4.2.2",
     "diff": "^4.0.2",

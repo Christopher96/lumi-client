@@ -15,7 +15,7 @@ export type SubscribeToCreateCallback = (input: IPatch) => void;
 export class FS {
   private static readonly watchOptions: WatchOptions = {
     // This will ignore dotfiles for example .shadow (we need to add support for also ignoring binary files, images and so on).
-    ignored: /(^|[\/\\])\../,
+    ignored: /((^|[\/\\])\..)|(>|<|\?|\/|\\|\'|\*|\"|\|)/,
     // Indicates whether the process should continue to run as long as files are being watched.
     persistent: true,
     // When we begin to watch the source folder we can make sure that already existing files do not trigger a file change event.
@@ -44,7 +44,10 @@ export class FS {
     return new Promise((resolve, reject) => {
       // For each specific file patch in the patch
       iPatch.diffs.forEach(patch => {
-        const filePath = patch.oldFileName;
+        // We split on any delimter and use the join function to
+        // make sure that the delimiter which is used is the correct
+        // for the OS.
+        const filePath = path.join(...patch.oldFileName.split(/\/|\\/g));
         const oldData = readFileGo(filePath);
         const appliedData = Diff.applyPatch(oldData, patch);
 
@@ -73,7 +76,7 @@ export class FS {
   static listenForPatches(source: string, onPatch: (patch: IPatch) => void) {
     const watcher = chokidar.watch(source, FS.watchOptions);
     watcher.on('change', filePath => {
-      const absoluteShadowPath = path.join(source, this.SHADOW_RELATIVE_PATH);
+      const absoluteShadowPath = this.SHADOW_RELATIVE_PATH;
       const relativeFilePath = path.relative(source, filePath);
       const diffs = this.getDiff(source, absoluteShadowPath, relativeFilePath);
       onPatch({ path: relativeFilePath, diffs, event: FileEvent.FILE_MODIFIED });
@@ -82,7 +85,7 @@ export class FS {
 
   static listenForFileChanges(source: string, onFileChange: (fileChange: IFileChange) => void) {
     const watcher = chokidar.watch(source, FS.watchOptions);
-    watcher.on('all', (event, filePath, buffer) => {
+    watcher.on('all', (event, filePath) => {
       // Checks that the event is one the select ones.
       if (event == 'change') return;
 
@@ -101,27 +104,29 @@ export class FS {
   }
 
   static applyFileChange(sourceFolderPath: string, fileChange: IFileChange) {
+    const osSpecific = path.join(...fileChange.path.split(/\/|\\/g));
+
     switch (fileChange.event) {
       case FileEvent.FILE_DELETED: {
-        fse.remove(path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path));
+        fse.remove(path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific));
         return;
       }
 
       case FileEvent.FILE_CREATED: {
-        const filePath = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        const filePath = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific);
         fse.ensureDirSync(path.dirname(filePath));
         fse.writeFile(filePath, fileChange.buffer);
         return;
       }
 
       case FileEvent.DIR_CREATED: {
-        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific);
         fse.ensureDirSync(dirName);
         return;
       }
 
       case FileEvent.DIR_DELETED: {
-        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, fileChange.path);
+        const dirName = path.join(sourceFolderPath, FS.SHADOW_RELATIVE_PATH, osSpecific);
         fse.remove(dirName);
         return;
       }
