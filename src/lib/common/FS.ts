@@ -15,7 +15,7 @@ export type SubscribeToCreateCallback = (input: IPatch) => void;
 export class FS {
   private static readonly watchOptions: WatchOptions = {
     // This will ignore dotfiles for example .shadow (we need to add support for also ignoring binary files, images and so on).
-    ignored: /(^|[\/\\])\../,
+    ignored: /((^|[\/\\])\..)|(>|<|\?|\/|\\|\'|\*|\"|\|)/,
     // Indicates whether the process should continue to run as long as files are being watched.
     persistent: true,
     // When we begin to watch the source folder we can make sure that already existing files do not trigger a file change event.
