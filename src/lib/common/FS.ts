@@ -146,27 +146,24 @@ export class FS {
    * @param fileChange the file change we want to apply in the shadow folder (this comes from the server).
    */
   static async applyFileChange(source: string, fileChange: IFileChange): Promise<void> {
-    const osSafeFilePath = path.join(...fileChange.path.split(/\/|\\/g));
+    const osSafeFilePath = path.join(source, FS.SHADOW_RELATIVE_PATH, ...fileChange.path.split(/\/|\\/g));
 
     switch (fileChange.event) {
       case FileEvent.FILE_DELETED: {
-        return fse.remove(path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath));
+        return fse.remove(osSafeFilePath);
       }
 
       case FileEvent.FILE_CREATED: {
-        const filePath = path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath);
-        await fse.ensureDir(path.dirname(filePath));
-        return fse.writeFile(filePath, fileChange.buffer);
+        await fse.ensureDir(path.dirname(osSafeFilePath));
+        return fse.writeFile(osSafeFilePath, fileChange.buffer);
       }
 
       case FileEvent.DIR_CREATED: {
-        const dirName = path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath);
-        return fse.ensureDir(dirName);
+        return fse.ensureDir(osSafeFilePath);
       }
 
       case FileEvent.DIR_DELETED: {
-        const dirName = path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath);
-        return fse.remove(dirName);
+        return fse.remove(osSafeFilePath);
       }
     }
 
