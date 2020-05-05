@@ -23,6 +23,7 @@ export class FS {
 
   static readonly SHADOW_RELATIVE_PATH = '.shadow';
 
+  // This object is used for file watching.
   private static watcher: FSWatcher;
 
   /**
@@ -109,6 +110,10 @@ export class FS {
     return Diff.parsePatch(patchData);
   }
 
+  /**
+   * Initialize the watcher with a source folder path.
+   * @param source the source folder path.
+   */
   static initWatcher(source: string): void {
     this.watcher = chokidar.watch(source, this.watchOptions);
   }
@@ -153,6 +158,9 @@ export class FS {
     });
   }
 
+  /**
+   * This will close the watcher.
+   */
   static closeWatcher(): Promise<void> {
     return this.watcher.close();
   }
