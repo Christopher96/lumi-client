@@ -40,7 +40,7 @@ export class FS {
     );
   }
 
-  static applyPatchs(sourceFolderPath: string, iPatch: IPatch) {
+  static applyPatches(sourceFolderPath: string, iPatch: IPatch) {
     return new Promise((resolve, reject) => {
       // For each specific file patch in the patch
       iPatch.diffs.forEach(patch => {

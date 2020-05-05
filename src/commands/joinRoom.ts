@@ -32,7 +32,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
       Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
       const patch = fileEventRequest.change as IPatch;
-      FS.applyPatchs(sourceFolderPath, patch);
+      FS.applyPatches(sourceFolderPath, patch);
     } else {
       Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
       const fileChange = fileEventRequest.change as IFileChange;
