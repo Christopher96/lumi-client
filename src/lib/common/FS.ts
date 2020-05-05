@@ -25,7 +25,7 @@ export class FS {
 
   /**
    * Takes in some compressed zip data and unzips it.
-   * @param buffer The data we want to unzip.
+   * @param buffer the data we want to unzip.
    */
   protected static unzipBuffer(buffer: Buffer): Promise<any> {
     return new Promise((res, rej) => zipper.unzip(buffer, (error, data) => (error ? rej(error) : res(data))));
