@@ -32,14 +32,23 @@ export class FS {
   }
 
   /**
+   * Will save the zip file.
+   * @param unzipped the unzipped object.
+   * @param savePath where we should save the data.
+   */
+  protected static saveBuffer(unzipped: any, savePath: string): Promise<void> {
+    return new Promise<void>((res, rej) => unzipped.save(savePath, error => (error ? rej(error) : res())));
+  }
+
+  /**
    * This will unzip the data and save it.
    * @param savePath where we should unzip and save the data.
    * @param buffer the zip data.
    */
   static async unzip(savePath: string, buffer: Buffer): Promise<void> {
     await fse.ensureDir(savePath);
-    const unzipped = await this.unzipBuffer(buffer);
-    await unzipped.save(savePath);
+    const unzipped = await FS.unzipBuffer(buffer);
+    await FS.saveBuffer(unzipped, savePath);
   }
 
   /**
@@ -65,7 +74,7 @@ export class FS {
           // We split on any delimter and use the join function to
           // make sure that the delimiter which is used is the correct
           // for the OS.
-          const osSafeFilePath = path.join(source, this.SHADOW_RELATIVE_PATH, ...iPatch.path.split(/\/|\\/g));
+          const osSafeFilePath = path.join(source, FS.SHADOW_RELATIVE_PATH, ...iPatch.path.split(/\/|\\/g));
           fse.readFile(osSafeFilePath).then(buffer => {
             const appliedData = Diff.applyPatch(buffer.toString(), patch);
 
@@ -88,7 +97,7 @@ export class FS {
    * @param filePath the path to the file that we want to use in the comparison.
    */
   static async getDiff(source: string, filePath: string): Promise<Diff.ParsedDiff[]> {
-    const shadowFile = path.join(source, this.SHADOW_RELATIVE_PATH, filePath);
+    const shadowFile = path.join(source, FS.SHADOW_RELATIVE_PATH, filePath);
     const sourceFile = path.join(source, filePath);
     const shadowData = (await fse.readFile(shadowFile)).toString();
     const sourceData = (await fse.readFile(sourceFile)).toString();
