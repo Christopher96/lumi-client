@@ -1,4 +1,4 @@
-import { API, DefaultServerResponse } from '../API';
+import { API, DefaultServerResponse, UserListServerResponse } from '../API';
 import io from 'socket.io-client';
 import { Events } from './SocketEvents';
 
@@ -12,7 +12,11 @@ export class RoomRequest {
   }
 
   static listRooms() {
-    return new API().get<DefaultServerResponse>('/room/list');
+    return new API().get<DefaultServerResponse>('/room/all');
+  }
+
+  static listUsersInRoom() {
+    return new API().get<UserListServerResponse>('room/users/:roomID');
   }
 
   static downloadRoom(roomId: string) {
