@@ -1,6 +1,8 @@
 import { API, DefaultServerResponse } from '../API';
 import io from 'socket.io-client';
 import { Events } from './SocketEvents';
+import { Console } from '@src/lib/utils/Console';
+import { FS } from '@src/lib/common/FS';
 
 export class RoomRequest {
   static create(buffer: Buffer) {
@@ -32,7 +34,13 @@ export class RoomRequest {
     return new Promise(res =>
       socket.once('connect', () => {
         socket.emit(Events.room_join, roomId);
-        socket.on(Events.room_join_res, () => res(socket));
+
+        // This code should run when the client has been kicked.
+        socket.on(Events.room_kick_res, (message: string) => {
+          Console.error(message);
+          FS.closeWatcher();
+          socket.close();
+        });
       })
     );
   }

@@ -2,7 +2,7 @@ import * as Diff from 'diff';
 import { IPatch, FileEvent, IFileChange } from './types';
 import * as path from 'path';
 import zipper from 'zip-local';
-import chokidar, { WatchOptions } from 'chokidar';
+import chokidar, { WatchOptions, FSWatcher } from 'chokidar';
 import { readFile } from 'fs';
 import fse from 'fs-extra';
 
@@ -22,6 +22,8 @@ export class FS {
   };
 
   static readonly SHADOW_RELATIVE_PATH = '.shadow';
+
+  private static watcher: FSWatcher;
 
   /**
    * Takes in some compressed zip data and unzips it.
@@ -47,8 +49,8 @@ export class FS {
    */
   static async unzip(savePath: string, buffer: Buffer): Promise<void> {
     await fse.ensureDir(savePath);
-    const unzipped = await FS.unzipBuffer(buffer);
-    await FS.saveBuffer(unzipped, savePath);
+    const unzipped = await this.unzipBuffer(buffer);
+    await this.saveBuffer(unzipped, savePath);
   }
 
   /**
@@ -107,14 +109,17 @@ export class FS {
     return Diff.parsePatch(patchData);
   }
 
+  static initWatcher(source: string): void {
+    this.watcher = chokidar.watch(source, this.watchOptions);
+  }
+
   /**
    * By calling this method you will begin to listen for FILE_MODIFIED in the source folder directory.
    * @param source the source folder path.
    * @param onPatch a callback function that will be called upon a file patch.
    */
   static listenForLocalPatches(source: string, onPatch: (patch: IPatch) => void) {
-    const watcher = chokidar.watch(source, FS.watchOptions);
-    watcher.on('change', async filePath => {
+    this.watcher.on('change', async filePath => {
       const relativeFilePath = path.relative(source, filePath);
       const diffs = await FS.getDiff(source, relativeFilePath);
       onPatch({ path: relativeFilePath, diffs, event: FileEvent.FILE_MODIFIED });
@@ -127,8 +132,7 @@ export class FS {
    * @param onFileChange a callback function that will be called upon a file change.
    */
   static listenForLocalFileChanges(source: string, onFileChange: (fileChange: IFileChange) => void) {
-    const watcher = chokidar.watch(source, FS.watchOptions);
-    watcher.on('all', (event, filePath) => {
+    this.watcher.on('all', (event, filePath) => {
       // This event is handled by patches.
       if (event == 'change') return;
 
@@ -147,6 +151,10 @@ export class FS {
         });
       }
     });
+  }
+
+  static closeWatcher(): Promise<void> {
+    return this.watcher.close();
   }
 
   /**
@@ -187,6 +195,6 @@ export class FS {
   static async createShadow(source: string, buffer: Buffer): Promise<void> {
     const shadowPath = path.join(source, FS.SHADOW_RELATIVE_PATH);
     await fse.emptyDir(shadowPath);
-    return FS.unzip(shadowPath, buffer);
+    return this.unzip(shadowPath, buffer);
   }
 }
