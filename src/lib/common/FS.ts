@@ -11,7 +11,6 @@ import fse from 'fs-extra';
  * In addition support for watching file changes.
  */
 export class FS {
-
   // These options are used when we initialize the directory watcher.
   private static readonly watchOptions: WatchOptions = {
     // This will ignore dotfiles for example .shadow (we need to add support for also ignoring binary files, images and so on).
@@ -37,7 +36,7 @@ export class FS {
    * @param savePath where we should unzip and save the data.
    * @param buffer the zip data.
    */
-  static async unzip(savePath: string, buffer: Buffer) {
+  static async unzip(savePath: string, buffer: Buffer): Promise<void> {
     await fse.ensureDir(savePath);
     const unzipped = await this.unzipBuffer(buffer);
     await unzipped.save(savePath);
@@ -58,26 +57,29 @@ export class FS {
    * @param source the source folder path.
    * @param iPatch the file patch we want to apply in the shadow folder (this comes from the server).
    */
-  static applyPatches(source: string, iPatch: IPatch) {
-    return new Promise((resolve, reject) => {
-      // For each specific file patch in the patch
-      iPatch.diffs.forEach(async patch => {
-        // We split on any delimter and use the join function to
-        // make sure that the delimiter which is used is the correct
-        // for the OS.
-        const filePath = path.join(source, this.SHADOW_RELATIVE_PATH, ...iPatch.path.split(/\/|\\/g));
-        const oldData = (await fse.readFile(filePath)).toString();
-        const appliedData = Diff.applyPatch(oldData, patch);
+  static applyPatches(source: string, iPatch: IPatch): Promise<void[]> {
+    // For each specific file patch in the patch
+    return Promise.all(
+      iPatch.diffs.map(patch => {
+        return new Promise<void>((resolve, reject) => {
+          // We split on any delimter and use the join function to
+          // make sure that the delimiter which is used is the correct
+          // for the OS.
+          const osSafeFilePath = path.join(source, this.SHADOW_RELATIVE_PATH, ...iPatch.path.split(/\/|\\/g));
+          fse.readFile(osSafeFilePath).then(buffer => {
+            const appliedData = Diff.applyPatch(buffer.toString(), patch);
 
-        // Check wheter the patch is valid or not
-        if (appliedData === 'false') reject('could not apply patch.');
+            // Check wheter the patch is valid or not
+            if (appliedData === 'false') reject('could not apply patch.');
 
-        fse.writeFile(filePath, appliedData, err => {
-          if (err) reject('could not write to file.');
-          else resolve(); // Resolve? Vad händer här egentligen / Marcus undrar! (TA bort kommentaren när marcus vet)
+            fse.writeFile(osSafeFilePath, appliedData, err => {
+              if (err) reject('could not write to file.');
+              else resolve();
+            });
+          });
         });
-      });
-    });
+      })
+    );
   }
 
   /**
@@ -85,7 +87,7 @@ export class FS {
    * @param sourceFolderPath the source folder path.
    * @param filePath the path to the file that we want to use in the comparison.
    */
-  static async getDiff(source: string, filePath: string) {
+  static async getDiff(source: string, filePath: string): Promise<Diff.ParsedDiff[]> {
     const shadowFile = path.join(source, this.SHADOW_RELATIVE_PATH, filePath);
     const sourceFile = path.join(source, filePath);
     const shadowData = (await fse.readFile(shadowFile)).toString();
@@ -144,26 +146,26 @@ export class FS {
    * @param fileChange the file change we want to apply in the shadow folder (this comes from the server).
    */
   static async applyFileChange(source: string, fileChange: IFileChange): Promise<void> {
-    const osSpecific = path.join(...fileChange.path.split(/\/|\\/g));
+    const osSafeFilePath = path.join(...fileChange.path.split(/\/|\\/g));
 
     switch (fileChange.event) {
       case FileEvent.FILE_DELETED: {
-        return fse.remove(path.join(source, FS.SHADOW_RELATIVE_PATH, osSpecific));
+        return fse.remove(path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath));
       }
 
       case FileEvent.FILE_CREATED: {
-        const filePath = path.join(source, FS.SHADOW_RELATIVE_PATH, osSpecific);
+        const filePath = path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath);
         await fse.ensureDir(path.dirname(filePath));
         return fse.writeFile(filePath, fileChange.buffer);
       }
 
       case FileEvent.DIR_CREATED: {
-        const dirName = path.join(source, FS.SHADOW_RELATIVE_PATH, osSpecific);
+        const dirName = path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath);
         return fse.ensureDir(dirName);
       }
 
       case FileEvent.DIR_DELETED: {
-        const dirName = path.join(source, FS.SHADOW_RELATIVE_PATH, osSpecific);
+        const dirName = path.join(source, FS.SHADOW_RELATIVE_PATH, osSafeFilePath);
         return fse.remove(dirName);
       }
     }
