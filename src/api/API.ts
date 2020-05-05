@@ -4,7 +4,6 @@ import { BasicRequest } from './routes/BasicRequest';
 import FormData from 'form-data';
 
 export type DefaultServerResponse = { message: string };
-export type UserListServerResponse = { message: string; users: string[] };
 
 export class API {
   static RoomRequest = RoomRequest;
