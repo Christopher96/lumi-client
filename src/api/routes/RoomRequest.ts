@@ -14,7 +14,11 @@ export class RoomRequest {
   }
 
   static listRooms() {
-    return new API().get<DefaultServerResponse>('/room/list');
+    return new API().get<DefaultServerResponse>('/room/all');
+  }
+
+  static listUsersInRoom(roomId: string) {
+    return new API().get<DefaultServerResponse & { users: string[] }>('/room/users/' + roomId);
   }
 
   static downloadRoom(roomId: string) {
