@@ -6,6 +6,7 @@ import { joinRoomCommand } from './commands/joinRoom';
 import { checkRoomCommand } from './commands/checkRoom';
 import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
+import { listUsersInRoomCommand } from './commands/listUsersInRoom';
 
 export default class CLI {
   constructor() {
@@ -65,11 +66,19 @@ export default class CLI {
       });
 
     program
-      .command('list')
+      .command('rooms')
       .description('Will list all rooms.')
-      .alias('l')
+      .alias('r')
+      .action(() => {
+        return listRoomsCommand();
+      });
+
+    program
+      .command('users <roomId>')
+      .description('Will list all active users in the current room.')
+      .alias('u')
       .action((roomId: string) => {
-        return listRoomsCommand(roomId);
+        return listUsersInRoomCommand(roomId);
       });
 
     program.parse(process.argv);
