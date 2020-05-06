@@ -24,7 +24,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
     socket.emit(Events.room_file_change, { change: fileChange, roomId });
   });
-  FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
+  FS.listenForPatches(sourceFolderPath, (patch: IPatch) => {
     socket.emit(Events.room_file_change, { change: patch, roomId });
   });
 
