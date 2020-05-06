@@ -1,6 +1,6 @@
 {
   "name": "lumi-cli",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "",
   "bin": {
     "lumi": "./bin/index"
