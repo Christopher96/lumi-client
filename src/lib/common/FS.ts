@@ -94,7 +94,7 @@ export class FS {
 
   /**
    * This method will compare two files and return the difference.
-   * @param sourceFolderPath the source folder path.
+   * @param source the source folder path.
    * @param filePath the path to the file that we want to use in the comparison.
    */
   static async getDiff(source: string, filePath: string): Promise<Diff.ParsedDiff[]> {
@@ -108,22 +108,33 @@ export class FS {
     return Diff.parsePatch(patchData);
   }
 
-  static async bindFileEventsForSocket(roomId: string, sourceFolderPath: string, socket: SocketIOClient.Socket) {
-    FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
+  /**
+   * Common function for listening to both patches and file events
+   * @param roomId, target room ID.
+   * @param source, the source folder path.
+   * @param socket, the socket to send emits from
+   */
+  static async bindFileEventsForSocket(roomId: string, source: string, socket: SocketIOClient.Socket) {
+    FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
       socket.emit(Events.room_file_change, { change: fileChange, roomId });
     });
-    FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
+    FS.listenForLocalPatches(source, (patch: IPatch) => {
       socket.emit(Events.room_file_change, { change: patch, roomId });
     });
   }
 
-  static async applyFileEventRequest(fileEventRequest: FileEventRequest, sourceFolderPath: string) {
+  /**
+   * Common function for applying patches and file events
+   * @param fileEventRequest, the file event.
+   * @param source, the source folder path.
+   */
+  static async applyFileEventRequest(fileEventRequest: FileEventRequest, source: string) {
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
       const patch = fileEventRequest.change as IPatch;
-      await FS.applyPatches(sourceFolderPath, patch);
+      await FS.applyPatches(source, patch);
     } else {
       const fileChange = fileEventRequest.change as IFileChange;
-      await FS.applyFileChange(sourceFolderPath, fileChange);
+      await FS.applyFileChange(source, fileChange);
     }
   }
 
