@@ -1,10 +1,11 @@
 import * as Diff from 'diff';
-import { IPatch, FileEvent, IFileChange } from './types';
+import { IPatch, FileEvent, FileEventRequest, IFileChange } from './types';
 import * as path from 'path';
 import zipper from 'zip-local';
 import chokidar, { WatchOptions, FSWatcher } from 'chokidar';
 import { readFile } from 'fs';
 import fse from 'fs-extra';
+import { Events } from '../../api/routes/SocketEvents';
 
 /**
  * This class contains static methods for manipulating files.
@@ -105,6 +106,25 @@ export class FS {
     const patchData = Diff.createTwoFilesPatch(shadowFile, sourceFile, shadowData, sourceData);
 
     return Diff.parsePatch(patchData);
+  }
+
+  static async bindFileEventsForSocket(roomId: string, sourceFolderPath: string, socket: SocketIOClient.Socket) {
+    FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
+      socket.emit(Events.room_file_change, { change: fileChange, roomId });
+    });
+    FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
+      socket.emit(Events.room_file_change, { change: patch, roomId });
+    });
+  }
+
+  static async applyFileEventRequest(fileEventRequest: FileEventRequest, sourceFolderPath: string) {
+    if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
+      const patch = fileEventRequest.change as IPatch;
+      await FS.applyPatches(sourceFolderPath, patch);
+    } else {
+      const fileChange = fileEventRequest.change as IFileChange;
+      await FS.applyFileChange(sourceFolderPath, fileChange);
+    }
   }
 
   /**
