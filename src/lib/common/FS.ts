@@ -5,12 +5,15 @@ import zipper from 'zip-local';
 import chokidar, { WatchOptions, FSWatcher } from 'chokidar';
 import { readFile } from 'fs';
 import fse from 'fs-extra';
+import { Console } from '../utils/Console';
 
 /**
  * This class contains static methods for manipulating files.
  * In addition support for watching file changes.
  */
 export class FS {
+  private static IGNORE_WINDOWS_FILES = />|<|\?|\/|\\|\'|\*|\"|\||\!/;
+
   // These options are used when we initialize the directory watcher.
   private static readonly watchOptions: WatchOptions = {
     // This will ignore dotfiles for example .shadow (we need to add support for also ignoring binary files, images and so on).
@@ -115,8 +118,16 @@ export class FS {
   static listenForLocalPatches(source: string, onPatch: (patch: IPatch) => void) {
     const watcher = chokidar.watch(source, this.watchOptions);
     watcher.on('change', async filePath => {
+      if (FS.IGNORE_WINDOWS_FILES.test(path.basename(filePath))) {
+        Console.error(
+          'You are trying to add a file which will not work on windows, this is not allowed and will be ignored ' +
+            filePath
+        );
+        return;
+      }
       const relativeFilePath = path.relative(source, filePath);
       const diffs = await FS.getDiff(source, relativeFilePath);
+
       onPatch({ path: relativeFilePath, diffs, event: FileEvent.FILE_MODIFIED });
     });
   }
@@ -131,6 +142,14 @@ export class FS {
     watcher.on('all', (event, filePath) => {
       // This event is handled by patches.
       if (event == 'change') return;
+
+      if (FS.IGNORE_WINDOWS_FILES.test(path.basename(filePath))) {
+        Console.error(
+          'You are trying to add a file which will not work on windows, this is not allowed and will be ignored ' +
+            filePath
+        );
+        return;
+      }
 
       // We don't want the source folder to be visible in the path.
       // For example the file path: source-folder/dog.cpp, we just want to send /dog.cpp to the server.
