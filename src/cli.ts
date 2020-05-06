@@ -6,6 +6,8 @@ import { joinRoomCommand } from './commands/joinRoom';
 import { checkRoomCommand } from './commands/checkRoom';
 import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
+import { listUsersInRoomCommand } from './commands/listUsersInRoom';
+import { configCommand } from './commands/config';
 
 export default class CLI {
   constructor() {
@@ -65,11 +67,28 @@ export default class CLI {
       });
 
     program
-      .command('list')
+      .command('rooms')
       .description('Will list all rooms.')
-      .alias('l')
+      .alias('r')
+      .action(() => {
+        return listRoomsCommand();
+      });
+
+    program
+      .command('users <roomId>')
+      .description('Will list all active users in the current room.')
+      .alias('u')
       .action((roomId: string) => {
-        return listRoomsCommand(roomId);
+        return listUsersInRoomCommand(roomId);
+      });
+
+    program
+      .command('config')
+      .description('A command to read or update the config.')
+      .alias('co')
+      .option('-s, --set <key> <value>', 'Set a new value in the config')
+      .action((obj) => {
+        return configCommand(obj);
       });
 
     program.parse(process.argv);

@@ -4,6 +4,7 @@ export class Console {
   static title(...title: any[]) {
     console.log(chalk.yellow(chalk.bgBlack(...title)));
   }
+
   static success(...successMessage: any[]) {
     console.log(chalk.green(...successMessage));
   }
