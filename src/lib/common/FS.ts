@@ -118,7 +118,7 @@ export class FS {
         );
         return;
       }
-      const absoluteShadowPath = this.SHADOW_RELATIVE_PATH;
+
       const relativeFilePath = path.relative(source, filePath);
       const diffs = await FS.getDiff(source, relativeFilePath);
       onPatch({ path: relativeFilePath, diffs, event: FileEvent.FILE_MODIFIED });
