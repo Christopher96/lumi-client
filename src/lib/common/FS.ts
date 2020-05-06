@@ -13,9 +13,10 @@ export type SubscribeToChangeCallback = (input: IPatch) => void;
 export type SubscribeToCreateCallback = (input: IPatch) => void;
 
 export class FS {
+  private static IGNORE_WINDOWS_FILES = />|<|\?|\/|\\|\'|\*|\"|\||\!/;
   private static readonly watchOptions: WatchOptions = {
     // This will ignore dotfiles for example .shadow (we need to add support for also ignoring binary files, images and so on).
-    ignored: /((^|[\/\\])\..)|(>|<|\?|\/|\\|\'|\*|\"|\|)/,
+    ignored: /(^|[\/\\])\../,
     // Indicates whether the process should continue to run as long as files are being watched.
     persistent: true,
     // When we begin to watch the source folder we can make sure that already existing files do not trigger a file change event.
@@ -76,6 +77,13 @@ export class FS {
   static listenForPatches(source: string, onPatch: (patch: IPatch) => void) {
     const watcher = chokidar.watch(source, FS.watchOptions);
     watcher.on('change', filePath => {
+      if (FS.IGNORE_WINDOWS_FILES.test(path.basename(filePath))) {
+        Console.error(
+          'You are trying to add a file which will not work on windows, this is not allowed and will be ignored ' +
+            filePath
+        );
+        return;
+      }
       const absoluteShadowPath = this.SHADOW_RELATIVE_PATH;
       const relativeFilePath = path.relative(source, filePath);
       const diffs = this.getDiff(source, absoluteShadowPath, relativeFilePath);
@@ -88,7 +96,13 @@ export class FS {
     watcher.on('all', (event, filePath) => {
       // Checks that the event is one the select ones.
       if (event == 'change') return;
-
+      if (FS.IGNORE_WINDOWS_FILES.test(path.basename(filePath))) {
+        Console.error(
+          'You are trying to add a file which will not work on windows, this is not allowed and will be ignored ' +
+            filePath
+        );
+        return;
+      }
       const relativeFilePath = path.relative(source, filePath);
 
       if (event === 'addDir' || event === 'unlink' || event === 'unlinkDir') {
