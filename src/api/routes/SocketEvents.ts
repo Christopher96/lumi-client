@@ -13,5 +13,9 @@ export enum Events {
 
   'room_kick' = 'room_kick',
   'room_kick_res' = 'room_kick_res',
-  'room_kick_err' = 'room_kick_err'
+  'room_kick_err' = 'room_kick_err',
+
+  'room_newHost' = 'room_newHost',
+  'room_newHost_res' = 'room_newHost_res',
+  'room_newHost_err' = 'room_newHost_err'
 }

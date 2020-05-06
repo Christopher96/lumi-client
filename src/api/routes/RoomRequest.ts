@@ -2,7 +2,6 @@ import { API, DefaultServerResponse } from '../API';
 import io from 'socket.io-client';
 import { Events } from './SocketEvents';
 import { Console } from '../../lib/utils/Console';
-import { FS } from '../../lib/common/FS';
 
 export class RoomRequest {
   static create(buffer: Buffer) {
@@ -54,6 +53,14 @@ export class RoomRequest {
         });
 
         socket.on(Events.room_leave_err, (message: string) => {
+          Console.error(message);
+        });
+
+        socket.on(Events.room_newHost_res, (message: string) => {
+          Console.yellow(message);
+        });
+
+        socket.on(Events.room_newHost_err, (message: string) => {
           Console.error(message);
         });
       })

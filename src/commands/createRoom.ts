@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { Console } from '../lib/utils/Console';
 import { API } from '../api/API';
 import { FS } from '../lib/common/FS';

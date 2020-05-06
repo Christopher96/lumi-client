@@ -4,7 +4,6 @@ import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest } from '../lib/common/types';
 import * as path from 'path';
-import { parsePatch } from 'diff';
 import { IFileChange } from '../lib/common/types';
 import { IPatch } from '../lib/common/types';
 
