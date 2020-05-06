@@ -5,3 +5,4 @@ export * from './joinRoom';
 export * from './listRoom';
 export * from './listUsersInRoom';
 export * from './ping';
+export * from './start';
