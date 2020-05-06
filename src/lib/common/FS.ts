@@ -108,9 +108,9 @@ export class FS {
     return Diff.parsePatch(patchData);
   }
 
-  static async listenForPatches(source: string, onPatch: (patch: IPatch) => void) {
+  static listenForPatches(source: string, onPatch: (patch: IPatch) => void) {
     const watcher = chokidar.watch(source, FS.watchOptions);
-    watcher.on('change', filePath => {
+    watcher.on('change', async filePath => {
       if (FS.IGNORE_WINDOWS_FILES.test(path.basename(filePath))) {
         Console.error(
           'You are trying to add a file which will not work on windows, this is not allowed and will be ignored ' +
