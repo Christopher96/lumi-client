@@ -13,5 +13,9 @@ export enum Events {
 
   'room_kick' = 'room_kick',
   'room_kick_res' = 'room_kick_res',
-  'room_kick_err' = 'room_kick_err'
+  'room_kick_err' = 'room_kick_err',
+
+  'public_config' = 'public_config',
+  'public_config_res' = 'public_config_res',
+  'public_config_err' = 'public_config_err',
 }
