@@ -27,7 +27,7 @@ export class Git {
       )
       // Checks if it was a comment.
       .filter(v => v.slice(0, 2) !== '^#')
-      // Combines the regex with and or command
+      // Combines the regex with an or command
       .join('|');
 
     return new RegExp(regex);
