@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import { Console } from '../utils/Console';
+import globToRegExp from 'glob-to-regexp';
 
 export class Git {
   public getIgnoredFilesRegex() {
@@ -11,12 +12,25 @@ export class Git {
   }
 
   private parseFile(gitIngoreFile: string) {
-    console.log(gitIngoreFile);
-    /// TODO
-    // IMPLEMENT PARSING OF THE IGNORE FILE
-    // CURRENLTY ONLY RETURNS ANY FILE WHICH INCLUDE THE
-    // WORD NODE MODULES
-    return /.*node_modules.*/;
+    // removes all empty rows.
+    const lines = gitIngoreFile.split('\n').filter(v => v.length > 1);
+
+    // creates a list of string which are regex representations of the
+    // git ignore file.
+    const regex = lines
+      .map(v =>
+        globToRegExp(v)
+          .toString()
+          .trim()
+          // remove the first and final character since they are / and /
+          .slice(1, globToRegExp(v).toString().length - 2)
+      )
+      // Checks if it was a comment.
+      .filter(v => v.slice(0, 2) !== '^#')
+      // Combines the regex with and or command
+      .join('|');
+
+    return new RegExp(regex);
   }
 
   private getPath() {
