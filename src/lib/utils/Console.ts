@@ -20,6 +20,9 @@ export class Console {
   static yellow(...message: any[]) {
     console.log(chalk.yellow(...message));
   }
+  static warn(...message: any[]) {
+    console.log(chalk.yellow(...message));
+  }
   static log(...message: any[]) {
     console.log(...message);
   }
