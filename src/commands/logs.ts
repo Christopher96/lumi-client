@@ -7,7 +7,7 @@ export const logsCommand = async (idOrAll: string, args: { amount: string }) => 
   const amount = Number.parseInt(args.amount) || 5;
 
   if (viewAllRooms) Console.title('Viewing logs for all rooms');
-  else Console.title('Viewing logs room', idOrAll);
+  else Console.title('Viewing logs room for', idOrAll);
 
   if (viewAllLogs) await viewAllLogs(amount);
   else await viewLogsForSingle(idOrAll, amount);
