@@ -42,12 +42,12 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     }
   });
 
-  socket.on(Events.room_file_change_err, (error?: { message: string }, event?: FileEventRequest) => {
-    if (error.message) {
-      Console.error(error.message);
-      process.exit();
+  socket.on(Events.room_file_change_err, (err: string | FileEventRequest) => {
+    if (typeof err === 'string') {
+      Console.error(err);
     } else {
-      Console.error(`The server could not apply your file change on: ${event.change.path}`);
+      const event = err as FileEventRequest;
+      Console.error(`The server could not apply the file change you made to: ${event.change.path}`);
     }
   });
 
