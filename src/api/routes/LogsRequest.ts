@@ -1,7 +1,8 @@
 import { API, DefaultServerResponse } from '../API';
 
 interface LogsQueryParams {
-  reverse: '1' | '0';
+  reverse?: '1' | '0';
+  offset?: string;
 }
 
 type LogEvent = {
