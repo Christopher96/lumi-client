@@ -8,6 +8,7 @@ import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
 import { listUsersInRoomCommand } from './commands/listUsersInRoom';
 import { configCommand } from './commands/config';
+import { logsCommand } from './commands/logs';
 
 export default class CLI {
   constructor() {
@@ -26,6 +27,14 @@ export default class CLI {
       .alias('p')
       .action(() => {
         return pingCommand();
+      });
+
+    program
+      .command('logs <id>')
+      .description('Will try to ping the server.')
+      .alias('p')
+      .action((idOrAll, obj) => {
+        return logsCommand(idOrAll, obj);
       });
 
     program
@@ -87,7 +96,7 @@ export default class CLI {
       .description('A command to read or update the config.')
       .alias('co')
       .option('-s, --set <key> <value>', 'Set a new value in the config')
-      .action((obj) => {
+      .action(obj => {
         return configCommand(obj);
       });
 
