@@ -1,13 +1,8 @@
 import { sha256 } from 'js-sha256';
+let readline = require('readline');
 
-// This method is written in a combination of TypeScript and
-// pure JavaScript. The readline interface when imported with
-// TypeScript does not have the same functionality as the
-// same interface in JavaScript, which is needed for the output
-// to be displayed as asterisks (*) instead of pure text.
 export async function getPassword(): Promise<string> {
-  var readline = require('readline');
-  var rl = readline.createInterface({
+  const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
