@@ -8,6 +8,7 @@ type LogEvent = {
   event: string;
   date: number;
   roomId: string;
+  body?: any;
   byWhom: {
     username: string;
   };

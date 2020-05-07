@@ -1,5 +1,4 @@
 import { Console } from '../lib/utils/Console';
-import { async } from 'rxjs/internal/scheduler/async';
 import { API } from '../api';
 
 export const logsCommand = async (idOrAll: string, args: { amount: string }) => {
