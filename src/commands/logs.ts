@@ -1,5 +1,5 @@
 import { Console } from '../lib/utils/Console';
-import { API } from '../api';
+import { API } from '../api/API';
 import { LogsQueryParams } from '../api/routes/LogsRequest';
 
 export const logsCommand = async (idOrAll: string, args: { amount: string; offset?: string; reverse?: boolean }) => {

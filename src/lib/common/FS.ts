@@ -6,7 +6,7 @@ import chokidar, { WatchOptions, FSWatcher } from 'chokidar';
 import { readFile } from 'fs';
 import fse from 'fs-extra';
 import { Console } from '../utils/Console';
-import { Git } from './git';
+import { Git } from './Git';
 import { Events } from '../../api/routes/SocketEvents';
 
 /**
