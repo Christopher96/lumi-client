@@ -16,9 +16,11 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
 
   await FS.createShadow(sourceFolderPath, zippedRoom);
 
-  const onError = (error: { message: string }) => {
-    Console.error(error.message);
-    process.exit();
+  const onError = (error: { roomExist: boolean; message: string }) => {
+    if (!error.roomExist) {
+      Console.error(error.message);
+      process.exit();
+    }
   };
 
   FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
@@ -31,13 +33,26 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
 
   socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-      Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
       const patch = fileEventRequest.change as IPatch;
-      await FS.applyPatches(sourceFolderPath, patch);
+      try {
+        await FS.applyPatches(sourceFolderPath, patch);
+      } catch (err) {
+        Console.error(err);
+      }
     } else {
-      Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
       const fileChange = fileEventRequest.change as IFileChange;
-      await FS.applyFileChange(sourceFolderPath, fileChange);
+      try {
+        await FS.applyFileChange(sourceFolderPath, fileChange);
+      } catch (err) {
+        Console.error(err);
+      }
+    }
+  });
+
+  socket.on(Events.room_file_change_err, (roomExist: boolean, fileEventRequest: FileEventRequest) => {
+    if (roomExist) {
+      Console.error(`The server could not apply your file change on: ${fileEventRequest.change.path}`);
+      Console.error('Please compare your file to the same file in the shadow folder');
     }
   });
 
