@@ -4,56 +4,57 @@ import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest } from '../lib/common/types';
 import * as path from 'path';
-import { IFileChange } from '../lib/common/types';
-import { IPatch } from '../lib/common/types';
 
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
 
-  const socket = await API.RoomRequest.joinRoom(roomId);
-
   const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-
   await FS.createShadow(sourceFolderPath, zippedRoom);
 
-  const onError = (error: { message?: string }) => {
-    if (error.message) {
-      Console.error(error.message);
-      process.exit();
-    }
-  };
+  const socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
 
-  FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
-    socket.emit(Events.room_file_change, { change: fileChange, roomId });
+  // After emitting Events.room_kick we should get this response (if the person got kicked).
+  socket.on(Events.room_kick_res, obj => {
+    Console.error(obj.message);
+    process.exit();
   });
 
-  FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
-    socket.emit(Events.room_file_change, { change: patch, roomId });
+  // After emitting Events.room_kick we should get this response (if the server failed to kick).
+  socket.on(Events.room_kick_err, obj => {
+    Console.error(obj.message);
+  });
+
+  // After emitting Events.room_leave we should get this response (if everything went well).
+  socket.on(Events.room_leave_res, () => {
+    Console.yellow('You have left the room');
+  });
+
+  // After emitting Events.room_leave we should get this response (if it failed).
+  socket.on(Events.room_leave_err, obj => {
+    Console.error(obj.message);
   });
 
   socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-      const patch = fileEventRequest.change as IPatch;
-      try {
-        await FS.applyPatches(sourceFolderPath, patch);
-      } catch (err) {
-        Console.error(err);
-      }
+      Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
     } else {
-      const fileChange = fileEventRequest.change as IFileChange;
-      try {
-        await FS.applyFileChange(sourceFolderPath, fileChange);
-      } catch (err) {
-        Console.error(err);
-      }
+      Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
     }
   });
 
-  socket.on(Events.room_file_change_err, (fileEventRequest?: FileEventRequest) => {
-    if (fileEventRequest) {
-      Console.error(`The server could not apply your file change on: ${fileEventRequest.change.path}`);
+  socket.on(Events.room_file_change_err, (error?: { message: string }, event?: FileEventRequest) => {
+    if (error.message) {
+      Console.error(error.message);
+      process.exit();
+    } else {
+      Console.error(`The server could not apply your file change on: ${event.change.path}`);
     }
   });
 
-  socket.on(Events.room_file_change_err, onError);
+  socket.on(Events.room_join_err, error => {
+    throw new Error(error.message);
+  });
+
+  // Tell the server we would like to join.
+  socket.emit(Events.room_join, roomId);
 };
