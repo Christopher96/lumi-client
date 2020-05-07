@@ -18,8 +18,8 @@ export async function getPassword(): Promise<string> {
   const PUBLICKEY1 = 'U9kNjNW*wqtr%4Fr=jvak-!_4*UNBS7mKWLZT8_hGpfqZ2jJUxFpQub7^';
   const PUBLICKEY2 = 'A_62Z_D?PMeQYYN^dx--LEVUVdWS';
   return new Promise(res => {
-    rl.question(null, function(password) {
-      hash = sha256(PUBLICKEY1 + password + PUBLICKEY2);
+    rl.question(null, function(password: string) {
+      hash = sha256(PUBLICKEY1 + password.trim() + PUBLICKEY2);
       rl.close();
       res(hash);
     });
