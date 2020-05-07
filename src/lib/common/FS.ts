@@ -5,6 +5,8 @@ import zipper from 'zip-local';
 import chokidar, { WatchOptions, FSWatcher } from 'chokidar';
 import { readFile } from 'fs';
 import fse from 'fs-extra';
+import { Console } from '../utils/Console';
+import { Git } from './git';
 import { Events } from '../../api/routes/SocketEvents';
 
 /**
@@ -13,13 +15,15 @@ import { Events } from '../../api/routes/SocketEvents';
  */
 export class FS {
   private static IGNORE_WINDOWS_FILES = />|<|\?|\/|\\|\'|\*|\"|\||\!/;
+  private static IGNORE_FOLDERS = new Git().getIgnoredFilesRegex();
 
   // These options are used when we initialize the directory watcher.
   private static readonly watchOptions: WatchOptions = {
     // This will ignore dotfiles for example .shadow (we need to add support for also ignoring binary files, images and so on).
-    ignored: /(^|[\/\\])\../,
+    ignored: /(^|[\/\\])\..|.*node_modules.*/,
     // Indicates whether the process should continue to run as long as files are being watched.
     persistent: true,
+
     // When we begin to watch the source folder we can make sure that already existing files do not trigger a file change event.
     ignoreInitial: true
   };
@@ -58,10 +62,27 @@ export class FS {
    * This will zip a directory and return it as binary data.
    * @param path the path to the directory we want to zip.
    */
-  static zip(path: string): Promise<Buffer> {
-    return new Promise((res, rej) =>
-      zipper.zip(path, (err, zipped) => (err ? rej(err) : res(zipped.compress().memory())))
-    );
+  static async zip(path: string): Promise<Buffer> {
+    const zip = zipper.sync.zip(path);
+
+    // If we get no IGNORED FILES regex we shall not
+    // use it at all. We therefore return the object without
+    // removing the files matching the regex.
+    if (!FS.IGNORE_FOLDERS) zip.compress().memory();
+
+    // Checks if any of the files match the regex,
+
+    zip
+      .lowLevel()
+      .folder(FS.IGNORE_FOLDERS)
+      .forEach(v => zip.lowLevel().remove(v.name));
+
+    zip
+      .lowLevel()
+      .file(FS.IGNORE_FOLDERS)
+      .map(v => zip.lowLevel().remove(v.name));
+
+    return zip.compress().memory();
   }
 
   /**
