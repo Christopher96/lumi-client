@@ -102,7 +102,7 @@ export class FS {
             const appliedData = Diff.applyPatch(buffer.toString(), patch) as string | boolean;
 
             // Check wheter the patch is valid or not
-            if (!appliedData) {
+            if (appliedData === false) {
               reject(`Could not apply patch on: ${osSafeFilePath}`);
             } else {
               fse.writeFile(osSafeFilePath, appliedData, err => {
