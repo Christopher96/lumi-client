@@ -31,9 +31,12 @@ export default class CLI {
 
     program
       .command('logs <id>')
-      .description('Will try to ping the server.')
-      .alias('p')
-      .action((idOrAll, obj) => {
+      .description('Will show all the logs from a certain room or all')
+      .alias('l')
+      .option('-a, --amount <amount>')
+      .option('-o, --offset <offset>')
+      .option('-r, --reverse')
+      .action((idOrAll, obj, te) => {
         return logsCommand(idOrAll, obj);
       });
 

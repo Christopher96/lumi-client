@@ -1,6 +1,6 @@
 import { API, DefaultServerResponse } from '../API';
 
-interface LogsQueryParams {
+export interface LogsQueryParams {
   reverse?: '1' | '0';
   offset?: string;
 }
@@ -23,11 +23,11 @@ type LogsRequestResponse = {
 
 export class LogsRequest {
   static getAllLogs(amount: number, config?: LogsQueryParams) {
-    const params = new URLSearchParams({ amount: '' + amount, ...(config || {}) });
+    const params = new URLSearchParams({ ...(config || {}), amount: '' + amount });
     return new API().get<LogsRequestResponse>('/log/all?' + params.toString());
   }
   static getLog(id: string, amount: number, config?: LogsQueryParams) {
-    const params = new URLSearchParams({ amount: '' + amount, ...(config || {}) });
+    const params = new URLSearchParams({ ...(config || {}), amount: '' + amount });
     return new API().get<LogsRequestResponse>(`/log/${id}?` + params.toString());
   }
 }
