@@ -1,6 +1,6 @@
 {
   "name": "lumi-cli",
-  "version": "0.0.16",
+  "version": "0.0.28",
   "description": "",
   "bin": {
     "lumi": "./bin/index"
@@ -22,6 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/glob-to-regexp": "^0.4.0",
     "archiver": "^4.0.1",
     "chalk": "^2.4.2",
     "chokidar": "^3.4.0",
@@ -33,6 +34,8 @@
     "extract-zip": "^2.0.0",
     "form-data": "^3.0.0",
     "fs-extra": "^9.0.0",
+    "glob-to-regexp": "^0.4.1",
+    "ignore": "^5.1.4",
     "inquirer": "^7.1.0",
     "js-sha256": "^0.9.0",
     "jsonwebtoken": "^8.5.1",
