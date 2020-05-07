@@ -23,9 +23,15 @@ export async function getPassword(): Promise<string> {
   const PUBLICKEY2 = 'A_62Z_D?PMeQYYN^dx--LEVUVdWS';
   return new Promise(res => {
     rl.question(null, function(password: string) {
-      hash = sha256(PUBLICKEY1 + password.trim() + PUBLICKEY2);
-      rl.close();
-      res(hash);
+      if (password.trim() === '') {
+        res(null);
+      } else {
+        hash = sha256(PUBLICKEY1 + password.trim() + PUBLICKEY2);
+        rl.close();
+        console.log('\n');
+
+        res(hash);
+      }
     });
   });
 }

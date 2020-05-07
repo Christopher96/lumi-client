@@ -14,5 +14,5 @@ export const createRoomCommand = async (sourceFolderPath: string) => {
   Console.title('Enter a password for the room:');
   const hash: string = await getPassword();
   const serverResponse2 = await API.RoomRequest.createPassword(roomID, hash);
-  Console.success('\n' + serverResponse2.message, 'Room ID: ' + roomID);
+  Console.success(serverResponse2.message, 'Room ID: ' + roomID);
 };

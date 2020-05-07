@@ -87,7 +87,7 @@ export default class CLI {
       .description('A command to read or update the config.')
       .alias('co')
       .option('-s, --set <key> <value>', 'Set a new value in the config')
-      .action((obj) => {
+      .action(obj => {
         return configCommand(obj);
       });
 
