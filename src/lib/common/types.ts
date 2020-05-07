@@ -23,3 +23,4 @@ export interface FileEventRequest {
   change: IPatch | IFileChange;
   roomId: string;
 }
+
