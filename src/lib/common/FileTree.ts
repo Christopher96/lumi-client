@@ -17,8 +17,6 @@ type Branch = {
 };
 
 export class FileTree {
-  path: '/';
-
   private isDirectory(path: string) {
     return fse.lstatSync(path).isDirectory();
   }
