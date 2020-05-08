@@ -100,15 +100,17 @@ export class FS {
           // for the OS.
           const osSafeFilePath = path.join(source, FS.SHADOW_RELATIVE_PATH, ...iPatch.path.split(/\/|\\/g));
           fse.readFile(osSafeFilePath).then(buffer => {
-            const appliedData = Diff.applyPatch(buffer.toString(), patch);
+            const appliedData = Diff.applyPatch(buffer.toString(), patch) as string | boolean;
 
             // Check wheter the patch is valid or not
-            if (appliedData === 'false') reject('could not apply patch.');
-
-            fse.writeFile(osSafeFilePath, appliedData, err => {
-              if (err) reject('could not write to file.');
-              else resolve();
-            });
+            if (appliedData === false) {
+              reject(`Could not apply patch on: ${osSafeFilePath}`);
+            } else {
+              fse.writeFile(osSafeFilePath, appliedData, err => {
+                if (err) reject(`Could not write to file: ${osSafeFilePath}`);
+                else resolve();
+              });
+            }
           });
         });
       })
@@ -246,7 +248,7 @@ export class FS {
       }
     }
 
-    throw new Error('Did not return in applyFileChange');
+    throw new Error(`Could not apply file change on: ${osSafeFilePath}`);
   }
 
   /**
