@@ -9,6 +9,13 @@ import { getPassword } from '../lib/common/getPassword';
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
 
+  const { ok } = await API.RoomRequest.getRoom(roomId);
+
+  if (!ok) {
+    Console.error(`The room ${roomId} doesn't exist`);
+    process.exit();
+  }
+
   const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
   await FS.createShadow(sourceFolderPath, zippedRoom);
 
@@ -43,9 +50,14 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     }
   });
 
-  socket.on(Events.room_file_change_err, (error: { message: string }) => {
-    Console.error(error.message);
-    process.exit();
+  socket.on(Events.room_file_change_err, (err: { message: string } | FileEventRequest) => {
+    const event = err as FileEventRequest;
+    if (!event) {
+      Console.error((err as { message: string }).message);
+      process.exit();
+    } else {
+      Console.error(`The server could not apply the file change you made to: ${event.change.path}`);
+    }
   });
 
   socket.on(Events.room_join_err, obj => {

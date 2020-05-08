@@ -8,6 +8,7 @@ import { listRoomsCommand } from './commands/listRoom';
 import { startCommand } from './commands/start';
 import { listUsersInRoomCommand } from './commands/listUsersInRoom';
 import { configCommand } from './commands/config';
+import { logsCommand } from './commands/logs';
 
 export default class CLI {
   constructor() {
@@ -26,6 +27,17 @@ export default class CLI {
       .alias('p')
       .action(() => {
         return pingCommand();
+      });
+
+    program
+      .command('logs <id>')
+      .description('Will show all the logs from a certain room or all')
+      .alias('l')
+      .option('-a, --amount <amount>')
+      .option('-o, --offset <offset>')
+      .option('-r, --reverse')
+      .action((idOrAll, obj, te) => {
+        return logsCommand(idOrAll, obj);
       });
 
     program

@@ -1,5 +1,6 @@
 import httpFetch from 'node-fetch';
 import { RoomRequest } from './routes/RoomRequest';
+import { LogsRequest } from './routes/LogsRequest';
 import { BasicRequest } from './routes/BasicRequest';
 import FormData from 'form-data';
 
@@ -8,6 +9,7 @@ export type DefaultServerResponse = { message: string };
 export class API {
   static RoomRequest = RoomRequest;
   static BasicRequest = BasicRequest;
+  static LogsRequest = LogsRequest;
 
   public get<T>(relativePath: string) {
     return httpFetch(process.env.SERVER_ENDPOINT + relativePath).then(v => v.json() as Promise<T>);
