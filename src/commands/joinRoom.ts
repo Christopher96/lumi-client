@@ -8,6 +8,13 @@ import * as path from 'path';
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
 
+  const { ok } = await API.RoomRequest.getRoom(roomId);
+
+  if (!ok) {
+    Console.error(`The room ${roomId} doesn't exist`);
+    process.exit();
+  }
+
   const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
   await FS.createShadow(sourceFolderPath, zippedRoom);
 
@@ -42,17 +49,19 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     }
   });
 
-  socket.on(Events.room_file_change_err, (err: string | FileEventRequest) => {
-    if (typeof err === 'string') {
-      Console.error(err);
+  socket.on(Events.room_file_change_err, (err: { message: string } | FileEventRequest) => {
+    const event = err as FileEventRequest;
+    if (!event) {
+      Console.error((err as { message: string }).message);
+      process.exit();
     } else {
-      const event = err as FileEventRequest;
       Console.error(`The server could not apply the file change you made to: ${event.change.path}`);
     }
   });
 
   socket.on(Events.room_join_err, error => {
-    throw new Error(error.message);
+    Console.error(error.message);
+    process.exit();
   });
 
   // Tell the server we would like to join.
