@@ -1,7 +1,7 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
 
-type Tree = Leaf | Branch;
+export type Tree = Leaf | Branch;
 
 type Leaf = {
   title: string;
