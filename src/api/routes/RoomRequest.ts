@@ -10,6 +10,18 @@ export class RoomRequest {
     return new API().upload<DefaultServerResponse & { roomId: string }>('/room/create', buffer);
   }
 
+  static createPassword(roomId: string, password: string) {
+    return new API().post<DefaultServerResponse>(
+      '/room/create/' + roomId,
+      JSON.stringify({ password }),
+      'application/json'
+    );
+  }
+
+  static setPassword(roomId: string, userID: string, password: string) {
+    return new API().post<DefaultServerResponse>('/room/set/' + roomId, userID + '\n' + password, 'application/json');
+  }
+
   static getRoom(roomId: string) {
     return new API().get<DefaultServerResponse & { room: any; ok: boolean }>('/room/' + roomId);
   }

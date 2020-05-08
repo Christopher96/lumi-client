@@ -4,6 +4,7 @@ import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest } from '../lib/common/types';
 import * as path from 'path';
+import { getPassword } from '../lib/common/getPassword';
 
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
@@ -59,9 +60,19 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     }
   });
 
-  socket.on(Events.room_join_err, error => {
-    Console.error(error.message);
+  socket.on(Events.room_join_err, obj => {
+    Console.error(obj.message);
     process.exit();
+  });
+
+  socket.on(Events.room_join_auth, async obj => {
+    Console.title(obj.message);
+    const hash = await getPassword();
+    socket.emit(Events.room_join_auth, { roomId, hash });
+  });
+
+  socket.on(Events.room_join_res, obj => {
+    Console.success(obj.message);
   });
 
   // Tell the server we would like to join.

@@ -15,10 +15,11 @@ export class API {
     return httpFetch(process.env.SERVER_ENDPOINT + relativePath).then(v => v.json() as Promise<T>);
   }
 
-  public post<T>(relativePath: string, body: string | FormData) {
+  public post<T>(relativePath: string, body: string | FormData, type?: string) {
     return httpFetch(process.env.SERVER_ENDPOINT + relativePath, {
       method: 'POST',
-      body
+      headers: type ? { 'content-type': type } : undefined,
+      body: body
     }).then(v => v.json() as Promise<T>);
   }
 

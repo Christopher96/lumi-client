@@ -1,5 +1,6 @@
 export enum Events {
   'room_join' = 'room_join',
+  'room_join_auth' = 'room_join_auth',
   'room_join_res' = 'room_join_res',
   'room_join_err' = 'room_join_err',
 
@@ -17,5 +18,5 @@ export enum Events {
 
   'public_config' = 'public_config',
   'public_config_res' = 'public_config_res',
-  'public_config_err' = 'public_config_err',
+  'public_config_err' = 'public_config_err'
 }
