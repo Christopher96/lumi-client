@@ -16,7 +16,7 @@ type Branch = {
   isLeaf: true;
 };
 
-class FileTree {
+export class FileTree {
   path: '/';
 
   private isDirectory(path: string) {
@@ -64,7 +64,3 @@ class FileTree {
     return this.recTree(dir, [0]);
   }
 }
-
-const tree = new FileTree().make('./dist');
-
-console.log(tree);
