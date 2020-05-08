@@ -75,7 +75,7 @@ export class FS {
     zip
       .lowLevel()
       .folder(FS.IGNORE_FOLDERS)
-      .forEach(v => zip.lowLevel().remove(v.name));
+      .map(v => zip.lowLevel().remove(v.name));
 
     zip
       .lowLevel()
