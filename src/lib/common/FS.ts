@@ -134,36 +134,6 @@ export class FS {
   }
 
   /**
-   * Common function for listening to both patches and file events
-   * @param roomId, target room ID.
-   * @param source, the source folder path.
-   * @param socket, the socket to send emits from
-   */
-  static async bindFileEventsForSocket(roomId: string, source: string, socket: SocketIOClient.Socket) {
-    FS.listenForLocalFileChanges(source, (fileChange: IFileChange) => {
-      socket.emit(Events.room_file_change, { change: fileChange, roomId });
-    });
-    FS.listenForLocalPatches(source, (patch: IPatch) => {
-      socket.emit(Events.room_file_change, { change: patch, roomId });
-    });
-  }
-
-  /**
-   * Common function for applying patches and file events
-   * @param fileEventRequest, the file event.
-   * @param source, the source folder path.
-   */
-  static async applyFileEventRequest(fileEventRequest: FileEventRequest, source: string) {
-    if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-      const patch = fileEventRequest.change as IPatch;
-      await FS.applyPatches(source, patch);
-    } else {
-      const fileChange = fileEventRequest.change as IFileChange;
-      await FS.applyFileChange(source, fileChange);
-    }
-  }
-
-  /**
    * By calling this method you will begin to listen for FILE_MODIFIED in the source folder directory.
    * @param source the source folder path.
    * @param onPatch a callback function that will be called upon a file patch.
