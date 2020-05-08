@@ -18,8 +18,15 @@ export class RoomRequest {
     );
   }
 
+  // How to use this function
+  // const hash = await getPassword( '<NEWPASSWORD>' );
+  // await API.RoomRequest.setPassword(roomId, socket.id, hash);
   static setPassword(roomId: string, userID: string, password: string) {
-    return new API().post<DefaultServerResponse>('/room/set/' + roomId, userID + '\n' + password, 'application/json');
+    return new API().post<DefaultServerResponse>(
+      '/room/set/' + roomId,
+      JSON.stringify({ userID, password }),
+      'application/json'
+    );
   }
 
   static getRoom(roomId: string) {
