@@ -1,21 +1,6 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
-
-export type Tree = Leaf | Branch;
-
-type Leaf = {
-  title: string;
-  key: string;
-  isLeaf: false;
-  children: Tree[];
-};
-
-type Branch = {
-  title: string;
-  key: string;
-  isLeaf: true;
-};
-
+import { Tree } from './types';
 export class FileTree {
   private isDirectory(path: string) {
     return fse.lstatSync(path).isDirectory();
@@ -59,6 +44,6 @@ export class FileTree {
   }
 
   public make(dir: string) {
-    return this.recTree(dir, [0]);
+    return [this.recTree(dir, [0])];
   }
 }

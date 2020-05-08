@@ -24,3 +24,17 @@ export interface FileEventRequest {
   roomId: string;
 }
 
+export type Tree = Leaf | Branch;
+
+type Leaf = {
+  title: string;
+  key: string;
+  isLeaf: false;
+  children: Tree[];
+};
+
+type Branch = {
+  title: string;
+  key: string;
+  isLeaf: true;
+};
