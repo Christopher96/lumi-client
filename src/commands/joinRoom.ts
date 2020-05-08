@@ -16,9 +16,6 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     process.exit();
   }
 
-  const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-  await FS.createShadow(sourceFolderPath, zippedRoom);
-
   const socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
 
   // After emitting Events.room_kick we should get this response (if the person got kicked).
@@ -71,7 +68,9 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     socket.emit(Events.room_join_auth, { roomId, hash });
   });
 
-  socket.on(Events.room_join_res, obj => {
+  socket.on(Events.room_join_res, async obj => {
+    const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
+    await FS.createShadow(sourceFolderPath, zippedRoom);
     Console.success(obj.message);
   });
 
