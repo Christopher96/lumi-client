@@ -2,8 +2,6 @@ import { API, DefaultServerResponse } from '../API';
 import io from 'socket.io-client';
 import { Events } from './SocketEvents';
 import { Config } from '../../lib/utils/Config';
-import { FS } from '../../lib/common/FS';
-import { FileEventRequest } from '../../lib/common/types';
 
 export class RoomRequest {
   static create(buffer: Buffer) {
@@ -45,7 +43,7 @@ export class RoomRequest {
     return new API().download('/room/download/' + roomId);
   }
 
-  static joinRoom(roomId: string, sourceFolderPath: string): Promise<SocketIOClient.Socket> {
+  static createSocket(): Promise<SocketIOClient.Socket> {
     // Create the server instance with the server
     const socket = io(process.env.SERVER_ENDPOINT, {
       transports: ['websocket']
@@ -53,19 +51,12 @@ export class RoomRequest {
 
     return new Promise(resolve => {
       socket.once('connect', () => {
-        socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
-          FS.applyFileEventRequest(fileEventRequest, sourceFolderPath);
-        });
-
         // If the server asks for our public config read the config and send it back to the server.
         socket.on(Events.public_config, () => {
           Config.get()
             .then(conf => socket.emit(Events.public_config_res, { config: conf.public }))
             .catch(err => socket.emit(Events.public_config_err, 'Failed to get config'));
         });
-
-        FS.bindFileEventsForSocket(roomId, sourceFolderPath, socket);
-
         resolve(socket);
       });
     });

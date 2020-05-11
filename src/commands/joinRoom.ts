@@ -2,7 +2,7 @@ import { Console } from '../lib/utils/Console';
 import { API } from '../api/API';
 import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
-import { FileEvent, FileEventRequest } from '../lib/common/types';
+import { FileEvent, FileEventRequest, IPatch, IFileChange } from '../lib/common/types';
 import * as path from 'path';
 import { getPassword } from '../lib/common/getPassword';
 
@@ -16,7 +16,19 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     process.exit();
   }
 
-  const socket = await API.RoomRequest.joinRoom(roomId, sourceFolderPath);
+  const socket = await API.RoomRequest.createSocket();
+
+  socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
+    if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
+      Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
+      const patch = fileEventRequest.change as IPatch;
+      await FS.applyPatches(sourceFolderPath, patch);
+    } else {
+      Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
+      const fileChange = fileEventRequest.change as IFileChange;
+      await FS.applyFileChange(sourceFolderPath, fileChange);
+    }
+  });
 
   // After emitting Events.room_kick we should get this response (if the person got kicked).
   socket.on(Events.room_kick_res, obj => {
@@ -37,14 +49,6 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   // After emitting Events.room_leave we should get this response (if it failed).
   socket.on(Events.room_leave_err, obj => {
     Console.error(obj.message);
-  });
-
-  socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
-    if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-      Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
-    } else {
-      Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
-    }
   });
 
   socket.on(Events.room_file_change_err, (err: { message: string } | FileEventRequest) => {
@@ -71,6 +75,14 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   socket.on(Events.room_join_res, async obj => {
     const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
     await FS.createShadow(sourceFolderPath, zippedRoom);
+
+    FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
+      socket.emit(Events.room_file_change, { change: fileChange, roomId });
+    });
+    FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
+      socket.emit(Events.room_file_change, { change: patch, roomId });
+    });
+
     Console.success(obj.message);
   });
 
