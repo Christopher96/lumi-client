@@ -40,7 +40,7 @@ export class RoomRequest {
   }
 
   static listExtendedUsersInRoom(roomId: string) {
-    return new API().get<DefaultServerResponse & { users: any[]; ok: boolean }>(`/room/users${roomId}?extended=1`);
+    return new API().get<DefaultServerResponse & { users: any[]; ok: boolean }>(`/room/users/${roomId}?extended=1`);
   }
 
   static downloadRoom(roomId: string) {
