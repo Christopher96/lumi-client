@@ -72,7 +72,7 @@ export class FS {
       Console.warn(
         'You are zipping without any gitingore. This is not recomended sing it increases the strain on the server'
       );
-      zip.compress().memory();
+      return zip.compress().memory();
     }
 
     // Checks if any of the files match the regex,
