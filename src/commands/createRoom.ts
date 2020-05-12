@@ -10,6 +10,7 @@ export const createRoomCommand = async (obj: any) => {
   const buffer = await FS.zip(sourceFolderPath);
   const serverResponse = await API.RoomRequest.create(buffer);
   const roomID = serverResponse.roomId;
+  Console.error(roomID);
 
   Console.title('Enter a password, or skip by pressing ENTER:');
   const hash: string = await getPassword();
