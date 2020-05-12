@@ -1,1 +1,1 @@
-{ "public": { "username": "I am a silly goose" } }
+{ "public": { "base": { "username": "I am a silly goose" }, "extended": { "addon": 1337 } } }

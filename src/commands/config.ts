@@ -8,7 +8,7 @@ export const configCommand = async obj => {
 
     switch (obj.set) {
       case 'username':
-        config.public.username = value;
+        config.public.base.username = value;
         break;
       default:
         Console.error(`You cannot set ${obj.set}`);

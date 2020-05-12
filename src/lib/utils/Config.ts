@@ -7,8 +7,17 @@ import * as path from 'path';
  */
 export interface IConfig {
   public: {
-    username: string;
+    base: IBaseConfig;
+    extended?: IExtendedConfig;
   };
+}
+
+interface IBaseConfig {
+  username: string;
+}
+
+interface IExtendedConfig {
+  avatar?: Buffer;
 }
 
 /**
