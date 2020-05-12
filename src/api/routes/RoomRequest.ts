@@ -39,10 +39,6 @@ export class RoomRequest {
     return new API().get<DefaultServerResponse & { users: any[]; ok: boolean }>('/room/users/' + roomId);
   }
 
-  static listExtendedUsersInRoom(roomId: string) {
-    return new API().get<DefaultServerResponse & { users: any[]; ok: boolean }>(`/room/users/${roomId}?extended=1`);
-  }
-
   static downloadRoom(roomId: string) {
     return new API().download('/room/download/' + roomId);
   }
@@ -58,7 +54,7 @@ export class RoomRequest {
         // If the server asks for our public config read the config and send it back to the server.
         socket.on(Events.public_config, () => {
           Config.get()
-            .then(conf => socket.emit(Events.public_config_res, { config: conf.public }))
+            .then(conf => socket.emit(Events.public_config_res, { config: conf }))
             .catch(err => socket.emit(Events.public_config_err, 'Failed to get config'));
         });
         resolve(socket);

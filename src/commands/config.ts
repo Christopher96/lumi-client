@@ -7,7 +7,7 @@ const validExtensions: string[] = ['.png', '.jpg'];
 
 /**
  * Check if the picture exists and has a valid extension.
- * @param picturePath 
+ * @param picturePath
  */
 function isValidAvatar(picturePath: string): boolean {
   if (!fse.pathExistsSync(picturePath)) {
@@ -29,16 +29,16 @@ export const configCommand = async obj => {
 
     switch (obj.set) {
       case 'username':
-        config.public.base.username = value;
+        config.username = value;
         break;
       case 'avatar':
         {
           // If the user wants to remove the avatar it can be done with 'none'.
           if (value === 'none') {
-            config.public.extended.avatar = null;
+            config.avatar = null;
           } else {
             const picturePath = path.join(process.cwd(), value);
-            if (isValidAvatar(picturePath)) config.public.extended.avatar = fse.readFileSync(picturePath);
+            if (isValidAvatar(picturePath)) config.avatar = fse.readFileSync(picturePath);
           }
         }
         break;

@@ -1,4 +1,4 @@
-import { IConfig, UserOnServerConfig } from '../utils/Config';
+import { IConfig } from '../utils/Config';
 
 export enum FileEvent {
   FILE_CREATED = 'add',
@@ -41,9 +41,8 @@ export type Branch = {
   children: Tree[];
 };
 
-export type User = {
+export type User = IConfig & {
   id: string;
-  config: UserOnServerConfig;
 };
 
 export type RoomChangedEvent = {
