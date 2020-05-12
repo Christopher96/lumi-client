@@ -68,7 +68,12 @@ export class FS {
     // If we get no IGNORED FILES regex we shall not
     // use it at all. We therefore return the object without
     // removing the files matching the regex.
-    if (!FS.IGNORE_FOLDERS) zip.compress().memory();
+    if (!FS.IGNORE_FOLDERS) {
+      Console.warn(
+        'You are zipping without any gitingore. This is not recomended sing it increases the strain on the server'
+      );
+      zip.compress().memory();
+    }
 
     // Checks if any of the files match the regex,
 

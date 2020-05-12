@@ -6,10 +6,12 @@ import * as path from 'path';
  * Feel free to add more fields when necessary.
  */
 export interface IConfig {
-  public: {
-    base: IBaseConfig;
-    extended?: IExtendedConfig;
-  };
+  public: UserOnServerConfig;
+}
+
+export interface UserOnServerConfig {
+  base: IBaseConfig;
+  extended?: IExtendedConfig;
 }
 
 interface IBaseConfig {
