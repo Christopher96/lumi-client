@@ -16,17 +16,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     process.exit();
   }
 
-  const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
-  await FS.createShadow(sourceFolderPath, zippedRoom);
-
   const socket = await API.RoomRequest.createSocket();
-
-  FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
-    socket.emit(Events.room_file_change, { change: fileChange, roomId });
-  });
-  FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
-    socket.emit(Events.room_file_change, { change: patch, roomId });
-  });
 
   socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
@@ -82,7 +72,17 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     socket.emit(Events.room_join_auth, { roomId, hash });
   });
 
-  socket.on(Events.room_join_res, obj => {
+  socket.on(Events.room_join_res, async obj => {
+    const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
+    await FS.createShadow(sourceFolderPath, zippedRoom);
+
+    FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
+      socket.emit(Events.room_file_change, { change: fileChange, roomId });
+    });
+    FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
+      socket.emit(Events.room_file_change, { change: patch, roomId });
+    });
+
     Console.success(obj.message);
   });
 
