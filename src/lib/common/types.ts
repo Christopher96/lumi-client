@@ -29,12 +29,12 @@ export type Tree = Leaf | Branch;
 type Leaf = {
   title: string;
   key: string;
-  isLeaf: false;
-  children: Tree[];
+  isLeaf: true;
 };
 
 type Branch = {
   title: string;
   key: string;
-  isLeaf: true;
+  isLeaf: false;
+  children: Tree[];
 };
