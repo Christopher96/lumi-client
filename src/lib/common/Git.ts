@@ -41,9 +41,6 @@ export class Git {
     const path = this.getPath();
 
     if (!fse.existsSync(path)) {
-      Console.warn(
-        `No git ignore file found on path ${path} please use this in the future to minimize burden on our poor server`
-      );
       return;
     }
 

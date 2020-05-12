@@ -1,3 +1,5 @@
+import { IConfig, UserOnServerConfig } from '../utils/Config';
+
 export enum FileEvent {
   FILE_CREATED = 'add',
   FILE_MODIFIED = 'change',
@@ -26,15 +28,26 @@ export interface FileEventRequest {
 
 export type Tree = Leaf | Branch;
 
-type Leaf = {
+export type Leaf = {
   title: string;
   key: string;
   isLeaf: true;
 };
 
-type Branch = {
+export type Branch = {
   title: string;
   key: string;
   isLeaf: false;
   children: Tree[];
+};
+
+export type User = {
+  id: string;
+  config: UserOnServerConfig;
+};
+
+export type RoomChangedEvent = {
+  users: User[];
+  message: string;
+  newUser: User;
 };

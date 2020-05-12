@@ -4,6 +4,9 @@ export enum Events {
   'room_join_res' = 'room_join_res',
   'room_join_err' = 'room_join_err',
 
+  'room_users_update_res' = 'room_users_update_res',
+  'room_users_update_err' = 'room_users_update_err',
+
   'room_leave' = 'room_leave',
   'room_leave_res' = 'room_leave_res',
   'room_leave_err' = 'room_leave_err',
