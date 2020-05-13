@@ -7,7 +7,9 @@ export const listUsersInRoomCommand = async (roomId: string) => {
   if (serverResponse.ok) {
     Console.success(serverResponse.message);
     serverResponse.users.forEach(user => {
-      Console.success(`${user.id} : ${user.username}`);
+      const userInfo = user.user;
+      if (user.isHost) Console.success(`${userInfo.id} : ${userInfo.username} - Host`);
+      else Console.success(`${userInfo.id} : ${userInfo.username}`);
     });
   } else {
     Console.error(serverResponse.message);

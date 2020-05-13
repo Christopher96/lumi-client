@@ -5,6 +5,10 @@ import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest, IPatch, IFileChange } from '../lib/common/types';
 import * as path from 'path';
 import { getPassword } from '../lib/common/getPassword';
+import readline from 'readline';
+import { listRoomsCommand } from './listRoom';
+import { listUsersInRoomCommand } from './listUsersInRoom';
+import { setPasswordCommand } from './setPassword';
 
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
@@ -44,6 +48,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   // After emitting Events.room_leave we should get this response (if everything went well).
   socket.on(Events.room_leave_res, () => {
     Console.yellow('You have left the room');
+    process.exit();
   });
 
   // After emitting Events.room_leave we should get this response (if it failed).
@@ -84,6 +89,42 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     });
 
     Console.success(obj.message);
+
+    // Experiment starts HERE
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: null
+    });
+
+    rl.on('line', async line => {
+      const args = line.split(' ');
+      if (args[0] === 'quit') {
+        socket.emit(Events.room_leave, roomId);
+        return;
+      }
+
+      switch (args[0]) {
+        case 'users':
+          await listUsersInRoomCommand(roomId);
+          break;
+        case 'rooms':
+          await listRoomsCommand();
+          break;
+        case 'set':
+          if (args[1] === 'password') await setPasswordCommand(roomId, socket.id);
+          else if (args[1] === 'host') socket.emit(Events.room_new_host, roomId, args[2]);
+          else Console.error('Command: set - Missing argument');
+          break;
+        case 'kick':
+          socket.emit(Events.room_kick, roomId, args[1]);
+          break;
+        case 'config':
+          break;
+        default:
+          Console.error('Not an available command');
+          break;
+      }
+    });
   });
 
   // Tell the server we would like to join.
