@@ -44,9 +44,3 @@ export type Branch = {
 export type User = IConfig & {
   id: string;
 };
-
-export type RoomChangedEvent = {
-  users: User[];
-  message: string;
-  newUser: User;
-};
