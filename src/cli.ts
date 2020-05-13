@@ -46,8 +46,10 @@ export default class CLI {
       .alias('c')
       .option('-d, --dir <path>', 'Use a custom directory.')
       .action(obj => {
-        if (obj.dir) return createRoomCommand(obj.dir);
-        else return createRoomCommand(process.cwd());
+        if (obj.dir) {
+          console.log('Command received: ' + obj.dir);
+          return createRoomCommand(obj.dir);
+        } else return createRoomCommand(process.cwd());
       });
 
     program

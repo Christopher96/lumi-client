@@ -5,7 +5,9 @@ import { FS } from '../lib/common/FS';
 import { getPassword } from '../lib/common/getPassword';
 
 export const createRoomCommand = async (obj: any) => {
-  const sourceFolderPath = obj.dir ? obj.dir : process.cwd();
+  const sourceFolderPath = obj ? obj : process.cwd();
+  console.log('Step1: ' + obj);
+  console.log('Step2: ' + sourceFolderPath);
   Console.title('Creating new room from path', sourceFolderPath);
   const buffer = await FS.zip(sourceFolderPath);
   const serverResponse = await API.RoomRequest.create(buffer);
