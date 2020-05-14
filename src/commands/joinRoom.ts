@@ -79,10 +79,10 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     await FS.createShadow(sourceFolderPath, zippedRoom);
 
     FS.listenForLocalFileChanges(sourceFolderPath, (fileChange: IFileChange) => {
-      socket.emit(Events.room_file_change, { change: fileChange, roomId, userId: socket.id });
+      socket.emit(Events.room_file_change, { change: fileChange, roomId });
     });
     FS.listenForLocalPatches(sourceFolderPath, (patch: IPatch) => {
-      socket.emit(Events.room_file_change, { change: patch, roomId, userId: socket.id });
+      socket.emit(Events.room_file_change, { change: patch, roomId });
     });
 
     Console.success(obj.message);
