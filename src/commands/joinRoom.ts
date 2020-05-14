@@ -7,7 +7,7 @@ import * as path from 'path';
 import { getPassword } from '../lib/utils/getPassword';
 import inquirer from 'inquirer';
 import { listUsersInRoomCommand } from './listUsersInRoom';
-import { setPasswordCommand } from './setPassword';
+import { setRoomPasswordCommand } from './setRoomPassword';
 import { Commands } from './availableCommands';
 
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
@@ -121,7 +121,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
               await listUsersInRoomCommand(roomId, socket.id);
               break;
             case Commands.SET_ROOM_PASSWORD:
-              await setPasswordCommand(roomId, socket.id);
+              await setRoomPasswordCommand(roomId, socket.id);
               break;
             case Commands.CHANGE_HOST:
               await hostTransferPrompt();
