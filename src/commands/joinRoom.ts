@@ -73,7 +73,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   socket.on(Events.room_join_auth, async obj => {
     Console.title(obj.message);
     const hash = await getPassword();
-    socket.emit(Events.room_join_auth, { roomId, hash });
+    socket.emit(Events.room_join, roomId, hash);
   });
 
   socket.on(Events.room_join_res, async obj => {
