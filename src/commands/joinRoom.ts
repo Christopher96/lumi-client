@@ -4,7 +4,11 @@ import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest, IPatch, IFileChange } from '../lib/common/types';
 import * as path from 'path';
-import { getPassword } from '../lib/common/getPassword';
+import { getPassword } from '../lib/utils/getPassword';
+import inquirer from 'inquirer';
+import { listUsersInRoomCommand } from './listUsersInRoom';
+import { setRoomPasswordCommand } from './setRoomPassword';
+import { Commands } from './availableCommands';
 
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
@@ -48,6 +52,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   // After emitting Events.room_leave we should get this response (if everything went well).
   socket.on(Events.room_leave_res, () => {
     Console.yellow('You have left the room');
+    process.exit();
   });
 
   // After emitting Events.room_leave we should get this response (if it failed).
@@ -71,8 +76,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   });
 
   socket.on(Events.room_join_auth, async obj => {
-    Console.title(obj.message);
-    const hash = await getPassword();
+    const hash = await getPassword(obj.message);
     socket.emit(Events.room_join, roomId, hash);
   });
 
@@ -88,7 +92,103 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     });
 
     Console.success(obj.message);
+
+    // Experiment starts HERE
+    let quit = false;
+    while (!quit) {
+      await inquirer
+        .prompt([
+          {
+            type: 'rawlist',
+            message: 'Room commands:',
+            name: 'command',
+            choices: [
+              Commands.LIST_USERS,
+              Commands.KICK_USERS,
+              Commands.SET_ROOM_PASSWORD,
+              Commands.CHANGE_HOST,
+              Commands.LEAVE_ROOM
+            ]
+          }
+        ])
+        .then(async answer => {
+          switch (answer.command) {
+            case Commands.LEAVE_ROOM:
+              quit = true;
+              socket.emit(Events.room_leave, roomId);
+              break;
+            case Commands.LIST_USERS:
+              await listUsersInRoomCommand(roomId, socket.id);
+              break;
+            case Commands.SET_ROOM_PASSWORD:
+              await setRoomPasswordCommand(roomId, socket.id);
+              break;
+            case Commands.CHANGE_HOST:
+              await hostTransferPrompt();
+              break;
+            case Commands.KICK_USERS:
+              await kickUserPrompt();
+              break;
+            default:
+              Console.error('Not an available command');
+              break;
+          }
+        });
+    }
   });
+
+  async function hostTransferPrompt() {
+    const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
+    const users = serverResponse.users.map(info => {
+      let str = info.user.id + ' : ' + info.user.username;
+      if (info.user.id === socket.id) str + ' (you)';
+      if (info.isHost) str + ' - ★';
+      return str;
+    });
+    await inquirer
+      .prompt([
+        {
+          type: 'rawlist',
+          message: 'Choose the next host:',
+          name: 'option',
+          choices: users
+        }
+      ])
+      .then(choice => {
+        const indexOfUser = users.indexOf(choice.option);
+        const userID = serverResponse.users[indexOfUser].user.id;
+        socket.emit(Events.room_new_host, roomId, userID);
+      });
+  }
+
+  async function kickUserPrompt() {
+    const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
+    const users = serverResponse.users
+      .filter(info => info.isHost == false)
+      .map(info => {
+        return info.user.id + ' : ' + info.user.username;
+      });
+    if (users.length == 0) {
+      Console.error('No other users in room');
+      return;
+    }
+
+    await inquirer
+      .prompt([
+        {
+          type: 'rawlist',
+          message: 'Choose a user to kick',
+          name: 'option',
+          choices: users
+        }
+      ])
+      .then(choice => {
+        const answer: string = choice.option;
+        const id: string = answer.split(' ')[0];
+
+        socket.emit(Events.room_kick, roomId, id);
+      });
+  }
 
   // Tell the server we would like to join.
   socket.emit(Events.room_join, roomId);

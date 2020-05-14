@@ -20,7 +20,7 @@ export class RoomRequest {
   // const hash = await getPassword( '<NEWPASSWORD>' );
   // await API.RoomRequest.setPassword(roomId, socket.id, hash);
   static setPassword(roomId: string, userID: string, password: string) {
-    return new API().post<DefaultServerResponse>(
+    return new API().post<DefaultServerResponse & { ok: boolean }>(
       '/room/set/' + roomId,
       JSON.stringify({ userID, password }),
       'application/json'
