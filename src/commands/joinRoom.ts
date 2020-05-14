@@ -91,21 +91,33 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     Console.success(obj.message);
 
     // Experiment starts HERE
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: null
-    });
 
-    rl.on('line', async line => {
-      const args = line.split(' ');
+    const read = async (): Promise<string> => {
+      return new Promise((res, rej) => {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: null
+        });
+        rl.question('', line => {
+          rl.close();
+          res(line);
+        });
+      });
+    };
+
+    while (true) {
+      const input = await read();
+
+      const args = input.split(' ');
       if (args[0] === 'quit') {
         socket.emit(Events.room_leave, roomId);
         return;
       }
 
+      // Run the entered command
       switch (args[0]) {
         case 'users':
-          await listUsersInRoomCommand(roomId);
+          await listUsersInRoomCommand(roomId, socket.id);
           break;
         case 'rooms':
           await listRoomsCommand();
@@ -124,7 +136,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
           Console.error('Not an available command');
           break;
       }
-    });
+    }
   });
 
   // Tell the server we would like to join.
