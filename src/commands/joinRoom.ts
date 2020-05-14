@@ -5,10 +5,11 @@ import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest, IPatch, IFileChange } from '../lib/common/types';
 import * as path from 'path';
 import { getPassword } from '../lib/common/getPassword';
-import readline from 'readline';
+import inquirer from 'inquirer';
 import { listRoomsCommand } from './listRoom';
 import { listUsersInRoomCommand } from './listUsersInRoom';
 import { setPasswordCommand } from './setPassword';
+import { Commands } from './availableCommands';
 
 export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) => {
   Console.title('Joining room with roomId', roomId);
@@ -91,53 +92,101 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     Console.success(obj.message);
 
     // Experiment starts HERE
-
-    const read = async (): Promise<string> => {
-      return new Promise((res, rej) => {
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: null
+    let quit = false;
+    while (!quit) {
+      await inquirer
+        .prompt([
+          {
+            type: 'rawlist',
+            message: 'Room commands:',
+            name: 'command',
+            choices: [
+              Commands.LIST_USERS,
+              Commands.KICK_USERS,
+              Commands.SET_ROOM_PASSWORD,
+              Commands.CHANGE_HOST,
+              Commands.LEAVE_ROOM
+            ]
+          }
+        ])
+        .then(async answer => {
+          switch (answer.command) {
+            case Commands.LEAVE_ROOM:
+              quit = true;
+              socket.emit(Events.room_leave, roomId);
+              break;
+            case Commands.LIST_USERS:
+              await listUsersInRoomCommand(roomId, socket.id);
+              break;
+            case Commands.SET_ROOM_PASSWORD:
+              await setPasswordCommand(roomId, socket.id);
+              break;
+            case Commands.CHANGE_HOST:
+              await hostTransferPrompt();
+              break;
+            case Commands.KICK_USERS:
+              await kickUserPrompt();
+              break;
+            default:
+              Console.error('Not an available command');
+              break;
+          }
         });
-        rl.question('', line => {
-          rl.close();
-          res(line);
-        });
-      });
-    };
-
-    while (true) {
-      const input = await read();
-
-      const args = input.split(' ');
-      if (args[0] === 'quit') {
-        socket.emit(Events.room_leave, roomId);
-        return;
-      }
-
-      // Run the entered command
-      switch (args[0]) {
-        case 'users':
-          await listUsersInRoomCommand(roomId, socket.id);
-          break;
-        case 'rooms':
-          await listRoomsCommand();
-          break;
-        case 'set':
-          if (args[1] === 'password') await setPasswordCommand(roomId, socket.id);
-          else if (args[1] === 'host') socket.emit(Events.room_new_host, roomId, args[2]);
-          else Console.error('Command: set - Missing argument');
-          break;
-        case 'kick':
-          socket.emit(Events.room_kick, roomId, args[1]);
-          break;
-        case 'config':
-          break;
-        default:
-          Console.error('Not an available command');
-          break;
-      }
     }
   });
+
+  async function hostTransferPrompt() {
+    const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
+    const users = serverResponse.users.map(info => {
+      let str = info.user.id + ' : ' + info.user.username;
+      if (info.user.id === socket.id) str + ' (you)';
+      if (info.isHost) str + ' - ★';
+      return str;
+    });
+    await inquirer
+      .prompt([
+        {
+          type: 'rawlist',
+          message: 'Choose the next host:',
+          name: 'option',
+          choices: users
+        }
+      ])
+      .then(choice => {
+        const indexOfUser = users.indexOf(choice.option);
+        const userID = serverResponse.users[indexOfUser].user.id;
+        socket.emit(Events.room_new_host, roomId, userID);
+      });
+  }
+
+  async function kickUserPrompt() {
+    const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
+    const users = serverResponse.users
+      .filter(info => info.isHost == false)
+      .map(info => {
+        return info.user.id + ' : ' + info.user.username;
+      });
+    if (users.length == 0) {
+      Console.error('No other users in room');
+      return;
+    }
+
+    await inquirer
+      .prompt([
+        {
+          type: 'rawlist',
+          message: 'Choose a user to kick',
+          name: 'option',
+          choices: users
+        }
+      ])
+      .then(choice => {
+        const answer: string = choice.option;
+        const id: string = answer.split(' ')[0];
+
+        socket.emit(Events.room_kick, roomId, id);
+      });
+  }
 
   // Tell the server we would like to join.
   socket.emit(Events.room_join, roomId);
