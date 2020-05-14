@@ -1,7 +1,7 @@
 import { Console } from '../lib/utils/Console';
 import { API } from '../api/API';
 import { FS } from '../lib/common/FS';
-import { getPassword } from '../lib/common/getPassword';
+import { getPassword } from '../lib/utils/getPassword';
 
 export const createRoomCommand = async (sourceFolderPath: string) => {
   Console.title('Creating new room from path', sourceFolderPath);

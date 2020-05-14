@@ -4,9 +4,8 @@ import { Events } from '../api/routes/SocketEvents';
 import { FS } from '../lib/common/FS';
 import { FileEvent, FileEventRequest, IPatch, IFileChange } from '../lib/common/types';
 import * as path from 'path';
-import { getPassword } from '../lib/common/getPassword';
+import { getPassword } from '../lib/utils/getPassword';
 import inquirer from 'inquirer';
-import { listRoomsCommand } from './listRoom';
 import { listUsersInRoomCommand } from './listUsersInRoom';
 import { setPasswordCommand } from './setPassword';
 import { Commands } from './availableCommands';
@@ -77,8 +76,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   });
 
   socket.on(Events.room_join_auth, async obj => {
-    Console.title(obj.message);
-    const hash = await getPassword();
+    const hash = await getPassword(obj.message);
     socket.emit(Events.room_join, roomId, hash);
   });
 
