@@ -30,4 +30,8 @@ export class LogsRequest {
     const params = new URLSearchParams({ ...(config || {}), amount: '' + amount });
     return new API().get<LogsRequestResponse>(`/log/${id}?` + params.toString());
   }
+
+  static getFileMap(roomId: string) {
+    return new API().get<DefaultServerResponse & { roomMap: Record<string, string> }>(`/log/file-map/${roomId}`);
+  }
 }

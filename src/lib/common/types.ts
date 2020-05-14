@@ -24,6 +24,7 @@ export interface IPatch {
 export interface FileEventRequest {
   change: IPatch | IFileChange;
   roomId: string;
+  userId?: string;
 }
 
 export type Tree = Leaf | Branch;
@@ -43,10 +44,4 @@ export type Branch = {
 
 export type User = IConfig & {
   id: string;
-};
-
-export type RoomChangedEvent = {
-  users: User[];
-  message: string;
-  newUser: User;
 };

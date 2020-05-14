@@ -6,8 +6,13 @@ import * as path from 'path';
  * Feel free to add more fields when necessary.
  */
 export interface IConfig {
-  avatar?: Buffer;
-  username: string;
+  avatar?: Buffer,
+  username: string,
+  notifyFileChange: boolean,
+  notifyFileError: boolean,
+  notifyUserJoin: boolean,
+  notifyUserLeave: boolean,
+  theme: string
 }
 
 /**

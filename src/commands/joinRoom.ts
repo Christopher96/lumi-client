@@ -24,15 +24,19 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   const socket = await API.RoomRequest.createSocket();
 
   socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
+    let fileEventType = '';
     if (fileEventRequest.change.event === FileEvent.FILE_MODIFIED) {
-      Console.green(`File patched: ${path.join('.shadow', fileEventRequest.change.path)}`);
+      fileEventType = 'patched';
       const patch = fileEventRequest.change as IPatch;
       await FS.applyPatches(sourceFolderPath, patch);
     } else {
-      Console.green(`File changed: ${path.join('.shadow', fileEventRequest.change.path)}`);
+      fileEventType = 'changed';
       const fileChange = fileEventRequest.change as IFileChange;
       await FS.applyFileChange(sourceFolderPath, fileChange);
     }
+    Console.green(
+      `File ${fileEventType}: ${path.join('.shadow', fileEventRequest.change.path)} by ${fileEventRequest.userId}`
+    );
   });
 
   // After emitting Events.room_kick we should get this response (if the person got kicked).
@@ -75,7 +79,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
   socket.on(Events.room_join_auth, async obj => {
     Console.title(obj.message);
     const hash = await getPassword();
-    socket.emit(Events.room_join_auth, { roomId, hash });
+    socket.emit(Events.room_join, roomId, hash);
   });
 
   socket.on(Events.room_join_res, async obj => {
