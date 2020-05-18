@@ -70,7 +70,7 @@ export class FS {
     // removing the files matching the regex.
     if (!FS.IGNORE_FOLDERS) {
       Console.warn(
-        'You are zipping without any gitingore. This is not recomended sing it increases the strain on the server'
+        'You are zipping without any gitingore. This is not recomended since it increases the strain on the server'
       );
       return zip.compress().memory();
     }
