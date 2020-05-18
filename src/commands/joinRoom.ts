@@ -19,6 +19,9 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     Console.error(`The room ${roomId} doesn't exist`);
     process.exit();
   }
+  let hasUpdates = false;
+  let displayLogs = false;
+  let fetchedUpdates = false;
 
   const socket = await API.RoomRequest.createSocket();
 
@@ -33,9 +36,12 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
       const fileChange = fileEventRequest.change as IFileChange;
       await FS.applyFileChange(sourceFolderPath, fileChange);
     }
-    Console.green(
-      `File ${fileEventType}: ${path.join('.shadow', fileEventRequest.change.path)} by ${fileEventRequest.userId}`
-    );
+    hasUpdates ? hasUpdates : (hasUpdates = true);
+    if (displayLogs) {
+      Console.green(
+        `File ${fileEventType}: ${path.join('.shadow', fileEventRequest.change.path)} by ${fileEventRequest.userId}`
+      );
+    }
   });
 
   // After emitting Events.room_kick we should get this response (if the person got kicked).
@@ -96,6 +102,10 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     // Experiment starts HERE
     let quit = false;
     while (!quit) {
+      if (hasUpdates && !fetchedUpdates) {
+        Console.success('Room has updated!');
+        fetchedUpdates = true;
+      }
       await inquirer
         .prompt([
           {
@@ -107,6 +117,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
               Commands.KICK_USERS,
               Commands.SET_ROOM_PASSWORD,
               Commands.CHANGE_HOST,
+              Commands.SEE_LOGS,
               Commands.LEAVE_ROOM
             ]
           }
@@ -129,6 +140,9 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
             case Commands.KICK_USERS:
               await kickUserPrompt();
               break;
+            case Commands.SEE_LOGS:
+              await seeLogsPrompt();
+              break;
             default:
               Console.error('Not an available command');
               break;
@@ -136,6 +150,23 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
         });
     }
   });
+
+  async function seeLogsPrompt() {
+    displayLogs = true;
+    await inquirer
+      .prompt([
+        {
+          type: 'input',
+          message: 'Press ENTER to exit logs feed.\n',
+          name: 'input'
+        }
+      ])
+      .then(pressed => {
+        displayLogs = false;
+        hasUpdates = false;
+        fetchedUpdates = false;
+      });
+  }
 
   async function hostTransferPrompt() {
     const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
