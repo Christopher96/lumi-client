@@ -19,6 +19,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     Console.error(`The room ${roomId} doesn't exist`);
     process.exit();
   }
+
   let hasUpdates = false;
   let displayLogs = false;
   let fetchedUpdates = false;
@@ -102,10 +103,6 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     // Experiment starts HERE
     let quit = false;
     while (!quit) {
-      if (hasUpdates && !fetchedUpdates) {
-        Console.success('Room has updated!');
-        fetchedUpdates = true;
-      }
       await inquirer
         .prompt([
           {
