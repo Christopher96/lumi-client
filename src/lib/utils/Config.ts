@@ -19,7 +19,15 @@ export interface IConfig {
  * A class to get the configuration that is stored on the local computer.
  */
 export class Config {
-  private static readonly CONFIG_PATH = path.join(__dirname, '..', '..', '..', 'config.json');
+  private static CONFIG_PATH = path.join(__dirname, '..', '..', '..', 'config.json');
+
+  /**
+   * Set a new custom path to the config.json file.
+   * @param path the new path.
+   */
+  public static setPath(path: string) {
+    this.CONFIG_PATH = path;
+  }
 
   /**
    * Returns the configuration as an IConfig object.
