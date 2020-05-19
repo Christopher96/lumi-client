@@ -20,6 +20,9 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     process.exit();
   }
 
+  let isHost = false;
+  let displayLogs = false;
+
   const socket = await API.RoomRequest.createSocket();
 
   socket.on(Events.room_file_change_res, async (fileEventRequest: FileEventRequest) => {
@@ -33,9 +36,11 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
       const fileChange = fileEventRequest.change as IFileChange;
       await FS.applyFileChange(sourceFolderPath, fileChange);
     }
-    Console.green(
-      `File ${fileEventType}: ${path.join('.shadow', fileEventRequest.change.path)} by ${fileEventRequest.userId}`
-    );
+    if (displayLogs) {
+      Console.green(
+        `File ${fileEventType}: ${path.join('.shadow', fileEventRequest.change.path)} by ${fileEventRequest.userId}`
+      );
+    }
   });
 
   // After emitting Events.room_kick we should get this response (if the person got kicked).
@@ -80,6 +85,20 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     socket.emit(Events.room_join, roomId, hash);
   });
 
+  socket.on(Events.room_new_host_res, obj => {
+    if (obj.host) {
+      isHost = true;
+      Console.success(obj.message);
+    } else {
+      isHost = false;
+      Console.yellow(obj.message);
+    }
+  });
+
+  socket.on(Events.room_new_host_err, err => {
+    Console.error(err);
+  });
+
   socket.on(Events.room_join_res, async obj => {
     const zippedRoom = await API.RoomRequest.downloadRoom(roomId);
     await FS.createShadow(sourceFolderPath, zippedRoom);
@@ -91,24 +110,39 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
       socket.emit(Events.room_file_change, { change: patch, roomId });
     });
 
+    const users = await API.RoomRequest.listUsersInRoom(roomId);
+    users.users.forEach(info => {
+      if (info.isHost) {
+        info.user.id == socket.id ? (isHost = true) : (isHost = false);
+      }
+    });
+
     Console.success(obj.message);
 
     // Experiment starts HERE
     let quit = false;
     while (!quit) {
+      let listOfCommands;
+      if (isHost) {
+        listOfCommands = [
+          Commands.LIST_USERS,
+          Commands.KICK_USERS,
+          Commands.SET_ROOM_PASSWORD,
+          Commands.CHANGE_HOST,
+          Commands.SEE_LOGS,
+          Commands.LEAVE_ROOM
+        ];
+      } else {
+        listOfCommands = [Commands.LIST_USERS, Commands.SEE_LOGS, Commands.LEAVE_ROOM];
+      }
+
       await inquirer
         .prompt([
           {
             type: 'rawlist',
             message: 'Room commands:',
             name: 'command',
-            choices: [
-              Commands.LIST_USERS,
-              Commands.KICK_USERS,
-              Commands.SET_ROOM_PASSWORD,
-              Commands.CHANGE_HOST,
-              Commands.LEAVE_ROOM
-            ]
+            choices: listOfCommands
           }
         ])
         .then(async answer => {
@@ -129,6 +163,9 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
             case Commands.KICK_USERS:
               await kickUserPrompt();
               break;
+            case Commands.SEE_LOGS:
+              await seeLogsPrompt();
+              break;
             default:
               Console.error('Not an available command');
               break;
@@ -137,12 +174,27 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     }
   });
 
+  async function seeLogsPrompt() {
+    displayLogs = true;
+    await inquirer
+      .prompt([
+        {
+          type: 'input',
+          message: 'Press ENTER to exit logs feed.\n',
+          name: 'input'
+        }
+      ])
+      .then(pressed => {
+        displayLogs = false;
+      });
+  }
+
   async function hostTransferPrompt() {
     const serverResponse = await API.RoomRequest.listUsersInRoom(roomId);
     const users = serverResponse.users.map(info => {
       let str = info.user.id + ' : ' + info.user.username;
-      if (info.user.id === socket.id) str + ' (you)';
-      if (info.isHost) str + ' - ★';
+      if (info.user.id === socket.id) str += ' (you)';
+      if (info.isHost) str += ' - ★';
       return str;
     });
     await inquirer
@@ -158,6 +210,11 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
         const indexOfUser = users.indexOf(choice.option);
         const userID = serverResponse.users[indexOfUser].user.id;
         socket.emit(Events.room_new_host, roomId, userID);
+        return new Promise((res, rej) => {
+          socket.once(Events.room_new_host_res, newHostId => {
+            res();
+          });
+        });
       });
   }
 
