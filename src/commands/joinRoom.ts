@@ -20,9 +20,7 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
     process.exit();
   }
 
-  let hasUpdates = false;
   let displayLogs = false;
-  let fetchedUpdates = false;
 
   const socket = await API.RoomRequest.createSocket();
 
@@ -37,7 +35,6 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
       const fileChange = fileEventRequest.change as IFileChange;
       await FS.applyFileChange(sourceFolderPath, fileChange);
     }
-    hasUpdates ? hasUpdates : (hasUpdates = true);
     if (displayLogs) {
       Console.green(
         `File ${fileEventType}: ${path.join('.shadow', fileEventRequest.change.path)} by ${fileEventRequest.userId}`
@@ -160,8 +157,6 @@ export const joinRoomCommand = async (roomId: string, sourceFolderPath: string) 
       ])
       .then(pressed => {
         displayLogs = false;
-        hasUpdates = false;
-        fetchedUpdates = false;
       });
   }
 
